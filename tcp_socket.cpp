@@ -71,32 +71,26 @@ namespace Socket {
         }
 
         while(true) {
-            struct sockaddr * clientAddr;
+            // TODO multithreading, multiprocessing, I/O comletion
+            struct sockaddr_in clientAddr;
             int connFd;
-            pid_t pid;
             socklen_t clientAddrLen;
 
-            clientAddr = (struct sockaddr *) malloc (sizeof(struct sockaddr));
             clientAddrLen = sizeof(clientAddr);
 
-            connFd = accept(socketFd, clientAddr, &clientAddrLen);
+            logInfo("socket connecting");
+            connFd = accept(socketFd, (struct sockaddr *)&clientAddr, &clientAddrLen);
 
             if(connFd < 0) {
-                return Status::Fail;
+                throw "socket connection error";
             }
 
-            if((pid = fork()) < 0) {
-                return Status::Fail;
-            } else if(pid == 0) {
-                // child process
-                close(socketFd);
-                handler->handler(connFd);  // use handler
-                close(connFd);
-                exit(0);  // exit child process
-            }
+            // TODO IPv6
+            char clientIP[80];
+            inet_ntop(AF_INET, &clientAddr.sin_addr, clientIP, sizeof(clientIP));
 
-            // TODO: avoid zombie child process
-            // parent process
+            logInfo("socket connected from " + std::string(clientIP));
+            handler->handler(connFd);
             close(connFd);
         }
     }
