@@ -3,34 +3,57 @@
 
 #include "httpd.hpp"
 #include <map>
-
+#include <vector>
+#include <algorithm>
 
 
 namespace Http {
 
     extern const std::map<std::string, std::string> MimeType;
 
+    struct HeaderField {
+        std::string name;
+        std::string value;
+        bool isSend;
+
+        HeaderField() = delete;
+        HeaderField(const std::string&, const std::string&, const bool);
+    };
+
     class HttpHeader {
     protected:
-        std::map<std::string, bool> selectItem;
-        std::map<std::string, std::string> item;
+        std::vector<HeaderField> item;
+        HeaderField& findItem(const std::string&);
+
     public:
-        HttpHeader() = delete;
         virtual Status setItemValue(const std::string&, const std::string&);
         virtual Status assignItem(const std::string&, const bool&);
     };
 
-    class GeneralHeader final : public HttpHeader {};
+    class GeneralHeader final : public HttpHeader {
+    public:
+        GeneralHeader();
+    };
 
-    class RequestHeader final : public HttpHeader {};
+    class RequestHeader final : public HttpHeader {
+    public:
+        RequestHeader();
+    };
 
-    class ResponseHeader final : public HttpHeader {};
+    class ResponseHeader final : public HttpHeader {
+    public:
+        ResponseHeader();
+    };
 
-    class EntityHeader final : public HttpHeader {};
+    class EntityHeader final : public HttpHeader {
+    public:
+        EntityHeader();
+    };
 
     std::string getStateByCode(const unsigned short&);
     std::string getMimeTypeByExt(const std::string&);
-    std::string createHeader(GeneralHeader&, RequestHeader&, ResponseHeader&, EntityHeader&);
+    std::string createHeader(GeneralHeader&, RequestHeader&,
+                             ResponseHeader&, EntityHeader&);
     void start();
 }
 

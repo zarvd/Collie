@@ -126,4 +126,68 @@ namespace Http {
     std::string getMimeTypeByExt(const std::string& ext) {
         return MimeType.at(ext);
     }
+
+    HeaderField::HeaderField(const std::string& fName,
+                             const std::string& fValue,
+                             const bool fIsSend) : name(fName), value(fValue), isSend(fIsSend) {}
+
+    HeaderField& HttpHeader::findItem(const std::string& itemName) {
+        auto it = std::find_if(item.begin(), item.end(), [itemName](HeaderField& elem) {
+                return elem.name == itemName;
+            });
+        return *it;
+    }
+
+    GeneralHeader::GeneralHeader() {
+        item = {
+            HeaderField("Cache-Control", "", false),
+            HeaderField("Cache-Control", "", false),
+            HeaderField("Connection", "", false),
+            HeaderField("Date", "", false),
+            HeaderField("Pragma", "", false),
+            HeaderField("Trailer", "", false),
+            HeaderField("Transfer-Encoding", "", false),
+            HeaderField("Upgrade", "", false),
+            HeaderField("Via", "", false),
+            HeaderField("Warning", "", false)
+        };
+    }
+
+    RequestHeader::RequestHeader() {
+        item = {
+            HeaderField("Accept", "", false),
+            HeaderField("Accept-Charset", "", false),
+            HeaderField("Accept-Encoding", "", false),
+            HeaderField("Accept-Language", "", false),
+            HeaderField("Authorization", "", false),
+            HeaderField("Expect", "", false),
+            HeaderField("From", "", false),
+            HeaderField("Host", "", false),
+            HeaderField("If-Match", "", false),
+            HeaderField("If-Modified-Since", "", false),
+            HeaderField("If-None-Match", "", false),
+            HeaderField("If-Range", "", false),
+            HeaderField("If-Unmodified-Since", "", false),
+            HeaderField("Max-Forwards", "", false),
+            HeaderField("Proxy-Authorization", "", false),
+            HeaderField("Range", "", false),
+            HeaderField("Referer", "", false),
+            HeaderField("TE", "", false),
+            HeaderField("User-Agent", "", false),
+        };
+    }
+
+    ResponseHeader::ResponseHeader() {
+        item = {
+            HeaderField("Accept-Ranges", "", false),
+            HeaderField("Age", "", false),
+            HeaderField("ETag", "", false),
+            HeaderField("Location", "", false),
+            HeaderField("Proxy-Authenticate", "", false),
+            HeaderField("Retry-After", "", false),
+            HeaderField("Server", "", false),
+            HeaderField("Vary", "", false),
+            HeaderField("WWW-Authenticate", "", false)
+        };
+    }
 }
