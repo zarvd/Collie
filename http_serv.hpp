@@ -26,8 +26,9 @@ namespace Http {
         HeaderField& findItem(const std::string&);
 
     public:
-        virtual Status setItemValue(const std::string&, const std::string&);
-        virtual Status assignItem(const std::string&, const bool&);
+        virtual ~HttpHeader() = 0;
+        Status setItemValue(const std::string&, const std::string&);
+        Status assignItem(const std::string&, const bool&);
     };
 
     class GeneralHeader final : public HttpHeader {
