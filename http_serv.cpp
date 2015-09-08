@@ -140,54 +140,68 @@ namespace Http {
 
     GeneralHeader::GeneralHeader() {
         item = {
-            HeaderField("Cache-Control", "", false),
-            HeaderField("Cache-Control", "", false),
-            HeaderField("Connection", "", false),
-            HeaderField("Date", "", false),
-            HeaderField("Pragma", "", false),
-            HeaderField("Trailer", "", false),
-            HeaderField("Transfer-Encoding", "", false),
-            HeaderField("Upgrade", "", false),
-            HeaderField("Via", "", false),
-            HeaderField("Warning", "", false)
+            HeaderField("Cache-Control"),
+            HeaderField("Cache-Control"),
+            HeaderField("Connection"),
+            HeaderField("Date"),
+            HeaderField("Pragma"),
+            HeaderField("Trailer"),
+            HeaderField("Transfer-Encoding"),
+            HeaderField("Upgrade"),
+            HeaderField("Via"),
+            HeaderField("Warning")
         };
     }
 
     RequestHeader::RequestHeader() {
         item = {
-            HeaderField("Accept", "", false),
-            HeaderField("Accept-Charset", "", false),
-            HeaderField("Accept-Encoding", "", false),
-            HeaderField("Accept-Language", "", false),
-            HeaderField("Authorization", "", false),
-            HeaderField("Expect", "", false),
-            HeaderField("From", "", false),
-            HeaderField("Host", "", false),
-            HeaderField("If-Match", "", false),
-            HeaderField("If-Modified-Since", "", false),
-            HeaderField("If-None-Match", "", false),
-            HeaderField("If-Range", "", false),
-            HeaderField("If-Unmodified-Since", "", false),
-            HeaderField("Max-Forwards", "", false),
-            HeaderField("Proxy-Authorization", "", false),
-            HeaderField("Range", "", false),
-            HeaderField("Referer", "", false),
-            HeaderField("TE", "", false),
-            HeaderField("User-Agent", "", false),
+            HeaderField("Accept"),
+            HeaderField("Accept-Charset"),
+            HeaderField("Accept-Encoding"),
+            HeaderField("Accept-Language"),
+            HeaderField("Authorization"),
+            HeaderField("Expect"),
+            HeaderField("From"),
+            HeaderField("Host"),
+            HeaderField("If-Match"),
+            HeaderField("If-Modified-Since"),
+            HeaderField("If-None-Match"),
+            HeaderField("If-Range"),
+            HeaderField("If-Unmodified-Since"),
+            HeaderField("Max-Forwards"),
+            HeaderField("Proxy-Authorization"),
+            HeaderField("Range"),
+            HeaderField("Referer"),
+            HeaderField("TE"),
+            HeaderField("User-Agent"),
         };
     }
 
     ResponseHeader::ResponseHeader() {
         item = {
-            HeaderField("Accept-Ranges", "", false),
-            HeaderField("Age", "", false),
-            HeaderField("ETag", "", false),
-            HeaderField("Location", "", false),
-            HeaderField("Proxy-Authenticate", "", false),
-            HeaderField("Retry-After", "", false),
-            HeaderField("Server", "", false),
-            HeaderField("Vary", "", false),
-            HeaderField("WWW-Authenticate", "", false)
+            HeaderField("Accept-Ranges"),
+            HeaderField("Age"),
+            HeaderField("ETag"),
+            HeaderField("Location"),
+            HeaderField("Proxy-Authenticate"),
+            HeaderField("Retry-After"),
+            HeaderField("Server"),
+            HeaderField("Vary"),
+            HeaderField("WWW-Authenticate")
+        };
+    }
+
+    EntityHeader::EntityHeader() {
+        item = {
+            HeaderField("Allow"),
+            HeaderField("Content-Encoding"),
+            HeaderField("Content-Language"),
+            HeaderField("Content-Length"),
+            HeaderField("Content-Location"),
+            HeaderField("Content-Range"),
+            HeaderField("Content-Type"),
+            HeaderField("Expires"),
+            HeaderField("Last-Modified")
         };
     }
 }

@@ -17,7 +17,7 @@ namespace Http {
         bool isSend;
 
         HeaderField() = delete;
-        HeaderField(const std::string&, const std::string&, const bool);
+        HeaderField(const std::string&, const std::string& = "", const bool = false);
     };
 
     class HttpHeader {
