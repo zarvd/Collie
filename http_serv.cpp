@@ -2,6 +2,175 @@
 
 
 namespace Http {
+    HeaderField::HeaderField(const std::string& fName,
+                             const std::string& fValue,
+                             const bool fIsSend) : name(fName), value(fValue), isSend(fIsSend) {}
+
+    HeaderField& HttpHeader::findItem(const std::string& itemName) {
+        auto it = std::find_if(item.begin(), item.end(), [itemName](HeaderField& elem) {
+                return elem.name == itemName;
+            });
+        if(it == item.end()) {
+            throw "out of range";
+        }
+        return *it;
+    }
+
+    const HeaderField& HttpHeader::findConstItem(const std::string& itemName) const {
+        auto it = std::find_if(item.begin(), item.end(), [itemName](const HeaderField& elem) {
+                return elem.name == itemName;
+            });
+        if(it == item.end()) {
+            throw "out of range";
+        }
+        return *it;
+    }
+
+    std::string HttpHeader::getItemValue(const std::string& name) const {
+        try {
+            const HeaderField& it = findConstItem(name);
+            return it.value;
+        } catch(const std::string& error) {
+            // TODO log error
+            return "";
+        }
+    }
+
+    Status HttpHeader::setItemValue(const std::string& name, const std::string& value) {
+        try {
+            HeaderField& it = findItem(name);
+            it.value = value;
+            it.isSend = true;
+            return Status::Success;
+        } catch(const std::string& error) {
+            // TODO log error
+            return Status::Fail;
+        }
+    }
+
+    Status HttpHeader::assignItem(const std::string& name, const bool flag) {
+        try {
+            HeaderField& it = findItem(name);
+            it.isSend = flag;
+            return Status::Success;
+        } catch(const std::string& error) {
+            // TODO log error
+            return Status::Fail;
+        }
+    }
+
+    std::string HttpHeader::toString() const {
+        std::string header;
+
+        for(auto& field : item) {
+            if(field.isSend && field.value != "") {
+                header += field.name + ": " + field.value + "\n";
+            }
+        }
+        return header;
+    }
+
+    GeneralHeader::GeneralHeader() {
+        item = {
+            HeaderField("Cache-Control"),
+            HeaderField("Connection"),
+            HeaderField("Date"),
+            HeaderField("Pragma"),
+            HeaderField("Trailer"),
+            HeaderField("Transfer-Encoding"),
+            HeaderField("Upgrade"),
+            HeaderField("Via"),
+            HeaderField("Warning")
+        };
+    }
+
+    Status GeneralHeader::init() {
+        if(setItemValue("Cache-Control", "public") == Status::Fail) {
+            return Status::Fail;
+        }
+        if(setItemValue("Connection", "keep-alive") == Status::Fail) {
+            return Status::Fail;
+        }
+        if(setItemValue("Date", getCurrentDate()) == Status::Fail) {
+            return Status::Fail;
+        }
+        return Status::Success;
+    }
+
+    std::string GeneralHeader::getCurrentDate() const {
+        std::time_t nowTime = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        char now[80];
+        strftime(now, 80, "%a, %d %b %Y %H:%M:%S %Z", gmtime(&nowTime));
+        return now;
+    }
+
+    RequestHeader::RequestHeader() {
+        item = {
+            HeaderField("Accept"),
+            HeaderField("Accept-Charset"),
+            HeaderField("Accept-Encoding"),
+            HeaderField("Accept-Language"),
+            HeaderField("Authorization"),
+            HeaderField("Expect"),
+            HeaderField("From"),
+            HeaderField("Host"),
+            HeaderField("If-Match"),
+            HeaderField("If-Modified-Since"),
+            HeaderField("If-None-Match"),
+            HeaderField("If-Range"),
+            HeaderField("If-Unmodified-Since"),
+            HeaderField("Max-Forwards"),
+            HeaderField("Proxy-Authorization"),
+            HeaderField("Range"),
+            HeaderField("Referer"),
+            HeaderField("TE"),
+            HeaderField("User-Agent"),
+        };
+    }
+
+    Status RequestHeader::init() {
+        return Status::Success;
+    }
+
+    ResponseHeader::ResponseHeader() {
+        item = {
+            HeaderField("Accept-Ranges"),
+            HeaderField("Age"),
+            HeaderField("ETag"),
+            HeaderField("Location"),
+            HeaderField("Proxy-Authenticate"),
+            HeaderField("Retry-After"),
+            HeaderField("Server"),
+            HeaderField("Vary"),
+            HeaderField("WWW-Authenticate")
+        };
+    }
+
+    Status ResponseHeader::init() {
+        if(setItemValue("Server", "miniHttpd") == Status::Fail) {
+            return Status::Fail;
+        }
+        return Status::Success;
+    }
+
+    EntityHeader::EntityHeader() {
+        item = {
+            HeaderField("Allow"),
+            HeaderField("Content-Encoding"),
+            HeaderField("Content-Language"),
+            HeaderField("Content-Length"),
+            HeaderField("Content-Location"),
+            HeaderField("Content-Range"),
+            HeaderField("Content-Type"),
+            HeaderField("Expires"),
+            HeaderField("Last-Modified")
+        };
+    }
+
+    Status EntityHeader::init() {
+        return Status::Success;
+    }
+
     const std::map<std::string, std::string> MimeType = {
         {"html", "text/html"},
         {"htm", "text/html"},
@@ -123,85 +292,14 @@ namespace Http {
         }
     }
 
-    std::string getMimeTypeByExt(const std::string& ext) {
-        return MimeType.at(ext);
-    }
-
-    HeaderField::HeaderField(const std::string& fName,
-                             const std::string& fValue,
-                             const bool fIsSend) : name(fName), value(fValue), isSend(fIsSend) {}
-
-    HeaderField& HttpHeader::findItem(const std::string& itemName) {
-        auto it = std::find_if(item.begin(), item.end(), [itemName](HeaderField& elem) {
-                return elem.name == itemName;
-            });
-        return *it;
-    }
-
-    GeneralHeader::GeneralHeader() {
-        item = {
-            HeaderField("Cache-Control"),
-            HeaderField("Cache-Control"),
-            HeaderField("Connection"),
-            HeaderField("Date"),
-            HeaderField("Pragma"),
-            HeaderField("Trailer"),
-            HeaderField("Transfer-Encoding"),
-            HeaderField("Upgrade"),
-            HeaderField("Via"),
-            HeaderField("Warning")
-        };
-    }
-
-    RequestHeader::RequestHeader() {
-        item = {
-            HeaderField("Accept"),
-            HeaderField("Accept-Charset"),
-            HeaderField("Accept-Encoding"),
-            HeaderField("Accept-Language"),
-            HeaderField("Authorization"),
-            HeaderField("Expect"),
-            HeaderField("From"),
-            HeaderField("Host"),
-            HeaderField("If-Match"),
-            HeaderField("If-Modified-Since"),
-            HeaderField("If-None-Match"),
-            HeaderField("If-Range"),
-            HeaderField("If-Unmodified-Since"),
-            HeaderField("Max-Forwards"),
-            HeaderField("Proxy-Authorization"),
-            HeaderField("Range"),
-            HeaderField("Referer"),
-            HeaderField("TE"),
-            HeaderField("User-Agent"),
-        };
-    }
-
-    ResponseHeader::ResponseHeader() {
-        item = {
-            HeaderField("Accept-Ranges"),
-            HeaderField("Age"),
-            HeaderField("ETag"),
-            HeaderField("Location"),
-            HeaderField("Proxy-Authenticate"),
-            HeaderField("Retry-After"),
-            HeaderField("Server"),
-            HeaderField("Vary"),
-            HeaderField("WWW-Authenticate")
-        };
-    }
-
-    EntityHeader::EntityHeader() {
-        item = {
-            HeaderField("Allow"),
-            HeaderField("Content-Encoding"),
-            HeaderField("Content-Language"),
-            HeaderField("Content-Length"),
-            HeaderField("Content-Location"),
-            HeaderField("Content-Range"),
-            HeaderField("Content-Type"),
-            HeaderField("Expires"),
-            HeaderField("Last-Modified")
-        };
+    std::string generateHeader() {
+        std::string header = "HTTP/1.1 200 OK\n";
+        GeneralHeader genHeader;
+        ResponseHeader resHeader;
+        EntityHeader EntHeader;
+        genHeader.init();
+        resHeader.init();
+        header += genHeader.toString() + resHeader.toString();
+        return header;
     }
 }

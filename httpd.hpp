@@ -30,8 +30,6 @@ enum Status {
     Success
 };
 
-void init() {
-    LoggingHandler.init();
-}
+void initHttpServer();
 
 #endif /* HTTPD_H */

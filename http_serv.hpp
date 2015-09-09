@@ -5,6 +5,8 @@
 #include <map>
 #include <vector>
 #include <algorithm>
+#include <chrono>
+#include <ctime>
 
 
 namespace Http {
@@ -24,37 +26,53 @@ namespace Http {
     protected:
         std::vector<HeaderField> item;
         HeaderField& findItem(const std::string&);
+        const HeaderField& findConstItem(const std::string&) const;
 
     public:
-        virtual ~HttpHeader() = 0;
+        virtual ~HttpHeader() = default;
+        virtual Status init() = 0;
+        std::string toString() const;
+        std::string getItemValue(const std::string&) const;
         Status setItemValue(const std::string&, const std::string&);
-        Status assignItem(const std::string&, const bool&);
+        Status assignItem(const std::string&, const bool);
     };
 
     class GeneralHeader final : public HttpHeader {
     public:
         GeneralHeader();
+        ~GeneralHeader() = default;
+        Status init() override;
+        std::string getCurrentDate() const;
     };
 
     class RequestHeader final : public HttpHeader {
     public:
         RequestHeader();
+        ~RequestHeader() = default;
+        Status init() override;
     };
 
     class ResponseHeader final : public HttpHeader {
     public:
         ResponseHeader();
+        ~ResponseHeader() = default;
+        Status init() override;
     };
 
     class EntityHeader final : public HttpHeader {
     public:
         EntityHeader();
+        ~EntityHeader() = default;
+        Status init() override;
     };
 
+
+    inline std::string getMimeTypeByExt(const std::string& ext) {
+        return MimeType.at(ext);
+    }
+
     std::string getStateByCode(const unsigned short&);
-    std::string getMimeTypeByExt(const std::string&);
-    std::string createHeader(GeneralHeader&, RequestHeader&,
-                             ResponseHeader&, EntityHeader&);
+    std::string generateHeader();
     void start();
 }
 
