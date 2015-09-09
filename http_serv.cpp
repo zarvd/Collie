@@ -171,6 +171,21 @@ namespace Http {
         return Status::Success;
     }
 
+    Status HttpHandler::init(const unsigned int& port) {
+        LoggingHandler.init();
+        Socket::TcpSocket socket;
+        socket.init(port, IP::IPv4);
+        Socket::TcpHandler handler;
+        handler.handler = [](const int connFd) -> Status {
+            char greeting[] = "Hello, world";
+            write(connFd, greeting, sizeof(greeting));
+            return Status::Success;
+        };
+        socket.setHandler(std::make_shared<Socket::TcpHandler>(handler));
+        socket.run();
+        return Status::Success;
+    }
+
     const std::map<std::string, std::string> MimeType = {
         {"html", "text/html"},
         {"htm", "text/html"},

@@ -10,7 +10,7 @@ namespace Socket {
         return ipVersion;
     }
 
-    Status TcpSocket::init(const int& port, const IP& ipVersion) {
+    Status TcpSocket::init(const unsigned int& port, const IP& ipVersion) {
         Status st = (ipVersion == IP::IPv4) ? initIPv4(port) : initIPv6(port);
         if(st == Status::Success) {
             this->ipVersion = ipVersion;
@@ -19,7 +19,7 @@ namespace Socket {
         return st;
     }
 
-    Status TcpSocket::initIPv4(const int& port) {
+    Status TcpSocket::initIPv4(const unsigned int& port) {
         struct sockaddr_in servAddr;
 
         servAddr.sin_family = AF_INET;
@@ -28,7 +28,7 @@ namespace Socket {
 
         int listenFd;
         listenFd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-        if(listenFd) {
+        if(listenFd < 0) {
             // TODO exception handler
             return Status::Fail;
         }
@@ -51,22 +51,22 @@ namespace Socket {
         return Status::Success;
     }
 
-    Status TcpSocket::initIPv6(const int&) {
+    Status TcpSocket::initIPv6(const unsigned int&) {
         // TODO
         return Status::Fail;
     }
 
     Status TcpSocket::setHandler(std::shared_ptr<TcpHandler> handler) {
-        if(handler == nullptr || handler->handler) {
-            return Status::Fail;
-        }
+        // if(handler == nullptr || handler->handler) {
+        //     return Status::Fail;
+        // }
 
         this->handler = handler;
         return Status::Success;
     }
 
     Status TcpSocket::run() {
-        if( ! socketFd || ipVersion == IP::None || handler == nullptr) {
+        if(socketFd < 0 || ipVersion == IP::None || handler == nullptr) {
             return Status::Fail;
         }
 
@@ -82,6 +82,7 @@ namespace Socket {
             connFd = accept(socketFd, (struct sockaddr *)&clientAddr, &clientAddrLen);
 
             if(connFd < 0) {
+                logError("socket connection error");
                 throw "socket connection error";
             }
 

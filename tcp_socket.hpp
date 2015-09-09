@@ -9,19 +9,19 @@ namespace Socket {
         Status (*handler)(const int);
     };
 
-    class TcpSocket {
+    class TcpSocket final {
     public:
         TcpSocket();
         ~TcpSocket() = default;
 
         IP getIPVersion() const;
-        Status init(const int&, const IP&);
+        Status init(const unsigned int&, const IP&);
         Status run();
         Status setHandler(std::shared_ptr<TcpHandler>);
 
     private:
-        Status initIPv4(const int&);
-        Status initIPv6(const int&);
+        Status initIPv4(const unsigned int&);
+        Status initIPv6(const unsigned int&);
         IP ipVersion;  // IP version
         int socketFd;  // listening socket descriptor
         std::shared_ptr<TcpHandler> handler = nullptr;

@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include "./logging/logger.hpp"
 
+
 using Logger::LoggingHandler;
 using Logger::logInfo;
 using Logger::logDebug;

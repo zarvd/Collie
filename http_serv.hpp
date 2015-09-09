@@ -2,6 +2,7 @@
 #define HTTP_SERV_H
 
 #include "httpd.hpp"
+#include "tcp_socket.hpp"
 #include <map>
 #include <vector>
 #include <algorithm>
@@ -66,6 +67,10 @@ namespace Http {
         Status init() override;
     };
 
+    class HttpHandler final {
+    public:
+        Status init(const unsigned&);
+    };
 
     inline std::string getMimeTypeByExt(const std::string& ext) {
         return MimeType.at(ext);
