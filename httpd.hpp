@@ -18,18 +18,9 @@ using Logger::logDebug;
 using Logger::logWarning;
 using Logger::logError;
 
-enum IP {
-    // FIXME: use enum class
-    None,
-    IPv4,
-    IPv6
-};
+enum class IP {None, IPv4, IPv6};
 
-enum Status {
-    // FIXME: use enum class
-    Fail,
-    Success
-};
+enum class Status {Fail, Success};
 
 void initHttpServer();
 
