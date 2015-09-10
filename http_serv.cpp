@@ -2,189 +2,70 @@
 
 
 namespace Http {
-    HeaderField::HeaderField(const std::string& fName,
-                             const std::string& fValue,
-                             const bool fIsSend) : name(fName), value(fValue), isSend(fIsSend) {}
 
-    HeaderField& HttpHeader::findItem(const std::string& itemName) {
-        auto it = std::find_if(item.begin(), item.end(), [itemName](HeaderField& elem) {
-                return elem.name == itemName;
-            });
-        if(it == item.end()) {
-            throw "out of range";
-        }
-        return *it;
+    Header::Header(const std::string& field, const HeaderType& type) :
+        field(field), type(type) {}
+
+    bool Header::operator<(const Header& that) const {
+        return field < that.field;
     }
 
-    const HeaderField& HttpHeader::findConstItem(const std::string& itemName) const {
-        auto it = std::find_if(item.begin(), item.end(), [itemName](const HeaderField& elem) {
-                return elem.name == itemName;
-            });
-        if(it == item.end()) {
-            throw "out of range";
-        }
-        return *it;
+    bool Header::operator==(const Header& that) const {
+        return field == that.field;
     }
 
-    std::string HttpHeader::getItemValue(const std::string& name) const {
-        try {
-            const HeaderField& it = findConstItem(name);
-            return it.value;
-        } catch(const std::string& error) {
-            // TODO log error
-            return "";
-        }
-    }
+    const std::set<Header> HTTPHeader = {
 
-    Status HttpHeader::setItemValue(const std::string& name, const std::string& value) {
-        try {
-            HeaderField& it = findItem(name);
-            it.value = value;
-            it.isSend = true;
-            return Status::Success;
-        } catch(const std::string& error) {
-            // TODO log error
-            return Status::Fail;
-        }
-    }
+        Header("Cache-Control", HeaderType::GENERAL),
+        Header("Connection", HeaderType::GENERAL),
+        Header("Date", HeaderType::GENERAL),
+        Header("Pragma", HeaderType::GENERAL),
+        Header("Trailer", HeaderType::GENERAL),
+        Header("Transfer-Encoding", HeaderType::GENERAL),
+        Header("Upgrade", HeaderType::GENERAL),
+        Header("Via", HeaderType::GENERAL),
+        Header("Warning", HeaderType::GENERAL),
 
-    Status HttpHeader::assignItem(const std::string& name, const bool flag) {
-        try {
-            HeaderField& it = findItem(name);
-            it.isSend = flag;
-            return Status::Success;
-        } catch(const std::string& error) {
-            // TODO log error
-            return Status::Fail;
-        }
-    }
+        Header("Accept", HeaderType::REQ),
+        Header("Accept-Charset", HeaderType::REQ),
+        Header("Accept-Encoding", HeaderType::REQ),
+        Header("Accept-Language", HeaderType::REQ),
+        Header("Authorization", HeaderType::REQ),
+        Header("Expect", HeaderType::REQ),
+        Header("From", HeaderType::REQ),
+        Header("Host", HeaderType::REQ),
+        Header("If-Match", HeaderType::REQ),
+        Header("If-Modified-Since", HeaderType::REQ),
+        Header("If-None-Match", HeaderType::REQ),
+        Header("If-Range", HeaderType::REQ),
+        Header("If-Unmodified-Since", HeaderType::REQ),
+        Header("Max-Forwards", HeaderType::REQ),
+        Header("Proxy-Authorization", HeaderType::REQ),
+        Header("Range", HeaderType::REQ),
+        Header("Referer", HeaderType::REQ),
+        Header("TE", HeaderType::REQ),
+        Header("User-Agent", HeaderType::REQ),
 
-    std::string HttpHeader::toString() const {
-        std::string header;
+        Header("Accept-Ranges", HeaderType::RES),
+        Header("Age", HeaderType::RES),
+        Header("ETag", HeaderType::RES),
+        Header("Location", HeaderType::RES),
+        Header("Proxy-Authenticate", HeaderType::RES),
+        Header("Retry-After", HeaderType::RES),
+        Header("Server", HeaderType::RES),
+        Header("Vary", HeaderType::RES),
+        Header("WWW-Authenticate", HeaderType::RES),
 
-        for(auto& field : item) {
-            if(field.isSend && field.value != "") {
-                header += field.name + ": " + field.value + "\n";
-            }
-        }
-        return header;
-    }
-
-    GeneralHeader::GeneralHeader() {
-        item = {
-            HeaderField("Cache-Control"),
-            HeaderField("Connection"),
-            HeaderField("Date"),
-            HeaderField("Pragma"),
-            HeaderField("Trailer"),
-            HeaderField("Transfer-Encoding"),
-            HeaderField("Upgrade"),
-            HeaderField("Via"),
-            HeaderField("Warning")
-        };
-    }
-
-    Status GeneralHeader::init() {
-        if(setItemValue("Cache-Control", "public") == Status::Fail) {
-            return Status::Fail;
-        }
-        if(setItemValue("Connection", "keep-alive") == Status::Fail) {
-            return Status::Fail;
-        }
-        if(setItemValue("Date", getCurrentDate()) == Status::Fail) {
-            return Status::Fail;
-        }
-        return Status::Success;
-    }
-
-    std::string GeneralHeader::getCurrentDate() const {
-        std::time_t nowTime = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-        char now[80];
-        strftime(now, 80, "%a, %d %b %Y %H:%M:%S %Z", gmtime(&nowTime));
-        return now;
-    }
-
-    RequestHeader::RequestHeader() {
-        item = {
-            HeaderField("Accept"),
-            HeaderField("Accept-Charset"),
-            HeaderField("Accept-Encoding"),
-            HeaderField("Accept-Language"),
-            HeaderField("Authorization"),
-            HeaderField("Expect"),
-            HeaderField("From"),
-            HeaderField("Host"),
-            HeaderField("If-Match"),
-            HeaderField("If-Modified-Since"),
-            HeaderField("If-None-Match"),
-            HeaderField("If-Range"),
-            HeaderField("If-Unmodified-Since"),
-            HeaderField("Max-Forwards"),
-            HeaderField("Proxy-Authorization"),
-            HeaderField("Range"),
-            HeaderField("Referer"),
-            HeaderField("TE"),
-            HeaderField("User-Agent"),
-        };
-    }
-
-    Status RequestHeader::init() {
-        return Status::Success;
-    }
-
-    ResponseHeader::ResponseHeader() {
-        item = {
-            HeaderField("Accept-Ranges"),
-            HeaderField("Age"),
-            HeaderField("ETag"),
-            HeaderField("Location"),
-            HeaderField("Proxy-Authenticate"),
-            HeaderField("Retry-After"),
-            HeaderField("Server"),
-            HeaderField("Vary"),
-            HeaderField("WWW-Authenticate")
-        };
-    }
-
-    Status ResponseHeader::init() {
-        if(setItemValue("Server", "miniHttpd") == Status::Fail) {
-            return Status::Fail;
-        }
-        return Status::Success;
-    }
-
-    EntityHeader::EntityHeader() {
-        item = {
-            HeaderField("Allow"),
-            HeaderField("Content-Encoding"),
-            HeaderField("Content-Language"),
-            HeaderField("Content-Length"),
-            HeaderField("Content-Location"),
-            HeaderField("Content-Range"),
-            HeaderField("Content-Type"),
-            HeaderField("Expires"),
-            HeaderField("Last-Modified")
-        };
-    }
-
-    Status EntityHeader::init() {
-        return Status::Success;
-    }
-
-    Status HttpHandler::init(const unsigned int& port) {
-        LoggingHandler.init();
-        Socket::TcpSocket socket;
-        socket.init(port, IP::IPv4);
-        Socket::TcpHandler handler;
-        handler.handler = [](const int connFd) -> Status {
-            char greeting[] = "Hello, world";
-            write(connFd, greeting, sizeof(greeting));
-            return Status::Success;
-        };
-        socket.setHandler(std::make_shared<Socket::TcpHandler>(handler));
-        socket.run();
-        return Status::Success;
-    }
+        Header("Allow", HeaderType::ENTITY),
+        Header("Content-Encoding", HeaderType::ENTITY),
+        Header("Content-Language", HeaderType::ENTITY),
+        Header("Content-Length", HeaderType::ENTITY),
+        Header("Content-Location", HeaderType::ENTITY),
+        Header("Content-Range", HeaderType::ENTITY),
+        Header("Content-Type", HeaderType::ENTITY),
+        Header("Expires", HeaderType::ENTITY),
+        Header("Last-Modified", HeaderType::ENTITY)
+    };
 
     const std::map<std::string, std::string> MimeType = {
         {"html", "text/html"},
@@ -307,14 +188,36 @@ namespace Http {
         }
     }
 
-    std::string generateHeader() {
-        std::string header = "HTTP/1.1 200 OK\n";
-        GeneralHeader genHeader;
-        ResponseHeader resHeader;
-        EntityHeader EntHeader;
-        genHeader.init();
-        resHeader.init();
-        header += genHeader.toString() + resHeader.toString();
-        return header;
+    HttpHandler::HttpHandler() {
+        LoggingHandler.init();
+        logInfo("HTTP handler created");
+
+        // init tcp handler
+        tcpHandler.handler = [](const int connFd) -> Status {
+            // FIXME parse header and set route
+            char greeting[] = "Hello, world";
+            write(connFd, greeting, sizeof(greeting));
+            return Status::Success;
+        };
+    }
+
+    Status HttpHandler::init(const unsigned int& port) {
+        // Socket::TcpSocket socket;
+        tcpSocket.init(port, IP::IPv4);
+        tcpSocket.setHandler(std::make_shared<Socket::TcpHandler>(tcpHandler));
+        logInfo("HTTP handler init");
+        return Status::Success;
+    }
+
+    Status HttpHandler::run() {
+        tcpSocket.run();
+        logInfo("HTTP handler running");
+        return Status::Success;
+    }
+
+    std::set<Header> HttpHandler::parseHeader(const std::string&) const {
+    }
+
+    std::string HttpHandler::generateHeader() const {
     }
 }
