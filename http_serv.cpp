@@ -3,8 +3,7 @@
 
 namespace Http {
 
-    Header::Header(const std::string& field, const HeaderType& type) :
-        field(field), type(type) {}
+    Header::Header(const std::string& field, const HeaderType& type) : field(field), type(type) {}
 
     bool Header::operator<(const Header& that) const {
         return field < that.field;
@@ -14,57 +13,57 @@ namespace Http {
         return field == that.field;
     }
 
-    const std::set<Header> HTTPHeader = {
+    const std::map<std::string, Header> HTTPHeader = {
 
-        Header("Cache-Control", HeaderType::GENERAL),
-        Header("Connection", HeaderType::GENERAL),
-        Header("Date", HeaderType::GENERAL),
-        Header("Pragma", HeaderType::GENERAL),
-        Header("Trailer", HeaderType::GENERAL),
-        Header("Transfer-Encoding", HeaderType::GENERAL),
-        Header("Upgrade", HeaderType::GENERAL),
-        Header("Via", HeaderType::GENERAL),
-        Header("Warning", HeaderType::GENERAL),
+        {"Cache-Control", Header("Cache-Control", HeaderType::GENERAL)},
+        {"Connection", Header("Connection", HeaderType::GENERAL)},
+        {"Date", Header("Date", HeaderType::GENERAL)},
+        {"Pragma", Header("Pragma", HeaderType::GENERAL)},
+        {"Trailer", Header("Trailer", HeaderType::GENERAL)},
+        {"Transfer-Encoding", Header("Transfer-Encoding", HeaderType::GENERAL)},
+        {"Upgrade", Header("Upgrade", HeaderType::GENERAL)},
+        {"Via", Header("Via", HeaderType::GENERAL)},
+        {"Warning", Header("Warning", HeaderType::GENERAL)},
 
-        Header("Accept", HeaderType::REQ),
-        Header("Accept-Charset", HeaderType::REQ),
-        Header("Accept-Encoding", HeaderType::REQ),
-        Header("Accept-Language", HeaderType::REQ),
-        Header("Authorization", HeaderType::REQ),
-        Header("Expect", HeaderType::REQ),
-        Header("From", HeaderType::REQ),
-        Header("Host", HeaderType::REQ),
-        Header("If-Match", HeaderType::REQ),
-        Header("If-Modified-Since", HeaderType::REQ),
-        Header("If-None-Match", HeaderType::REQ),
-        Header("If-Range", HeaderType::REQ),
-        Header("If-Unmodified-Since", HeaderType::REQ),
-        Header("Max-Forwards", HeaderType::REQ),
-        Header("Proxy-Authorization", HeaderType::REQ),
-        Header("Range", HeaderType::REQ),
-        Header("Referer", HeaderType::REQ),
-        Header("TE", HeaderType::REQ),
-        Header("User-Agent", HeaderType::REQ),
+        {"Accept", Header("Accept", HeaderType::REQ)},
+        {"Accept-Charset", Header("Accept-Charset", HeaderType::REQ)},
+        {"Accept-Encoding", Header("Accept-Encoding", HeaderType::REQ)},
+        {"Accept-Language", Header("Accept-Language", HeaderType::REQ)},
+        {"Authorization", Header("Authorization", HeaderType::REQ)},
+        {"Expect", Header("Expect", HeaderType::REQ)},
+        {"From", Header("From", HeaderType::REQ)},
+        {"Host", Header("Host", HeaderType::REQ)},
+        {"If-Match", Header("If-Match", HeaderType::REQ)},
+        {"If-Modified-Since", Header("If-Modified-Since", HeaderType::REQ)},
+        {"If-None-Match", Header("If-None-Match", HeaderType::REQ)},
+        {"If-Range", Header("If-Range", HeaderType::REQ)},
+        {"If-Unmodified-Since", Header("If-Unmodified-Since", HeaderType::REQ)},
+        {"Max-Forwards", Header("Max-Forwards", HeaderType::REQ)},
+        {"Proxy-Authorization", Header("Proxy-Authorization", HeaderType::REQ)},
+        {"Range", Header("Range", HeaderType::REQ)},
+        {"Referer", Header("Referer", HeaderType::REQ)},
+        {"TE", Header("TE", HeaderType::REQ)},
+        {"User-Agent", Header("User-Agent", HeaderType::REQ)},
 
-        Header("Accept-Ranges", HeaderType::RES),
-        Header("Age", HeaderType::RES),
-        Header("ETag", HeaderType::RES),
-        Header("Location", HeaderType::RES),
-        Header("Proxy-Authenticate", HeaderType::RES),
-        Header("Retry-After", HeaderType::RES),
-        Header("Server", HeaderType::RES),
-        Header("Vary", HeaderType::RES),
-        Header("WWW-Authenticate", HeaderType::RES),
+        {"Accept-Ranges", Header("Accept-Ranges", HeaderType::RES)},
+        {"Age", Header("Age", HeaderType::RES)},
+        {"ETag", Header("ETag", HeaderType::RES)},
+        {"Location", Header("Location", HeaderType::RES)},
+        {"Proxy-Authenticate", Header("Proxy-Authenticate", HeaderType::RES)},
+        {"Retry-After", Header("Retry-After", HeaderType::RES)},
+        {"Server", Header("Server", HeaderType::RES)},
+        {"Vary", Header("Vary", HeaderType::RES)},
+        {"WWW-Authenticate", Header("WWW-Authenticate", HeaderType::RES)},
 
-        Header("Allow", HeaderType::ENTITY),
-        Header("Content-Encoding", HeaderType::ENTITY),
-        Header("Content-Language", HeaderType::ENTITY),
-        Header("Content-Length", HeaderType::ENTITY),
-        Header("Content-Location", HeaderType::ENTITY),
-        Header("Content-Range", HeaderType::ENTITY),
-        Header("Content-Type", HeaderType::ENTITY),
-        Header("Expires", HeaderType::ENTITY),
-        Header("Last-Modified", HeaderType::ENTITY)
+        {"Allow", Header("Allow", HeaderType::ENTITY)},
+        {"Content-Encoding", Header("Content-Encoding", HeaderType::ENTITY)},
+        {"Content-Language", Header("Content-Language", HeaderType::ENTITY)},
+        {"Content-Length", Header("Content-Length", HeaderType::ENTITY)},
+        {"Content-Location", Header("Content-Location", HeaderType::ENTITY)},
+        {"Content-Range", Header("Content-Range", HeaderType::ENTITY)},
+        {"Content-Type", Header("Content-Type", HeaderType::ENTITY)},
+        {"Expires", Header("Expires", HeaderType::ENTITY)},
+        {"Last-Modified", Header("Last-Modified", HeaderType::ENTITY)}
     };
 
     const std::map<std::string, std::string> MimeType = {
@@ -215,7 +214,26 @@ namespace Http {
         return Status::Success;
     }
 
-    std::set<Header> HttpHandler::parseHeader(const std::string&) const {
+    std::set<Header> HttpHandler::parseHeader(const std::string& str) const {
+        std::stringstream in(str);
+        std::set<Header> headers;
+        std::string line;
+        while(std::getline(in, line)) {
+            const std::size_t foundPos = line.find(':');
+            if(foundPos != std::string::npos) {
+                std::string field = line.substr(0, foundPos);
+                Header header;
+                try {
+                    header = HTTPHeader.at(field);
+                } catch(std::exception& err) {
+                    logError("Unknow header field: " + field);
+                }
+                std::string content = trim(line.substr(foundPos + 1));
+                header.content = content;
+                headers.insert(header);
+            }
+        }
+        return headers;
     }
 
     std::string HttpHandler::generateHeader() const {

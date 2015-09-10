@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <chrono>
 #include <ctime>
+#include <sstream>
 
 
 namespace Http {
@@ -20,14 +21,16 @@ namespace Http {
         std::string field;
         std::string content;
         HeaderType type;
-        Header() = delete;
+        Header() = default;
         ~Header() = default;
         Header(const std::string&, const HeaderType&);
         bool operator<(const Header&) const;
         bool operator==(const Header&) const;
+        bool operator<(const std::string&) const;
+        bool operator==(const std::string&) const;
     };
 
-    extern const std::set<Header> HTTPHeader;
+    extern const std::map<std::string, Header> HTTPHeader;
 
     // Request body
     struct Request {
