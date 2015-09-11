@@ -194,8 +194,17 @@ namespace Http {
         // init tcp handler
         tcpHandler.handler = [](const int connFd) -> Status {
             // FIXME parse header and set route
-            char greeting[] = "Hello, world";
-            write(connFd, greeting, sizeof(greeting));
+            // BUG readline and detective if it is a new request
+            char header[300];
+            while(recv(connFd, header, 300, 0) != -1) {
+                Request req = parseHeader(header);
+                char greeting[] =
+                    "HTTP/1.1 200 OK\n"
+                    "Content-Type: text/html\n"
+                    "\n"
+                    "<h1>Hello, world</h1>";
+                send(connFd, greeting, sizeof(greeting), 0);  // BUG
+            }
             return Status::Success;
         };
     }
@@ -214,28 +223,41 @@ namespace Http {
         return Status::Success;
     }
 
-    std::set<Header> HttpHandler::parseHeader(const std::string& str) const {
+    Request parseHeader(const std::string& str) {
+        std::cout << str << std::endl;
         std::stringstream in(str);
-        std::set<Header> headers;
+        Request req;
         std::string line;
+        std::getline(in, line);  // get url, method and httpVersion
+        auto head = split(line, ' ');
+        if(head.size() != 3) {
+            std::string err("Unknow header field: " + line);
+            logError(err);
+            throw std::length_error(err);
+        }
+        req.method = getMethod(head[0]);
+        req.url = head[1];
+        req.httpVersion = head[2];
+
         while(std::getline(in, line)) {
+            removeSpace(line);
             const std::size_t foundPos = line.find(':');
             if(foundPos != std::string::npos) {
                 std::string field = line.substr(0, foundPos);
-                Header header;
-                try {
-                    header = HTTPHeader.at(field);
-                } catch(std::exception& err) {
-                    logError("Unknow header field: " + field);
-                }
-                std::string content = trim(line.substr(foundPos + 1));
-                header.content = content;
-                headers.insert(header);
+                // Should it ignore unknown header fields?
+                // try {
+                //     HTTPHeader.at(field);
+                // } catch(std::out_of_range& err) {
+                //     logError("Unknow header field: " + field);
+                // }
+                std::string content = line.substr(foundPos + 1);
+                req.header[field] = content;
             }
         }
-        return headers;
+        return req;
     }
 
     std::string HttpHandler::generateHeader() const {
+        return "";
     }
 }

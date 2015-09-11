@@ -17,17 +17,42 @@ namespace Http {
     enum class Method {POST, GET, HEAD, PUT, NONE};
     enum class HeaderType {RES, REQ, ENTITY, GENERAL};
 
+    inline Method getMethod(const std::string& str) {
+        if(str == "GET") {
+            return Method::GET;
+        } else if(str == "POST") {
+            return Method::POST;
+        } else if(str == "PUT") {
+            return Method::PUT;
+        } else if(str == "HEAD") {
+            return Method::HEAD;
+        } else {
+            return Method::NONE;
+        }
+    }
+
+    inline std::string getMethod(const Method& method) {
+        if(method == Method::GET) {
+            return "GET";
+        } else if(method == Method::POST) {
+            return "POST";
+        } else if(method == Method::PUT) {
+            return "PUT";
+        } else if(method == Method::HEAD) {
+            return "HEAD";
+        } else {
+            return "";
+        }
+    }
+
     struct Header {
         std::string field;
-        std::string content;
         HeaderType type;
-        Header() = default;
+        Header() = delete;
         ~Header() = default;
         Header(const std::string&, const HeaderType&);
         bool operator<(const Header&) const;
         bool operator==(const Header&) const;
-        bool operator<(const std::string&) const;
-        bool operator==(const std::string&) const;
     };
 
     extern const std::map<std::string, Header> HTTPHeader;
@@ -39,8 +64,8 @@ namespace Http {
         std::string url;
         std::string httpVersion;
 
-        Request() = delete;
-        explicit Request(const std::string&, const Method&);
+        Request() = default;
+        // explicit Request(const std::string&, const Method&);
     };
 
     extern const std::map<std::string, std::string> MimeType;
@@ -73,10 +98,10 @@ namespace Http {
         HttpHandler();
         Status init(const unsigned&);
         Status run();
-        std::set<Header> parseHeader(const std::string&) const;
         std::string generateHeader() const;
     };
 
+    Request parseHeader(const std::string&);
 }
 
 #endif /* HTTP_SERV_H */

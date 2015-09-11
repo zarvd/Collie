@@ -30,19 +30,23 @@ namespace Socket {
         listenFd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
         if(listenFd < 0) {
             // TODO exception handler
+            logError("Socket failed in creating");
             return Status::Fail;
         }
 
         if(bind(listenFd, (struct sockaddr *)&servAddr, sizeof(servAddr)) < 0) {
+            logError("Socket failed in binding");
             return Status::Fail;
         }
 
         if(listen(listenFd, SOMAXCONN) < 0) {
+            logError("Socket failed in listening");
             return Status::Fail;
         }
 
         if(socketFd && close(socketFd)) {
             // close a existed socket
+            logError("Socket already created");
             return Status::Fail;
         }
 
@@ -93,6 +97,7 @@ namespace Socket {
             logInfo("socket connected from " + std::string(clientIP));
             handler->handler(connFd);
             close(connFd);
+            logInfo("socket connection closed");
         }
     }
 }
