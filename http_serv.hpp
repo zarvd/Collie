@@ -84,8 +84,10 @@ namespace Http {
 
     std::string getStateByCode(const unsigned short&);
 
+    class HttpHandler;
+
     // Request Handler
-    typedef Status (*RequestHandler)(Request&);
+    typedef Status (*RequestHandler)(HttpHandler&, Request&);
 
     class HttpHandler final {
     private:

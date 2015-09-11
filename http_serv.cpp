@@ -195,15 +195,21 @@ namespace Http {
         tcpHandler.handler = [](const int connFd) -> Status {
             // FIXME parse header and set route
             // BUG readline and detective if it is a new request
-            char header[300];
-            while(recv(connFd, header, 300, 0) != -1) {
-                Request req = parseHeader(header);
+            char header[3000];
+            recv(connFd, header, 3000, 0);
+            Request req = parseHeader(header);
+            if(req.url == "/" && req.method == Method::GET) {
                 char greeting[] =
                     "HTTP/1.1 200 OK\n"
                     "Content-Type: text/html\n"
+                    "Server: miniHttpd\n"
                     "\n"
                     "<h1>Hello, world</h1>";
-                send(connFd, greeting, sizeof(greeting), 0);  // BUG
+                send(connFd, greeting, sizeof(greeting), 0);
+            } else {
+                char response[] =
+                "HTTP/1.1 404 Not Found\n";
+                send(connFd, response, sizeof(response), 0);
             }
             return Status::Success;
         };

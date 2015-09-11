@@ -27,6 +27,7 @@ namespace Socket {
         servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
 
         int listenFd;
+        // FIXME close socket when recv terminal singal
         listenFd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
         if(listenFd < 0) {
             // TODO exception handler
