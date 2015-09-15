@@ -187,12 +187,18 @@ namespace Http {
         }
     }
 
-    HttpHandler::HttpHandler() {
+    HttpHandler::HttpHandler() :
+        tcpSocket(nullptr),
+        tcpHandler(new Socket::TcpHandler) {
+
         LoggingHandler.init();
         logInfo("HTTP handler created");
+        setDefaultTCPHandler();
+    }
 
-        // init tcp handler
-        tcpHandler.handler = [](const int connFd) -> Status {
+    void HttpHandler::setDefaultTCPHandler() {
+        // init default tcp handler
+        tcpHandler->handler = [](const int connFd) -> Status {
             // FIXME parse header and set route
             // BUG readline and detective if it is a new request
             char header[3000];
@@ -208,29 +214,47 @@ namespace Http {
                 send(connFd, greeting, sizeof(greeting), 0);
             } else {
                 char response[] =
-                "HTTP/1.1 404 Not Found\n";
+                "HTTP/1.1 404 Not Found\n"
+                "\n"
+                "<h1>404 Not Found</h1>";
                 send(connFd, response, sizeof(response), 0);
             }
             return Status::Success;
         };
     }
 
+    /**
+     * Initialize a HTTP handler before it runs
+     */
     Status HttpHandler::init(const unsigned int& port) {
-        // Socket::TcpSocket socket;
-        tcpSocket.init(port, IP::IPv4);
-        tcpSocket.setHandler(std::make_shared<Socket::TcpHandler>(tcpHandler));
-        logInfo("HTTP handler init");
-        return Status::Success;
+        logInfo("HTTP handler trying to init");
+        try {
+            tcpSocket = std::unique_ptr<Socket::TcpSocket>(new Socket::TcpSocket);
+            tcpSocket->init(port, IP::IPv4);
+            tcpSocket->setHandler(tcpHandler);
+            logInfo("HTTP handler inited");
+            return Status::Success;
+        } catch(const std::exception& err) {
+            logError("HTTP handler fail to init");
+            logError(err.what());
+            return Status::Fail;
+        }
     }
 
-    Status HttpHandler::run() {
-        tcpSocket.run();
-        logInfo("HTTP handler running");
-        return Status::Success;
+    /**
+     *
+     */
+    void HttpHandler::run() {
+        try {
+            tcpSocket->run();
+            logInfo("HTTP handler running");
+        } catch(const std::exception& err) {
+            logError("HTTP handler fail to run");
+            logError(err.what());
+        }
     }
 
     Request parseHeader(const std::string& str) {
-        std::cout << str << std::endl;
         std::stringstream in(str);
         Request req;
         std::string line;
@@ -238,11 +262,10 @@ namespace Http {
         auto head = split(line, ' ');
         if(head.size() != 3) {
             std::string err("Unknow header field: " + line);
-            logError(err);
             throw std::length_error(err);
         }
         req.method = getMethod(head[0]);
-        req.url = head[1];
+        req.url = head[1];  // TODO split GET data
         req.httpVersion = head[2];
 
         while(std::getline(in, line)) {
@@ -250,12 +273,6 @@ namespace Http {
             const std::size_t foundPos = line.find(':');
             if(foundPos != std::string::npos) {
                 std::string field = line.substr(0, foundPos);
-                // Should it ignore unknown header fields?
-                // try {
-                //     HTTPHeader.at(field);
-                // } catch(std::out_of_range& err) {
-                //     logError("Unknow header field: " + field);
-                // }
                 std::string content = line.substr(foundPos + 1);
                 req.header[field] = content;
             }

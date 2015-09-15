@@ -6,6 +6,12 @@ namespace Socket {
         socketFd = 0;
     }
 
+    TcpSocket::~TcpSocket() {
+        if(socketFd > 2) {
+            close(socketFd);
+        }
+    }
+
     inline IP TcpSocket::getIPVersion() const {
         return ipVersion;
     }
@@ -31,23 +37,23 @@ namespace Socket {
         listenFd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
         if(listenFd < 0) {
             // TODO exception handler
-            logError("Socket failed in creating");
+            throw std::runtime_error("Socket failed in creating");
             return Status::Fail;
         }
 
         if(bind(listenFd, (struct sockaddr *)&servAddr, sizeof(servAddr)) < 0) {
-            logError("Socket failed in binding");
+            throw std::runtime_error("Socket failed in binding");
             return Status::Fail;
         }
 
         if(listen(listenFd, SOMAXCONN) < 0) {
-            logError("Socket failed in listening");
+            throw std::runtime_error("Socket failed in listening");
             return Status::Fail;
         }
 
         if(socketFd && close(socketFd)) {
             // close a existed socket
-            logError("Socket already created");
+            throw std::logic_error("Socket already created");
             return Status::Fail;
         }
 
@@ -87,8 +93,7 @@ namespace Socket {
             connFd = accept(socketFd, (struct sockaddr *)&clientAddr, &clientAddrLen);
 
             if(connFd < 0) {
-                logError("socket connection error");
-                throw "socket connection error";
+                throw std::runtime_error("socket connection error");
             }
 
             // TODO IPv6

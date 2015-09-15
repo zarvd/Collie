@@ -12,7 +12,7 @@ namespace Socket {
     class TcpSocket final {
     public:
         TcpSocket();
-        ~TcpSocket() = default;
+        ~TcpSocket();
 
         IP getIPVersion() const;
         Status init(const unsigned int&, const IP&);

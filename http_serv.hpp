@@ -5,6 +5,7 @@
 #include "tcp_socket.hpp"
 #include <map>
 #include <set>
+#include <tuple>
 #include <vector>
 #include <algorithm>
 #include <chrono>
@@ -84,22 +85,48 @@ namespace Http {
 
     std::string getStateByCode(const unsigned short&);
 
-    class HttpHandler;
+
+    class RequestHandler {
+    public:
+        virtual ~RequestHandler() = 0;
+        virtual void get() const {
+            throw std::logic_error("undeclared method: GET");
+        }
+        virtual void post() const {
+            throw std::logic_error("undeclared method: POST");
+        }
+        virtual void head() const {
+            throw std::logic_error("undeclared method: HEAD");
+        }
+        virtual void put() const {
+            throw std::logic_error("undeclared method: PUT");
+        }
+    protected:
+        const std::map<std::string, std::string> cookies;
+        const std::map<Method, std::map<std::string, std::string> > data;
+        // const std::map<std::string, std::string> getData;
+        // const std::map<std::string, std::string> postData;
+        // virtual std::string getCookie(const std::string&) const final;
+    private:
+    };
+
+    // class HttpHandler;
 
     // Request Handler
-    typedef Status (*RequestHandler)(HttpHandler&, Request&);
+    // typedef Status (*RequestHandler)(HttpHandler&, Request&);
 
     class HttpHandler final {
     private:
-        Socket::TcpSocket tcpSocket;
+        std::unique_ptr<Socket::TcpSocket> tcpSocket;
 
     public:
-        std::map<std::string, RequestHandler> router;
-        Socket::TcpHandler tcpHandler;
+        std::map<std::string, std::unique_ptr<RequestHandler> > router;
+        std::shared_ptr<Socket::TcpHandler> tcpHandler;
 
         HttpHandler();
         Status init(const unsigned&);
-        Status run();
+        void run();
+        void setDefaultTCPHandler();
         std::string generateHeader() const;
     };
 
