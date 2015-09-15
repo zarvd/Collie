@@ -18,7 +18,7 @@
 using Logger::LoggingHandler;
 using Logger::logInfo;
 using Logger::logDebug;
-using Logger::logWarning;
+using Logger::logWarn;
 using Logger::logError;
 
 enum class IP {None, IPv4, IPv6};
