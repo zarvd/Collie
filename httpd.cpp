@@ -1,6 +1,11 @@
 #include "httpd.hpp"
 
 
-void initHttpServer() {
+void initLogging() {
+    LoggingHandler.setLogFile("httpd.log");
     LoggingHandler.init();
+}
+
+void initHttpd() {
+    initLogging();
 }

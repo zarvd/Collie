@@ -1,7 +1,8 @@
 #include "tcp_socket.hpp"
 
 namespace Socket {
-    TcpSocket::TcpSocket() {
+    TcpSocket::TcpSocket() :
+        handler(nullptr) {
         ipVersion = IP::None;
         socketFd = 0;
     }
@@ -16,7 +17,7 @@ namespace Socket {
         return ipVersion;
     }
 
-    Status TcpSocket::init(const unsigned int& port, const IP& ipVersion) {
+    Status TcpSocket::init(const unsigned& port, const IP& ipVersion) {
         Status st = (ipVersion == IP::IPv4) ? initIPv4(port) : initIPv6(port);
         if(st == Status::Success) {
             this->ipVersion = ipVersion;
@@ -25,36 +26,32 @@ namespace Socket {
         return st;
     }
 
-    Status TcpSocket::initIPv4(const unsigned int& port) {
+    Status TcpSocket::initIPv4(const unsigned& port) {
         struct sockaddr_in servAddr;
 
         servAddr.sin_family = AF_INET;
         servAddr.sin_port = htons(port);
         servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
 
-        int listenFd;
-        // FIXME close socket when recv terminal singal
+        int listenFd, err;
         listenFd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
         if(listenFd < 0) {
-            // TODO exception handler
             throw std::runtime_error("Socket failed in creating");
-            return Status::Fail;
         }
 
-        if(bind(listenFd, (struct sockaddr *)&servAddr, sizeof(servAddr)) < 0) {
+        err = bind(listenFd, (struct sockaddr *)&servAddr, sizeof(servAddr));
+        if(err < 0) {
             throw std::runtime_error("Socket failed in binding");
-            return Status::Fail;
         }
 
-        if(listen(listenFd, SOMAXCONN) < 0) {
+        err = listen(listenFd, SOMAXCONN);
+        if(err) {
             throw std::runtime_error("Socket failed in listening");
-            return Status::Fail;
         }
 
         if(socketFd && close(socketFd)) {
             // close a existed socket
             throw std::logic_error("Socket already created");
-            return Status::Fail;
         }
 
         socketFd = listenFd;
@@ -68,9 +65,9 @@ namespace Socket {
     }
 
     Status TcpSocket::setHandler(std::shared_ptr<TcpHandler> handler) {
-        // if(handler == nullptr || handler->handler) {
-        //     return Status::Fail;
-        // }
+        if( ! handler || ! handler->handler) {
+            return Status::Fail;
+        }
 
         this->handler = handler;
         return Status::Success;
@@ -89,7 +86,7 @@ namespace Socket {
 
             clientAddrLen = sizeof(clientAddr);
 
-            logInfo("socket connecting");
+            Log(logLevel::Info) << "socket connecting";
             connFd = accept(socketFd, (struct sockaddr *)&clientAddr, &clientAddrLen);
 
             if(connFd < 0) {
@@ -100,10 +97,10 @@ namespace Socket {
             char clientIP[80];
             inet_ntop(AF_INET, &clientAddr.sin_addr, clientIP, sizeof(clientIP));
 
-            logInfo("socket connected from " + std::string(clientIP));
+            Log(logLevel::Info) << "socket connected from " + std::string(clientIP);
             handler->handler(connFd);
             close(connFd);
-            logInfo("socket connection closed");
+            Log(logLevel::Info) << "socket connection closed";
         }
     }
 }

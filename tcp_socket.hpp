@@ -15,16 +15,16 @@ namespace Socket {
         ~TcpSocket();
 
         IP getIPVersion() const;
-        Status init(const unsigned int&, const IP&);
+        Status init(const unsigned&, const IP&);
         Status run();
         Status setHandler(std::shared_ptr<TcpHandler>);
 
     private:
-        Status initIPv4(const unsigned int&);
-        Status initIPv6(const unsigned int&);
+        Status initIPv4(const unsigned&);
+        Status initIPv6(const unsigned&);
         IP ipVersion;  // IP version
         int socketFd;  // listening socket descriptor
-        std::shared_ptr<TcpHandler> handler = nullptr;
+        std::shared_ptr<TcpHandler> handler;
     };
 }
 

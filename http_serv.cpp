@@ -192,7 +192,7 @@ namespace Http {
         tcpHandler(new Socket::TcpHandler) {
 
         LoggingHandler.init();
-        logInfo("HTTP handler created");
+        Log(logLevel::Info) << "HTTP handler created";
         setDefaultTCPHandler();
     }
 
@@ -227,16 +227,16 @@ namespace Http {
      * Initialize a HTTP handler before it runs
      */
     Status HttpHandler::init(const unsigned int& port) {
-        logInfo("HTTP handler trying to init");
+        Log(logLevel::Info) << "HTTP handler trying to init";
         try {
             tcpSocket = std::unique_ptr<Socket::TcpSocket>(new Socket::TcpSocket);
             tcpSocket->init(port, IP::IPv4);
             tcpSocket->setHandler(tcpHandler);
-            logInfo("HTTP handler inited");
+            Log(logLevel::Info) << "HTTP handler inited";
             return Status::Success;
         } catch(const std::exception& err) {
-            logError("HTTP handler fail to init");
-            logError(err.what());
+            Log(logLevel::Error) << "HTTP handler fail to init";
+            Log(logLevel::Error) << err.what();
             return Status::Fail;
         }
     }
@@ -247,10 +247,10 @@ namespace Http {
     void HttpHandler::run() {
         try {
             tcpSocket->run();
-            logInfo("HTTP handler running");
+            Log(logLevel::Info) << "HTTP handler running";
         } catch(const std::exception& err) {
-            logError("HTTP handler fail to run");
-            logError(err.what());
+            Log(logLevel::Error) << "HTTP handler fail to run";
+            Log(logLevel::Error) << err.what();
         }
     }
 
@@ -259,7 +259,7 @@ namespace Http {
         Request req;
         std::string line;
         std::getline(in, line);  // get url, method and httpVersion
-        auto head = split(line, ' ');
+        auto head = StringHelper::split(line, ' ');
         if(head.size() != 3) {
             std::string err("Unknow header field: " + line);
             throw std::length_error(err);
@@ -269,7 +269,7 @@ namespace Http {
         req.httpVersion = head[2];
 
         while(std::getline(in, line)) {
-            removeSpace(line);
+            StringHelper::removeSpace(line);
             const std::size_t foundPos = line.find(':');
             if(foundPos != std::string::npos) {
                 std::string field = line.substr(0, foundPos);
