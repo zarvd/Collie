@@ -121,7 +121,7 @@ namespace Http {
 
     public:
         std::map<std::string, std::unique_ptr<RequestHandler> > router;
-        std::shared_ptr<Socket::TcpHandler> tcpHandler;
+        Socket::TcpSocket::Handler tcpHandler;
 
         HttpHandler();
         Status init(const unsigned&);

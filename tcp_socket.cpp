@@ -2,7 +2,7 @@
 
 namespace Socket {
     TcpSocket::TcpSocket() :
-        handler(nullptr) {
+        connectHandler(nullptr) {
         ipVersion = IP::None;
         socketFd = 0;
     }
@@ -64,17 +64,17 @@ namespace Socket {
         return Status::Fail;
     }
 
-    Status TcpSocket::setHandler(std::shared_ptr<TcpHandler> handler) {
-        if( ! handler || ! handler->handler) {
+    Status TcpSocket::setConnectHandler(Handler handler) {
+        if( ! handler) {
             return Status::Fail;
         }
 
-        this->handler = handler;
+        this->connectHandler = handler;
         return Status::Success;
     }
 
     Status TcpSocket::run() {
-        if(socketFd < 0 || ipVersion == IP::None || handler == nullptr) {
+        if(socketFd < 0 || ipVersion == IP::None || connectHandler == nullptr) {
             return Status::Fail;
         }
 
@@ -98,7 +98,7 @@ namespace Socket {
             inet_ntop(AF_INET, &clientAddr.sin_addr, clientIP, sizeof(clientIP));
 
             Log(logLevel::Info) << "socket connected from " + std::string(clientIP);
-            handler->handler(connFd);
+            connectHandler(connFd);
             close(connFd);
             Log(logLevel::Info) << "socket connection closed";
         }

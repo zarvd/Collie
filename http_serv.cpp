@@ -189,7 +189,7 @@ namespace Http {
 
     HttpHandler::HttpHandler() :
         tcpSocket(nullptr),
-        tcpHandler(new Socket::TcpHandler) {
+        tcpHandler(nullptr) {
 
         LoggingHandler.init();
         Log(logLevel::Info) << "HTTP handler created";
@@ -198,7 +198,7 @@ namespace Http {
 
     void HttpHandler::setDefaultTCPHandler() {
         // init default tcp handler
-        tcpHandler->handler = [](const int connFd) -> Status {
+        tcpHandler = [](const int& connFd) -> void {
             // FIXME parse header and set route
             // BUG readline and detective if it is a new request
             char header[3000];
@@ -219,7 +219,6 @@ namespace Http {
                 "<h1>404 Not Found</h1>";
                 send(connFd, response, sizeof(response), 0);
             }
-            return Status::Success;
         };
     }
 
@@ -231,7 +230,7 @@ namespace Http {
         try {
             tcpSocket = std::unique_ptr<Socket::TcpSocket>(new Socket::TcpSocket);
             tcpSocket->init(port, IP::IPv4);
-            tcpSocket->setHandler(tcpHandler);
+            tcpSocket->setConnectHandler(tcpHandler);
             Log(logLevel::Info) << "HTTP handler inited";
             return Status::Success;
         } catch(const std::exception& err) {

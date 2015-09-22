@@ -5,26 +5,23 @@
 
 
 namespace Socket {
-    struct TcpHandler {
-        Status (*handler)(const int);
-    };
-
     class TcpSocket final {
     public:
+        typedef void (*Handler)(const int& connFd);
         TcpSocket();
         ~TcpSocket();
 
         IP getIPVersion() const;
         Status init(const unsigned&, const IP&);
         Status run();
-        Status setHandler(std::shared_ptr<TcpHandler>);
+        Status setConnectHandler(Handler);
 
     private:
         Status initIPv4(const unsigned&);
         Status initIPv6(const unsigned&);
         IP ipVersion;  // IP version
         int socketFd;  // listening socket descriptor
-        std::shared_ptr<TcpHandler> handler;
+        Handler connectHandler;
     };
 }
 
