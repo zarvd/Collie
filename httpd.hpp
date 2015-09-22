@@ -12,7 +12,7 @@
 #include <unistd.h>
 #include <exception>
 #include <vector>
-#include "./logging/logger.hpp"
+#include "logging/Logger.hpp"
 
 
 using Logger::LoggingHandler;
