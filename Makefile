@@ -9,14 +9,16 @@ TEST = test
 
 all: main
 
-logger.o:
-	$(CC) $(FLAG) -c ./logging/logger.cpp
+Logger.o:
+	make -C logging prod
+	cp logging/prod/Logger.o ./
 
 $(OBJS):
 	$(CC) $(FLAG) -c $(addsuffix .cpp, $(basename $@))
 
-main: $(OBJS) logger.o
-	$(CC) $(FLAG) $(OBJS) logger.o -lm -o $(MAIN)
+main: $(OBJS) Logger.o
+	$(CC) $(FLAG) $(OBJS) Logger.o -lm -o $(MAIN)
 
 clean:
-	rm *.o $(MAIN)
+	make -C logging clean
+	-rm *.o $(MAIN)
