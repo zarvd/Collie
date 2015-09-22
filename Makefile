@@ -1,29 +1,22 @@
-CC=clang++
-FLAG=-Wall -std=c++11 -g -O0 -pthread
-MAIN=main
-TEST=test
+CC = clang++
+CFLAGS = -Wall -std=c++11 -g -O0 -pthread
+SRCS = $(wildcard *.cpp)
+OBJS=$(SRCS:.cpp=.o)
+MAIN = main
+TEST = test
 
 .PHONY: all test clean
 
-all: main test
+all: main
 
 logger.o:
-	$(CC) $(FLAG) -c ./logging/logger.cpp
+	$(CC) $(CFLAGS) -c ./logging/logger.cpp
 
-http_serv.o:
-	$(CC) $(FLAG) -c http_serv.cpp
+$(OBJS):
+	$(CC) $(CFLAGS) -c $(addsuffix .cpp, $(basename $@))
 
-tcp_socket.o:
-	$(CC) $(FLAG) -c tcp_socket.cpp
-
-httpd.o:
-	$(CC) $(FLAG) -c httpd.cpp
-
-main.o:
-	$(CC) $(FLAG) -c main.cpp
-
-main: main.o logger.o http_serv.o tcp_socket.o httpd.o
-	$(CC) $(FLAG) http_serv.o httpd.o tcp_socket.o logger.o main.o -lm -o $(MAIN)
+main: $(OBJS) logger.o
+	$(CC) $(CFLAGS) $(OBJS) logger.o -lm -o $(MAIN)
 
 clean:
 	rm *.o $(MAIN)

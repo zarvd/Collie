@@ -19,10 +19,10 @@ using Logger::LoggingHandler;
 using logLevel = Logger::Level;
 
 enum class IP {None, IPv4, IPv6};
-
 enum class Status {Fail, Success};
 
 void initHttpd();
+
 
 namespace StringHelper {
     // remove all spaces form string

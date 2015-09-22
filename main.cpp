@@ -1,7 +1,7 @@
-#include "http_serv.hpp"
+#include "HttpHandler.hpp"
 
 
-int main(int argc, char *argv[]) {
+int main(void) {
     Http::HttpHandler http;
     http.init(8080);
     http.run();
