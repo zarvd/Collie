@@ -18,12 +18,14 @@ namespace Socket {
     }
 
     Status TcpSocket::init(const unsigned& port, const IP& ipVersion) {
-        Status st = (ipVersion == IP::IPv4) ? initIPv4(port) : initIPv6(port);
-        if(st == Status::Success) {
+        Status status = (ipVersion == IP::IPv4) ? initIPv4(port) : initIPv6(port);
+        if(status == Status::Success) {
             this->ipVersion = ipVersion;
+        } else {
+            Log(logLevel::Warn) << "TcpSocket init error";
         }
 
-        return st;
+        return status;
     }
 
     Status TcpSocket::initIPv4(const unsigned& port) {
