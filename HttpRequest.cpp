@@ -2,18 +2,25 @@
 
 
 namespace Http {
+    HttpRequest::HttpRequest() :
+        method(Method::NONE),
+        url(),
+        httpVersion() {}
+
     HttpRequest HttpRequest::parse(const std::string& str) {
         std::stringstream in(str);
         HttpRequest req;
         std::string line;
+
         std::getline(in, line);  // get url, method and httpVersion
+
         auto head = StringHelper::split(line, ' ');
         if(head.size() != 3) {
-            std::string err("Unknow header field: " + line);
-            throw std::length_error(err);
+            Log(logLevel::Warn) << "Unknow header field: " << line;
+            return req;
         }
         req.method = getMethod(head[0]);
-        req.url = head[1];  // TODO split GET data
+        req.url = head[1];
         req.httpVersion = head[2];
 
         while(std::getline(in, line)) {

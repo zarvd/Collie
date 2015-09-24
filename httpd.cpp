@@ -2,6 +2,8 @@
 
 
 void initLogging() {
+    LoggingHandler.setFlushFrequency(1);
+    LoggingHandler.setLogLevel(logLevel::Info);
     LoggingHandler.setLogFile("httpd.log");
     LoggingHandler.init();
 }

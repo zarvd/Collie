@@ -3,15 +3,21 @@
 
 #include <iostream>
 #include <algorithm>
+
 #include <string>
-#include <memory>
+#include <vector>
+
 #include <thread>
+#include <memory>
+#include <exception>
+#include <functional>
+
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-#include <exception>
-#include <vector>
+#include <sys/epoll.h>
+
 #include "logging/Logger.hpp"
 
 

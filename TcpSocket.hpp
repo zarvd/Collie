@@ -7,7 +7,7 @@
 namespace Socket {
     class TcpSocket final {
     public:
-        typedef void (*Handler)(const int& connFd);
+        typedef std::function<void(const int&)> Handler;
         TcpSocket();
         ~TcpSocket();
 
@@ -20,7 +20,7 @@ namespace Socket {
         Status initIPv4(const unsigned&);
         Status initIPv6(const unsigned&);
         IP ipVersion;  // IP version
-        int socketFd;  // listening socket descriptor
+        int listenFd;  // listening socket descriptor
         Handler connectHandler;
     };
 }

@@ -6,8 +6,7 @@ namespace Http {
         tcpSocket(nullptr),
         tcpHandler(nullptr) {
 
-        LoggingHandler.init();
-        Log(logLevel::Info) << "HTTP handler created";
+        Log(logLevel::Debug) << "HTTP handler created";
         setDefaultTCPHandler();
     }
 
@@ -41,12 +40,12 @@ namespace Http {
      * Initialize a HTTP handler before it runs
      */
     Status HttpHandler::init(const unsigned int& port) {
-        Log(logLevel::Info) << "HTTP handler trying to init";
+        Log(logLevel::Debug) << "HTTP handler trying to init";
         try {
             tcpSocket = std::unique_ptr<Socket::TcpSocket>(new Socket::TcpSocket);
             tcpSocket->init(port, IP::IPv4);
             tcpSocket->setConnectHandler(tcpHandler);
-            Log(logLevel::Info) << "HTTP handler inited";
+            Log(logLevel::Debug) << "HTTP handler inited";
             return Status::Success;
         } catch(const std::exception& err) {
             Log(logLevel::Error) << "HTTP handler fail to init";
@@ -60,8 +59,8 @@ namespace Http {
      */
     void HttpHandler::run() {
         try {
+            Log(logLevel::Debug) << "HTTP handler running";
             tcpSocket->run();
-            Log(logLevel::Info) << "HTTP handler running";
         } catch(const std::exception& err) {
             Log(logLevel::Error) << "HTTP handler fail to run";
             Log(logLevel::Error) << err.what();

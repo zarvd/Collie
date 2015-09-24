@@ -12,7 +12,7 @@ namespace Http {
         std::string url;
         std::string httpVersion;
 
-        HttpRequest() = default;
+        HttpRequest();
         static HttpRequest parse(const std::string&);
     };
 }
