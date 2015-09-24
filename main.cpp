@@ -3,10 +3,7 @@
 
 int main(int argc, char *argv[]) {
     try {
-        LoggingHandler.setFlushFrequency(1);
-        LoggingHandler.setLogLevel(logLevel::Debug);
-        LoggingHandler.setLogFile("httpd.log");
-        LoggingHandler.init();
+        initHttpd();
         unsigned port = 8080;
         if(argc == 2) {
             port = atoi(argv[1]);

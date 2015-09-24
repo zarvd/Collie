@@ -5,6 +5,7 @@ namespace Socket {
     TcpSocket::TcpSocket() :
         ipVersion(IP::None),
         listenFd(0),
+        port(0),
         connectHandler(nullptr) {}
 
     TcpSocket::~TcpSocket() {
@@ -13,13 +14,18 @@ namespace Socket {
         }
     }
 
-    inline IP TcpSocket::getIPVersion() const {
+    IP TcpSocket::getIPVersion() const {
         return ipVersion;
+    }
+
+    unsigned TcpSocket::getPort() const {
+        return port;
     }
 
     Status TcpSocket::init(const unsigned& port, const IP& ipVersion) {
         Status status = (ipVersion == IP::IPv4) ? initIPv4(port) : initIPv6(port);
         if(status == Status::Success) {
+            this->port = port;
             this->ipVersion = ipVersion;
         } else {
             Log(logLevel::Warn) << "TcpSocket init error";

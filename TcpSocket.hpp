@@ -11,16 +11,20 @@ namespace Socket {
         TcpSocket();
         ~TcpSocket();
 
-        IP getIPVersion() const;
         Status init(const unsigned&, const IP&);
         Status run();
+
         Status setConnectHandler(Handler);
+
+        IP getIPVersion() const;
+        unsigned getPort() const;
 
     private:
         Status initIPv4(const unsigned&);
         Status initIPv6(const unsigned&);
         IP ipVersion;  // IP version
         int listenFd;  // listening socket descriptor
+        unsigned port;
         Handler connectHandler;
     };
 }

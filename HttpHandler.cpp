@@ -59,7 +59,7 @@ namespace Http {
      */
     void HttpHandler::run() {
         try {
-            Log(logLevel::Debug) << "HTTP handler running";
+            Log(logLevel::Info) << "HTTP Server running on port " << tcpSocket->getPort();
             tcpSocket->run();
         } catch(const std::exception& err) {
             Log(logLevel::Error) << "HTTP handler fail to run";
