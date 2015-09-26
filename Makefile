@@ -19,15 +19,15 @@ $(OBJS):
 	$(CC) $(FLAG) -c $(addsuffix .cpp, $(basename $@))
 
 $(HTTP_OBJS):
-	cd http
-	$(CC) $(FLAG) -c $(addsuffix .cpp, $(basename $@))
-	ld -r $(OBJS_WITH_NO_TEST) -o ./HTTP_LIB.o
-	cd ..
-	cp http/HTTP_LIB.o ./
+	$(CC) $(FLAG) -c $(addsuffix .cpp, $(basename $@)) -o $@
 
-main: $(OBJS) Logger.o
-	$(CC) $(FLAG) $(OBJS) HTTP_LIB.o Logger.o -lm -o $(MAIN)
+Http.o: $(HTTP_OBJS)
+	ld -r $(HTTP_OBJS) -o ./Http.o
+
+main: $(OBJS) Http.o Logger.o
+	$(CC) $(FLAG) $(OBJS) Http.o Logger.o -lm -o $(MAIN)
 
 clean:
 	make -C logging clean
 	-rm *.o $(MAIN)
+	-rm http/*.o
