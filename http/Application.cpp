@@ -1,8 +1,8 @@
-#include "HttpHandler.hpp"
+#include "Application.hpp"
 
 
 namespace Http {
-    HttpHandler::HttpHandler() :
+    Application::Application() :
         tcpSocket(nullptr),
         tcpHandler(nullptr) {
 
@@ -10,36 +10,47 @@ namespace Http {
         setDefaultTCPHandler();
     }
 
-    void HttpHandler::setDefaultTCPHandler() {
+    void Application::setDefaultTCPHandler() {
         // init default tcp handler
-        tcpHandler = [](const int& connFd) -> void {
+        tcpHandler = [this](const int& connFd) -> void {
             // FIXME parse header and set route
             // BUG readline and detective if it is a new request
+            // TODO maximum header size
             char header[3000];
             recv(connFd, header, 3000, 0);
-            HttpRequest req = HttpRequest::parse(header);
-            if(req.url == "/" && req.method == Method::GET) {
-                char greeting[] =
-                    "HTTP/1.1 200 OK\n"
-                    "Content-Type: text/html\n"
-                    "Server: miniHttpd\n"
-                    "\n"
-                    "<h1>Hello, world</h1>";
-                send(connFd, greeting, sizeof(greeting), 0);
+            Request req = Request::parse(header);
+
+            RequestHandler handler;
+            auto it = router.find({req.url, req.method});
+            if(it != router.end()) {
+                handler = it->second;
+                handler(req);
             } else {
+                // no router rule
+                // response 404
                 char response[] =
                 "HTTP/1.1 404 Not Found\n"
                 "\n"
                 "<h1>404 Not Found</h1>";
                 send(connFd, response, sizeof(response), 0);
             }
+            // if(req.url == "/" && req.method == Method::GET) {
+            //     char greeting[] =
+            //         "HTTP/1.1 200 OK\n"
+            //         "Content-Type: text/html\n"
+            //         "Server: miniHttpd\n"
+            //         "\n"
+            //         "<h1>Hello, world</h1>";
+            //     send(connFd, greeting, sizeof(greeting), 0);
+            // } else {
+            // }
         };
     }
 
     /**
      * Initialize a HTTP handler before it runs
      */
-    Status HttpHandler::init(const unsigned int& port) {
+    Status Application::init(const unsigned int& port) {
         Log(logLevel::Debug) << "HTTP handler trying to init";
         try {
             tcpSocket = std::unique_ptr<Socket::TcpSocket>(new Socket::TcpSocket);
@@ -57,7 +68,7 @@ namespace Http {
     /**
      *
      */
-    void HttpHandler::run() {
+    void Application::run() {
         try {
             Log(logLevel::Info) << "HTTP Server running on port " << tcpSocket->getPort();
             tcpSocket->run();
@@ -67,7 +78,7 @@ namespace Http {
         }
     }
 
-    std::string HttpHandler::generateHeader() const {
+    std::string Application::generateHeader() const {
         return "";
     }
 }

@@ -20,12 +20,14 @@ namespace Socket {
         unsigned getPort() const;
 
     private:
-        Status initIPv4(const unsigned&);
-        Status initIPv6(const unsigned&);
         IP ipVersion;  // IP version
         int listenFd;  // listening socket descriptor
         unsigned port;
+
         Handler connectHandler;
+
+        Status initIPv4(const unsigned&);
+        Status initIPv6(const unsigned&);
     };
 }
 

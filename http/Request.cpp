@@ -1,15 +1,15 @@
-#include "HttpRequest.hpp"
+#include "Request.hpp"
 
 
 namespace Http {
-    HttpRequest::HttpRequest() :
+    Request::Request() :
         method(Method::NONE),
         url(),
         httpVersion() {}
 
-    HttpRequest HttpRequest::parse(const std::string& str) {
+    Request Request::parse(const std::string& str) {
         std::stringstream in(str);
-        HttpRequest req;
+        Request req;
         std::string line;
 
         std::getline(in, line);  // get url, method and httpVersion

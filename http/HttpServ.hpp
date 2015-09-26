@@ -1,7 +1,8 @@
 #ifndef HTTP_SERV_H
 #define HTTP_SERV_H
 
-#include "TcpSocket.hpp"
+#include "../httpd.hpp"
+#include "../TcpSocket.hpp"
 #include <map>
 #include <set>
 #include <tuple>

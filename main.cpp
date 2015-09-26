@@ -1,4 +1,4 @@
-#include "HttpHandler.hpp"
+#include "http/Application.hpp"
 
 
 int main(int argc, char *argv[]) {
@@ -8,7 +8,7 @@ int main(int argc, char *argv[]) {
         if(argc == 2) {
             port = atoi(argv[1]);
         }
-        Http::HttpHandler http;
+        Http::Application http;
         http.init(port);
         http.run();
     } catch(const std::exception& err) {

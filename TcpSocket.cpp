@@ -79,14 +79,15 @@ namespace Socket {
             return Status::Fail;
         }
 
+        Log(logLevel::Debug) << "TcpSocket running";
 
         while(true) {
+            // client detail
             struct sockaddr_in clientAddr;
             socklen_t clientAddrLen;
             clientAddrLen = sizeof(clientAddr);
 
             int connFd;
-            Log(logLevel::Debug) << "TcpSocket running";
             connFd = accept(listenFd, (struct sockaddr *)&clientAddr, &clientAddrLen);
 
             if(connFd < 0) {
@@ -94,11 +95,14 @@ namespace Socket {
             }
 
             // TODO IPv6
+            // get client ip
             char clientIP[80];
             inet_ntop(AF_INET, &clientAddr.sin_addr, clientIP, sizeof(clientIP));
 
             Log(logLevel::Info) << "TcpSocket connected from " + std::string(clientIP);
+
             connectHandler(connFd);
+
             close(connFd);
             Log(logLevel::Debug) << "TcpSocket connection closed";
         }
