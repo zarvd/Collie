@@ -20,11 +20,8 @@ namespace Http {
             recv(connFd, header, 3000, 0);
             Request req = Request::parse(header);
 
-            RequestHandler handler;
             auto it = router.find({req.url, req.method});
             if(it != router.end()) {
-                handler = it->second;
-                handler(req);
             } else {
                 // no router rule
                 // response 404
@@ -34,16 +31,6 @@ namespace Http {
                 "<h1>404 Not Found</h1>";
                 send(connFd, response, sizeof(response), 0);
             }
-            // if(req.url == "/" && req.method == Method::GET) {
-            //     char greeting[] =
-            //         "HTTP/1.1 200 OK\n"
-            //         "Content-Type: text/html\n"
-            //         "Server: miniHttpd\n"
-            //         "\n"
-            //         "<h1>Hello, world</h1>";
-            //     send(connFd, greeting, sizeof(greeting), 0);
-            // } else {
-            // }
         };
     }
 

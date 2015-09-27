@@ -24,6 +24,9 @@
 using Logger::LoggingHandler;
 using logLevel = Logger::Level;
 
+typedef const std::string& constStrRef;
+typedef const std::string constStr;
+
 enum class IP {None, IPv4, IPv6};
 enum class Status {Fail, Success};
 
