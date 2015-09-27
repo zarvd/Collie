@@ -2,13 +2,14 @@
 #define HTTP_REQUEST_HANDLER_HPP
 
 #include "HttpServ.hpp"
+#include "Request.hpp"
 #include "Response.hpp"
 
 
 namespace Http {
     class RequestHandler {
     public:
-        virtual ~RequestHandler();
+        virtual ~RequestHandler() = 0;
         virtual Response get();
         virtual Response post();
         virtual Response put();
@@ -16,10 +17,13 @@ namespace Http {
 
     protected:
         unsigned connFd;
+        const Request req;
 
-        Response response(const std::string&);
-        Response view(const std::string&);
-        Response sendError(const unsigned&, const std::string&);
+        Response redirect(const std::string&) const;
+        Response content(const std::string&) const;
+        Response view(const std::string&) const;
+        Response sendFile(const std::string&) const;
+        Response response(const unsigned&, const std::string&) const;
 
         friend class Handler;
     };

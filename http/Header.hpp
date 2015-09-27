@@ -5,19 +5,18 @@
 
 
 namespace Http {
-    struct Header {
-        std::string field;
-        HeaderType type;
+    namespace Header {
+        extern const std::map<std::string, HeaderType> HEADER;
 
-        Header() = delete;
-        ~Header() = default;
-        Header(const std::string&, const HeaderType&);
-
-        bool operator<(const Header&) const;
-        bool operator==(const Header&) const;
-    };
-
-    extern const std::map<std::string, Header> HTTPHeader;
+        inline std::string generateHeader(const std::map<std::string, std::string>& header) {
+            std::string str;
+            for(const auto& it : header) {
+                str += it.first + ":" + it.second + "\n";
+            }
+            str += "\n";
+            return str;
+        }
+    }
 }
 
 #endif /* HTTP_HEADER_H */
