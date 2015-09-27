@@ -17,7 +17,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <sys/epoll.h>
-
+#include <sstream>
 #include "logging/Logger.hpp"
 
 
@@ -61,20 +61,31 @@ namespace StringHelper {
         return str.substr(begin + 1, end - begin + 1);
     }
 
-    // split string into vector of string by a char
-    inline std::vector<std::string> split(const std::string& str, const char& sym) {
-        unsigned short begin;
-        begin = 0;
-        std::vector<std::string> vec;
-        for(std::size_t idx = 0; idx < str.length(); ++ idx) {
-            const char& curChar = str[idx];
-            if(curChar == sym) {
-                vec.push_back(trim(str.substr(begin, idx - begin)));
-                begin = idx;
-            }
+    inline std::vector<std::string>& split(const std::string& s, const char& delim, std::vector<std::string>& elems) {
+        std::stringstream ss(s);
+        std::string item;
+        while (std::getline(ss, item, delim)) {
+            if(item != "")
+                elems.push_back(item);
         }
-        vec.push_back(trim(str.substr(begin)));
-        return vec;
+        return elems;
+    }
+
+    inline std::vector<std::string> split(const std::string& s, const char& delim) {
+        std::vector<std::string> elems;
+        split(s, delim, elems);
+        return elems;
+    }
+
+    inline std::string join(const std::vector<std::string>& v, const char& c) {
+        std::stringstream ss;
+        for(size_t i = 0; i < v.size(); ++i)
+        {
+            if(i != 0) ss << c;
+            ss << v[i];
+        }
+        std::string s = ss.str();
+        return s;
     }
 }
 
