@@ -1,25 +1,22 @@
 #ifndef HTTP_STATIC_FILE_HANDLER_H
 #define HTTP_STATIC_FILE_HANDLER_H
 
-#include "../httpd.hpp"
+#include "HttpServ.hpp"
 #include "Request.hpp"
 #include "Utility.hpp"
-#include <cstring>
+#include "Response.hpp"
 
 
 namespace Http {
     class StaticFileHandler final {
     public:
-        StaticFileHandler(const std::string&,
-                          const std::string&,
-                          const unsigned&);
+        StaticFileHandler(const std::string&, const std::string&);
         ~StaticFileHandler();
 
-        void view(const Request&);
+        Response view(const Request&);
         std::string renderDirPage(const std::string&, const std::string&) const;
 
     private:
-        const unsigned connFd;
         const std::string baseDir;
         const std::string baseUrl;
     };

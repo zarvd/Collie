@@ -20,19 +20,12 @@ namespace Http {
             recv(connFd, header, 8192, 0);
             Request req = Request::parse(header);
 
-            // auto it = router.find({req.url, req.method});
-            // if(it != router.end()) {
-            StaticFileHandler staticHandler("./", "/", connFd);
-            staticHandler.view(req);
-            // } else {
-            // no router rule
-            // response 404
-            // char response[] =
-            // "HTTP/1.1 404 Not Found\n"
-            // "\n"
-            // "<h1>404 Not Found</h1>";
-            // send(connFd, response, sizeof(response), 0);
-            // }
+            StaticFileHandler staticHandler("./", "/");
+            Response res = staticHandler.view(req);
+
+            char page[res.get().length() + 1];
+            std::strcpy(page, res.get().c_str());
+            send(connFd, page, sizeof(page), 0);
         };
     }
 
