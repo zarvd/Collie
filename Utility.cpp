@@ -1,7 +1,7 @@
 #include "Utility.hpp"
 
-namespace Utility {
 
+namespace Utility {
     std::string getAbsolutePath(const std::string& baseUrl, const std::string& absoluteUrl, const std::string& baseDir) {
         std::string relativeUrl, absoluteDir;
         auto baseUrlVec = StringHelper::split(baseUrl, '/');

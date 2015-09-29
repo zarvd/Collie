@@ -2,9 +2,15 @@
 #define UTILITY_H
 
 
-#include "../httpd.hpp"
-#include <dirent.h>
 #include <set>
+#include <string>
+
+#include <exception>
+
+#include <dirent.h>
+#include <sys/stat.h>
+
+#include "StringHelper.hpp"
 
 
 namespace Utility {

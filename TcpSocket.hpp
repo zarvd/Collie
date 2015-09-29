@@ -1,6 +1,10 @@
 #ifndef SOCKET_H
 #define SOCKET_H
 
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
 #include "httpd.hpp"
 
 

@@ -2,9 +2,11 @@
 #define APPLICATION_H
 
 #include <cstring>
+
 #include "HttpServ.hpp"
 #include "Request.hpp"
 #include "StaticFileHandler.hpp"
+#include "../TcpSocket.hpp"
 
 
 namespace Http {

@@ -1,20 +1,16 @@
 #ifndef HTTP_SERV_H
 #define HTTP_SERV_H
 
-#include "../httpd.hpp"
-#include "../TcpSocket.hpp"
 #include <map>
-#include <set>
-#include <tuple>
-#include <vector>
-#include <algorithm>
+
 #include <chrono>
 #include <ctime>
-#include <sstream>
+
+#include "../httpd.hpp"
+#include "../Utility.hpp"
 
 
 namespace Http {
-
     extern const std::map<std::string, std::string> MimeType;
     enum class Method {POST, GET, HEAD, PUT, NONE};
     enum class HeaderType {RES, REQ, ENTITY, GENERAL};
