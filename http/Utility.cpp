@@ -2,7 +2,7 @@
 
 namespace Utility {
 
-    std::string getAbsoluteDir(const std::string& baseUrl, const std::string& absoluteUrl, const std::string& baseDir) {
+    std::string getAbsolutePath(const std::string& baseUrl, const std::string& absoluteUrl, const std::string& baseDir) {
         std::string relativeUrl, absoluteDir;
         auto baseUrlVec = StringHelper::split(baseUrl, '/');
         auto absoluteUrlVec = StringHelper::split(absoluteUrl, '/');

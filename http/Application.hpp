@@ -3,6 +3,7 @@
 
 #include "HttpServ.hpp"
 #include "Request.hpp"
+#include "StaticFileHandler.hpp"
 
 
 namespace Http {

@@ -4,6 +4,7 @@
 #include "../httpd.hpp"
 #include "Request.hpp"
 #include "Utility.hpp"
+#include <cstring>
 
 
 namespace Http {
@@ -15,7 +16,7 @@ namespace Http {
         ~StaticFileHandler();
 
         void view(const Request&);
-        std::string renderDirPage(const std::string&) const;
+        std::string renderDirPage(const std::string&, const std::string&) const;
 
     private:
         const unsigned connFd;

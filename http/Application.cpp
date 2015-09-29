@@ -16,21 +16,23 @@ namespace Http {
             // FIXME parse header and set route
             // BUG readline and detective if it is a new request
             // TODO maximum header size
-            char header[3000];
-            recv(connFd, header, 3000, 0);
+            char header[8192];
+            recv(connFd, header, 8192, 0);
             Request req = Request::parse(header);
 
-            auto it = router.find({req.url, req.method});
-            if(it != router.end()) {
-            } else {
-                // no router rule
-                // response 404
-                char response[] =
-                "HTTP/1.1 404 Not Found\n"
-                "\n"
-                "<h1>404 Not Found</h1>";
-                send(connFd, response, sizeof(response), 0);
-            }
+            // auto it = router.find({req.url, req.method});
+            // if(it != router.end()) {
+            StaticFileHandler staticHandler("./", "/", connFd);
+            staticHandler.view(req);
+            // } else {
+            // no router rule
+            // response 404
+            // char response[] =
+            // "HTTP/1.1 404 Not Found\n"
+            // "\n"
+            // "<h1>404 Not Found</h1>";
+            // send(connFd, response, sizeof(response), 0);
+            // }
         };
     }
 
