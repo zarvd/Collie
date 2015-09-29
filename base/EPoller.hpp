@@ -21,18 +21,22 @@ public:
     };
 
     EPoller();
+    explicit EPoller(const unsigned&);
     ~EPoller();
 
     Status create();
-    void insert(const int&, const EventType&, eventHandler&);
-    void remove();
-    void modify();
+    Status insert(const int&, const EventType&, const eventHandler&);
+    Status modify(const int&, const EventType&, const eventHandler&);
+    Status remove(const int&);
+    void loop(const unsigned& timeout = -1);
 
     const unsigned MaxEvent;
+
 private:
+    bool isCreated;
+    bool isLooping;
     int epollFd;
-    Event event;
-    Event * eventQueue;
+    std::map<int, eventHandler> handlers;
 };
 
 
