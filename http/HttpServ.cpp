@@ -53,7 +53,7 @@ namespace Http {
         {"ttf", "application/x-font-ttf"}
     };
 
-    std::string getStateByCode(const unsigned short& code) {
+    std::string getStatusByCode(const unsigned short& code) {
         switch(code) {
         case 100: return "Continue";
         case 101: return "Switching Protocols";

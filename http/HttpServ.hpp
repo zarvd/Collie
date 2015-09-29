@@ -51,7 +51,7 @@ namespace Http {
         return now;
     }
 
-    std::string getStateByCode(const unsigned short&);
+    std::string getStatusByCode(const unsigned short&);
 }
 
 #endif /* HTTP_SERV_H */
