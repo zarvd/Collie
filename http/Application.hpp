@@ -6,7 +6,7 @@
 #include "HttpServ.hpp"
 #include "Request.hpp"
 #include "StaticFileHandler.hpp"
-#include "../TcpSocket.hpp"
+#include "../base/TcpSocket.hpp"
 
 
 namespace Http {
