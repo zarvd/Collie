@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
         http.init(port);
         http.run();
     } catch(const std::exception& err) {
-        Log(logLevel::Error) << err.what();
+        Log(ERROR) << err.what();
     }
     return 0;
 }

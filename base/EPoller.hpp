@@ -1,30 +1,28 @@
 #ifndef EPOLLER_H
 #define EPOLLER_H
 
-
+#include <sys/epoll.h>
 #include "../httpd.hpp"
-#include "sys/epoll.h"
 
+
+enum EventType {
+    Read = EPOLLIN,
+    Write = EPOLLOUT,
+    Error = EPOLLERR,
+    Close = EPOLLHUP,
+    OngShot = EPOLLONESHOT,
+    EdgeTriggered = EPOLLET,
+    Priority = EPOLLPRI
+};
 
 class EPoller {
 public:
     typedef struct epoll_event Event;
     typedef std::function<void(int)> eventHandler;
-    enum EventType {
-        In = EPOLLIN,
-        Out = EPOLLOUT,
-        Error = EPOLLERR,
-        HangUp = EPOLLHUP,
-        OngShot = EPOLLONESHOT,
-        EdgeTriggered = EPOLLET,
-        Priority = EPOLLPRI
-    };
-
     EPoller();
     explicit EPoller(const unsigned&);
     ~EPoller();
 
-    Status create();
     Status insert(const int&, const EventType&, const eventHandler&);
     Status modify(const int&, const EventType&, const eventHandler&);
     Status remove(const int&);
@@ -33,8 +31,8 @@ public:
     const unsigned MaxEvent;
 
 private:
-    bool isCreated;
-    bool isLooping;
+    Status create();
+
     int epollFd;
     std::map<int, eventHandler> handlers;
 };

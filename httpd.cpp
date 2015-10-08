@@ -3,7 +3,7 @@
 
 void initLogging() {
     LoggingHandler.setFlushFrequency(1);
-    LoggingHandler.setLogLevel(logLevel::Info);
+    LoggingHandler.setLogLevel(INFO);
     LoggingHandler.setLogFile("httpd.log");
     LoggingHandler.init();
 }

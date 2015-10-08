@@ -16,7 +16,7 @@ namespace Http {
             const std::string body = renderDirPage(req.url, path);
             return Response(body);
         } else {
-            Log(logLevel::Warn) << path << " is not directory";
+            Log(WARN) << path << " is not directory";
             return Response(404);
         }
     }

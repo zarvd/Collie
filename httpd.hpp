@@ -5,13 +5,16 @@
 
 
 using Logger::LoggingHandler;
-using logLevel = Logger::Level;
+using Logger::Level::DEBUG;
+using Logger::Level::INFO;
+using Logger::Level::WARN;
+using Logger::Level::ERROR;
 
 typedef const std::string& constStrRef;
 typedef const std::string constStr;
 
-enum class IP {None, IPv4, IPv6};
-enum class Status {Fail, Success};
+enum class IP {NONE, IPv4, IPv6};
+enum class Status {FAIL, SUCCESS};
 
 void initHttpd();
 

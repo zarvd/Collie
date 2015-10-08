@@ -16,7 +16,7 @@ namespace Http {
 
         auto head = StringHelper::split(line, ' ');
         if(head.size() != 3) {
-            Log(logLevel::Warn) << "Unknow header field: " << line;
+            Log(WARN) << "Unknow header field: " << line;
             return req;
         }
         req.method = getMethod(head[0]);

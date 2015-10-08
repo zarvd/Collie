@@ -3,7 +3,7 @@
 
 namespace Socket {
     TcpSocket::TcpSocket() :
-        ipVersion(IP::None),
+        ipVersion(IP::NONE),
         listenFd(0),
         port(0),
         connectHandler(nullptr) {}
@@ -24,11 +24,11 @@ namespace Socket {
 
     Status TcpSocket::init(const unsigned& port, const IP& ipVersion) {
         Status status = (ipVersion == IP::IPv4) ? initIPv4(port) : initIPv6(port);
-        if(status == Status::Success) {
+        if(status == Status::SUCCESS) {
             this->port = port;
             this->ipVersion = ipVersion;
         } else {
-            Log(logLevel::Warn) << "TcpSocket init error";
+            Log(WARN) << "TcpSocket init error";
         }
 
         return status;
@@ -57,29 +57,29 @@ namespace Socket {
             throw std::runtime_error("Socket failed in listening");
         }
 
-        return Status::Success;
+        return Status::SUCCESS;
     }
 
     Status TcpSocket::initIPv6(const unsigned int&) {
         // TODO
-        return Status::Fail;
+        return Status::FAIL;
     }
 
     Status TcpSocket::setConnectHandler(Handler handler) {
         if( ! handler) {
-            return Status::Fail;
+            return Status::FAIL;
         }
 
         this->connectHandler = handler;
-        return Status::Success;
+        return Status::SUCCESS;
     }
 
     Status TcpSocket::run() {
-        if(listenFd < 0 || ipVersion == IP::None || connectHandler == nullptr) {
-            return Status::Fail;
+        if(listenFd < 0 || ipVersion == IP::NONE || connectHandler == nullptr) {
+            return Status::FAIL;
         }
 
-        Log(logLevel::Debug) << "TcpSocket running";
+        Log(DEBUG) << "TcpSocket running";
 
         while(true) {
             // client detail
@@ -99,12 +99,12 @@ namespace Socket {
             char clientIP[80];
             inet_ntop(AF_INET, &clientAddr.sin_addr, clientIP, sizeof(clientIP));
 
-            Log(logLevel::Info) << "TcpSocket connected from " + std::string(clientIP);
+            Log(INFO) << "TcpSocket connected from " + std::string(clientIP);
 
             connectHandler(connFd);
 
             close(connFd);
-            Log(logLevel::Debug) << "TcpSocket connection closed";
+            Log(DEBUG) << "TcpSocket connection closed";
         }
     }
 }
