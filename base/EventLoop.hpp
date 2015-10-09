@@ -7,11 +7,14 @@
 #include "EPoller.hpp"
 
 
+namespace MiniHttp { namespace Base {
+
+
 class EventLoop {
 public:
     EventLoop();
-    EventLoop(const EventLoop&) = delete;
-    EventLoop& operator=(const EventLoop&) = delete;
+    EventLoop(const EventLoop &) = delete;
+    EventLoop & operator=(const EventLoop &) = delete;
     ~EventLoop();
     void loop();
     void updateChannel(std::shared_ptr<Channel>);
@@ -25,5 +28,7 @@ private:
     ChannelList channelList;
     bool isLooping;
 };
+
+}}
 
 #endif /* EVENTLOOP_H */

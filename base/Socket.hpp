@@ -22,6 +22,9 @@ public:
     int getFd() const {
         return fd;
     }
+    int getPort() const {
+        return port;
+    }
     static int socket(const unsigned& port);
     void listen() const;
     int accept(std::shared_ptr<SocketAddress>) const;

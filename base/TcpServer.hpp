@@ -6,7 +6,7 @@
 
 namespace MiniHttp { namespace Base {
 
-class Accepter;
+class Acceptor;
 
 class EventLoop;
 
@@ -19,7 +19,7 @@ public:
     TcpServer & operator=(const TcpServer &) = delete;
     ~TcpServer();
 
-    void listen(const unsigned & port);
+    void listen();
     void start();
     void setConnectCallback(ConnectCallback & cb) {
         connectCallback = cb;
@@ -27,8 +27,8 @@ public:
     unsigned getPort() const { return port; }
 
 private:
-    unsigned port;
-    std::unique_ptr<Accepter> accepter;
+    const unsigned port;
+    std::unique_ptr<Acceptor> acceptor;
     std::shared_ptr<EventLoop> eventLoop;
     ConnectCallback connectCallback;
 };
