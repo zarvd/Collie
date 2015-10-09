@@ -18,15 +18,18 @@ enum EventType {
 class EPoller {
 public:
     typedef struct epoll_event Event;
-    typedef std::function<void(int)> eventHandler;
+
     EPoller();
     explicit EPoller(const unsigned&);
+    EPoller(const EPoller&) = delete;
+    EPoller& operator=(const EPoller&) = delete;
     ~EPoller();
 
-    Status insert(const int&, const EventType&, const eventHandler&);
-    Status modify(const int&, const EventType&, const eventHandler&);
+    Status insert(const int&, const int&);
+    Status modify(const int&, const int&);
     Status remove(const int&);
-    void loop(const unsigned& timeout = -1);
+    void wait(const unsigned& timeout = -1);
+    std::shared_ptr<Event> getEvents() const;
 
     const unsigned MaxEvent;
 
@@ -34,7 +37,8 @@ private:
     Status create();
 
     int epollFd;
-    std::map<int, eventHandler> handlers;
+    std::shared_ptr<Event> eventQueue;
+    int eventNum;
 };
 
 

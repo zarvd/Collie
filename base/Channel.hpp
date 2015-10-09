@@ -7,8 +7,8 @@
 
 class EventLoop;
 
-class Channel final {
- public:
+class Channel {
+public:
     typedef std::function<void()> EventCallback;
 
     Channel(std::shared_ptr<EventLoop>, const int&);
@@ -35,7 +35,7 @@ class Channel final {
     bool isWrite() const { return events & EventType::Write; }
     void remove();
 
- private:
+private:
     void update();
 
     const int fd;  // file descriptor

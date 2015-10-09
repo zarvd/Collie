@@ -2,8 +2,9 @@
 #define EVENTLOOP_H
 
 #include <memory>
-#include <vector>
+#include <unordered_set>
 #include "Channel.hpp"
+#include "EPoller.hpp"
 
 
 class EventLoop {
@@ -18,8 +19,9 @@ public:
     bool hasChannel(std::shared_ptr<Channel>) const;
 
 private:
-    typedef std::vector<std::shared_ptr<Channel> > ChannelList;
+    typedef std::unordered_set<std::shared_ptr<Channel> > ChannelList;
 
+    EPoller poller;
     ChannelList channelList;
     bool isLooping;
 };
