@@ -27,6 +27,7 @@ public:
     unsigned getPort() const { return port; }
 
 private:
+
     const unsigned port;
     std::unique_ptr<Acceptor> acceptor;
     std::shared_ptr<EventLoop> eventLoop;

@@ -5,15 +5,7 @@
 #include "../httpd.hpp"
 
 
-enum EventType {
-    Read = EPOLLIN,
-    Write = EPOLLOUT,
-    Error = EPOLLERR,
-    Close = EPOLLHUP,
-    OngShot = EPOLLONESHOT,
-    EdgeTriggered = EPOLLET,
-    Priority = EPOLLPRI
-};
+namespace MiniHttp { namespace Base {
 
 class EPoller {
 public:
@@ -41,5 +33,6 @@ private:
     int eventNum;
 };
 
+}}
 
 #endif /* EPOLLER_H */

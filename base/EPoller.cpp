@@ -1,5 +1,4 @@
 #include "EPoller.hpp"
-#include <cstring>
 
 
 EPoller::EPoller() :

@@ -3,12 +3,13 @@
 
 #include <memory>
 #include <unordered_set>
-#include "Channel.hpp"
-#include "EPoller.hpp"
 
 
 namespace MiniHttp { namespace Base {
 
+class Channel;
+
+class EPoller;
 
 class EventLoop {
 public:
@@ -24,7 +25,7 @@ public:
 private:
     typedef std::unordered_set<std::shared_ptr<Channel> > ChannelList;
 
-    EPoller poller;
+    std::unique_ptr<EPoller> poller;
     ChannelList channelList;
     bool isLooping;
 };

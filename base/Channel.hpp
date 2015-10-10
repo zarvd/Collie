@@ -2,8 +2,11 @@
 #define CHANNEL_H
 
 #include <functional>
-#include "EPoller.hpp"
+#include <memory>
+#include "EventType.hpp"
 
+
+namespace MiniHttp { namespace Base {
 
 class EventLoop;
 
@@ -11,18 +14,18 @@ class Channel {
 public:
     typedef std::function<void()> EventCallback;
 
-    Channel(std::shared_ptr<EventLoop>, const int&);
+    Channel(std::shared_ptr<EventLoop>, const int & fd);
     Channel(const Channel&) = delete;  // non-copyable
-    Channel& operator=(const Channel&) = delete;
+    Channel & operator=(const Channel &) = delete;
     ~Channel();
-    void setReadCallback(EventCallback& cb) { readCallback = cb; }
-    void setReadCallback(EventCallback&& cb) { readCallback = std::move(cb); }
-    void setWriteCallback(EventCallback& cb) { writeCallback = cb; }
-    void setWriteCallback(EventCallback&& cb) { writeCallback = std::move(cb); }
-    void setCloseCallback(EventCallback& cb) { closeCallback = cb; }
-    void setCloseCallback(EventCallback&& cb) { closeCallback = std::move(cb); }
-    void setErrorCallback(EventCallback& cb) { errorCallback = cb; }
-    void setErrorCallback(EventCallback&& cb) { errorCallback = std::move(cb); }
+    void setReadCallback(EventCallback & cb) { readCallback = cb; }
+    void setReadCallback(EventCallback && cb) { readCallback = std::move(cb); }
+    void setWriteCallback(EventCallback & cb) { writeCallback = cb; }
+    void setWriteCallback(EventCallback && cb) { writeCallback = std::move(cb); }
+    void setCloseCallback(EventCallback & cb) { closeCallback = cb; }
+    void setCloseCallback(EventCallback && cb) { closeCallback = std::move(cb); }
+    void setErrorCallback(EventCallback & cb) { errorCallback = cb; }
+    void setErrorCallback(EventCallback && cb) { errorCallback = std::move(cb); }
     int getFd() const { return fd; }
     int getEvents() const { return events; }
     bool isNoneEvent() const { return events == 0; }
@@ -47,5 +50,7 @@ private:
     EventCallback closeCallback;
     EventCallback errorCallback;
 };
+
+}}
 
 #endif /* CHANNEL_H */

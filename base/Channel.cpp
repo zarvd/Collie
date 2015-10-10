@@ -2,6 +2,8 @@
 #include "EventLoop.hpp"
 
 
+namespace MiniHttp { namespace Base {
+
 Channel::Channel(std::shared_ptr<EventLoop> eventLoop, const int& fd) :
     fd(fd),
     events(0),
@@ -23,3 +25,5 @@ void Channel::remove() {
         eventLoop->removeChannel(std::shared_ptr<Channel>(this));
     }
 }
+
+}}

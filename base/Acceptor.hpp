@@ -8,25 +8,25 @@
 namespace MiniHttp { namespace Base {
 
 class EventLoop;
+class Channel;
 
 class Acceptor {
 public:
-    typedef std::function<void(int)> ConnectCallback;
-
     Acceptor(std::shared_ptr<EventLoop>, const int & socketFd);
     Acceptor(const Acceptor &) = delete;
     Acceptor & operator=(const Acceptor &) = delete;
     ~Acceptor();
-    void setConnectCallback(const ConnectCallback & cb) {
-        connectCallback = cb;
+    std::shared_ptr<Channel> getChannel() const {
+        return channel;
     }
+    void connectCallback();
     void accept();
 
 private:
 
     int socketFd;
     std::shared_ptr<EventLoop> eventLoop;
-    ConnectCallback connectCallback;
+    std::shared_ptr<Channel> channel;
 };
 
 }}
