@@ -1,6 +1,8 @@
 #include "EPoller.hpp"
 
 
+namespace MiniHttp { namespace Base {
+
 EPoller::EPoller() :
     MaxEvent(64),
     eventQueue(new Event[MaxEvent]),
@@ -34,8 +36,7 @@ Status EPoller::insert(const int& fd, const int& events){
     event.events = events;
     const int ret = epoll_ctl(epollFd, EPOLL_CTL_ADD, fd, &event);
     if(ret == -1) {
-        const std::string errMsg = strerror(errno);
-        Log(ERROR) << "EPoll add ctl failed: " << errMsg;
+        Log(ERROR) << "EPoll add ctl failed: " << getErr();
         return Status::FAIL;
     }
     return Status::SUCCESS;
@@ -46,8 +47,7 @@ Status EPoller::modify(const int& fd, const int& events) {
     event.events = events;
     const int ret = epoll_ctl(epollFd, EPOLL_CTL_MOD, fd, &event);
     if(ret == -1) {
-        const std::string errMsg = strerror(errno);
-        Log(ERROR) << "EPoll mod ctl failed: " << errMsg;
+        Log(ERROR) << "EPoll mod ctl failed: " << getErr();
         return Status::FAIL;
     }
     return Status::SUCCESS;
@@ -56,8 +56,7 @@ Status EPoller::modify(const int& fd, const int& events) {
 Status EPoller::remove(const int& fd) {
     const int ret = epoll_ctl(epollFd, EPOLL_CTL_DEL, fd, NULL);
     if(ret == -1) {
-        const std::string errMsg = strerror(errno);
-        Log(ERROR) << "EPoll del ctl failed: " << errMsg;
+        Log(ERROR) << "EPoll del ctl failed: " << getErr();
         return Status::FAIL;
     }
     return Status::SUCCESS;
@@ -66,11 +65,11 @@ Status EPoller::remove(const int& fd) {
 void EPoller::wait(const unsigned& timeout) {
     eventNum = epoll_wait(epollFd, eventQueue.get(), MaxEvent, timeout);
     if(eventNum == -1) {
-        const std::string errMsg = strerror(errno);
-        Log(ERROR) << "EPoll wait failed: " << errMsg;
+        Log(ERROR) << "EPoll wait failed: " << getErr();
     }
 }
 
 std::shared_ptr<EPoller::Event> EPoller::getEvents() const {
     return eventQueue;
 }
+}}
