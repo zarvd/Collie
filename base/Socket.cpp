@@ -34,6 +34,10 @@ void Socket::listen() const {
 }
 
 int Socket::accept(std::shared_ptr<SocketAddress> addr) const {
+    return accept(fd, addr);
+}
+
+int Socket::accept(const int & fd, std::shared_ptr<SocketAddress> addr) {
     struct sockaddr_in clientAddr;
     socklen_t clientAddrLen;
     clientAddrLen = sizeof(clientAddr);

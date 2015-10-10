@@ -28,6 +28,7 @@ public:
     static int socket(const unsigned& port);
     void listen() const;
     int accept(std::shared_ptr<SocketAddress>) const;
+    static int accept(const int & fd, std::shared_ptr<SocketAddress>);
     void close();
 
 private:
