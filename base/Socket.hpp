@@ -1,13 +1,13 @@
 #ifndef SOCKET_H
 #define SOCKET_H
 
-#include "../httpd.hpp"
-#include "SocketAddress.hpp"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <memory>
+#include "../Httpd.hpp"
+#include "SocketAddress.hpp"
 
 
 namespace MiniHttp { namespace Base {
