@@ -1,5 +1,5 @@
-#ifndef APPLICATION_H
-#define APPLICATION_H
+#ifndef MINIHTTP_HTTP_APPLICATION_HPP
+#define MINIHTTP_HTTP_APPLICATION_HPP
 
 #include <cstring>
 
@@ -33,4 +33,4 @@ private:
 
 }}
 
-#endif /* APPLICATION_H */
+#endif /* MINIHTTP_HTTP_APPLICATION_HPP */

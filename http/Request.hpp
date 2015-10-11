@@ -1,7 +1,7 @@
-#ifndef HTTP_REQUEST_H
-#define HTTP_REQUEST_H
+#ifndef MINIHTTP_HTTP_REQUEST_HPP
+#define MINIHTTP_HTTP_REQUEST_HPP
 
-#include "HttpServ.hpp"
+#include "Common.hpp"
 
 
 namespace MiniHttp { namespace Http {
@@ -19,4 +19,4 @@ public:
 };
 
 }}
-#endif /* HTTP_REQUEST_H */
+#endif /* MINIHTTP_HTTP_REQUEST_HPP */

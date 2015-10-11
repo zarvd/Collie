@@ -1,5 +1,5 @@
-#ifndef HTTP_SERV_H
-#define HTTP_SERV_H
+#ifndef MINIHTTP_HTTP_COMMON_HPP
+#define MINIHTTP_HTTP_COMMON_HPP
 
 #include <map>
 #include <ctime>
@@ -47,5 +47,4 @@ inline std::string getCurrentDate() {
 std::string getStatusByCode(const unsigned short &);
 }}
 
-
-#endif /* HTTP_SERV_H */
+#endif /* MINIHTTP_HTTP_COMMON_HPP */

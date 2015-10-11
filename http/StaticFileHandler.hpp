@@ -1,7 +1,7 @@
-#ifndef HTTP_STATIC_FILE_HANDLER_H
-#define HTTP_STATIC_FILE_HANDLER_H
+#ifndef MINIHTTP_STATICFILEHANDLER_HPP
+#define MINIHTTP_STATICFILEHANDLER_HPP
 
-#include "HttpServ.hpp"
+#include "Common.hpp"
 #include "Request.hpp"
 #include "Response.hpp"
 
@@ -25,4 +25,4 @@ private:
 
 }}
 
-#endif /* HTTP_STATIC_FILE_HANDLER_H */
+#endif /* MINIHTTP_STATICFILEHANDLER_HPP */

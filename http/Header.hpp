@@ -1,7 +1,7 @@
-#ifndef HTTP_HEADER_H
-#define HTTP_HEADER_H
+#ifndef MINIHTTP_HTTP_HEADER_HPP
+#define MINIHTTP_HTTP_HEADER_HPP
 
-#include "HttpServ.hpp"
+#include "Common.hpp"
 
 
 namespace MiniHttp { namespace Http {namespace Header {
@@ -20,4 +20,4 @@ inline std::string generateHeader(const std::map<std::string, std::string>& head
 }}}
 
 
-#endif /* HTTP_HEADER_H */
+#endif /* MINIHTTP_HTTP_HEADER_HPP */

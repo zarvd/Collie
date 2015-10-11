@@ -1,7 +1,7 @@
-#ifndef HTPP_RESPONSE_H
-#define HTPP_RESPONSE_H
+#ifndef MINIHTTP_HTTP_RESPONSE_HPP
+#define MINIHTTP_HTTP_RESPONSE_HPP
 
-#include "HttpServ.hpp"
+#include "Common.hpp"
 
 
 namespace MiniHttp { namespace Http {
@@ -26,4 +26,4 @@ protected:
 
 }}
 
-#endif /* HTPP_RESPONSE_H */
+#endif /* MINIHTTP_HTTP_RESPONSE_HPP */
