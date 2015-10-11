@@ -48,4 +48,13 @@ void Channel::activate(const unsigned & revents) const {
     }
 }
 
+void Channel::update() const {
+    eventLoop->updateChannel(fd);
+}
+
+void Channel::remove() const {
+    close(fd);  // FIXME
+    // eventLoop->removeChannel(fd);
+}
+
 }}

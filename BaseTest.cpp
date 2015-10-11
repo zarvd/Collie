@@ -21,26 +21,24 @@ int main(int argc, char *argv[]) {
 
     TcpServer tcp(port);
     ConnectCallback acceptCB = [&tcp](const int connFd) {
-            std::shared_ptr<Channel> connChannel(new Channel(tcp.getEventLoop(), connFd));
+        std::shared_ptr<Channel> connChannel(new Channel(tcp.getEventLoop(), connFd));
 
-            ConnectCallback readCB = [connChannel](const int fd) {
-                    const std::string msg = Socket::recv(fd);
-                    connChannel->enableWrite();
-                    connChannel->setWriteCallback([connChannel](const int fd) {
-                            Socket::send(fd, "HTTP/1.1 200 OK\n"
-                                         "\n"
-                                         "<h1> Hello,wold! </h1>");
-                            connChannel->getEventLoop()->removeChannel(connChannel);
-                        });
-                    Log(ERROR) << connChannel->getEvents();
-                    connChannel->getEventLoop()->updateChannel(connChannel);
-            };
+        ConnectCallback readCB = [connChannel](const int fd) {
+            const std::string msg = Socket::recv(fd);
+            connChannel->enableWrite();
+            connChannel->setWriteCallback([connChannel](const int fd) {
+                    Socket::send(fd, "HTTP/1.1 200 OK\n"
+                                 "\n"
+                                 "<h1> Hello,wold! </h1>");
+                    connChannel->remove();
+                });
+            connChannel->update();
+        };
 
-            connChannel->enableRead();
-            connChannel->setReadCallback(readCB);
+        connChannel->enableRead();
+        connChannel->setReadCallback(readCB);
 
-            Log(ERROR) << connChannel->getEvents();
-            tcp.getEventLoop()->updateChannel(connChannel);
+        tcp.getEventLoop()->updateChannel(connChannel);  // FIXME
     };
     tcp.setConnectCallback(acceptCB);
     tcp.start();

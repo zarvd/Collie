@@ -26,14 +26,16 @@ public:
     int getEvents() const { return events; }
     std::shared_ptr<EventLoop> const getEventLoop() { return eventLoop; }
     bool isNoneEvent() const { return events == 0; }
-    void enableRead() { Event::enableRead(events); }
-    void disableRead() { Event::disableRead(events); }
+    void enableRead() { Event::enableRead(events); update(); }
+    void disableRead() { Event::disableRead(events); update(); }
     bool isRead() const { return Event::isRead(events); }
-    void enableWrite() { Event::enableWrite(events); }
-    void disableWrite() { Event::disableRead(events); }
-    void disableAll() { events = 0; }
+    void enableWrite() { Event::enableWrite(events); update(); }
+    void disableWrite() { Event::disableRead(events); update(); }
+    void disableAll() { events = 0; update(); }
     bool isWrite() const { return Event::isWrite(events); }
     void activate(const unsigned & revents) const;
+    void remove() const;
+    void update() const;
 
 private:
 

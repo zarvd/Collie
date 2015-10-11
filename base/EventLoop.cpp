@@ -38,6 +38,16 @@ void EventLoop::updateChannel(std::shared_ptr<Channel> channel) {
     }
 }
 
+void EventLoop::updateChannel(const int fd) {
+    Log(TRACE) << "EventLoop update channel(fd) " << fd;
+    if(channels->find(fd) != channels->end()) {
+        // FIXME
+        auto channel = channels->at(fd);
+        poller->modify(channel->getFd(), channel->getEvents());
+    } else {
+    }
+}
+
 void EventLoop::removeChannel(std::shared_ptr<Channel> channel) {
     Log(TRACE) << "EventLoop remove channel " << channel->getFd();
     if(hasChannel(channel)) {
@@ -45,6 +55,16 @@ void EventLoop::removeChannel(std::shared_ptr<Channel> channel) {
         channels->erase(channel->getFd());
     } else {
         Log(WARN) << "EventLoop does NOT have channel " << channel->getFd();
+    }
+}
+
+void EventLoop::removeChannel(const int fd) {
+    if(channels->find(fd) != channels->end()) {
+        // FIXME
+        auto channel = channels->at(fd);
+        poller->remove(channel->getFd());
+        channels->erase(fd);
+    } else {
     }
 }
 

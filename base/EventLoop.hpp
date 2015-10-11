@@ -20,6 +20,8 @@ public:
     void updateChannel(std::shared_ptr<Channel>);
     void removeChannel(std::shared_ptr<Channel>);
     bool hasChannel(std::shared_ptr<Channel>) const;
+    void updateChannel(const int fd);
+    void removeChannel(const int fd);
 
 private:
     typedef std::map<int, std::shared_ptr<Channel> > ChannelMap;
