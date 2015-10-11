@@ -19,18 +19,21 @@ int main(int argc, char *argv[]) {
     }
 
     TcpServer tcp(port);
-    tcp.setConnectCallback([&tcp](const int & connFd) {
+    tcp.setConnectCallback([&tcp](const int connFd) {
             std::shared_ptr<Channel> connChannel(new Channel(tcp.getEventLoop(), connFd));
             // TODO setup the connection callback of this channel
-            connChannel->setReadCallback([&connChannel](const int & fd) {
+            connChannel->enableRead();
+            connChannel->setReadCallback([connChannel](const int fd) {
                     const std::string msg = Socket::recv(fd);
-                    Log(INFO) << msg;
-                    connChannel->setWriteCallback([](const int & fd) {
+                    connChannel->enableWrite();
+                    connChannel->setWriteCallback([](const int fd) {
                             Socket::send(fd, "HTTP/1.1 200 OK\n"
                                          "\n"
                                          "<h1> Hello,wold! </h1>");
                         });
+                    Log(ERROR) << connChannel->getEvents();
                 });
+            Log(ERROR) << connChannel->getEvents();
             tcp.getEventLoop()->updateChannel(connChannel);
         });
     tcp.start();

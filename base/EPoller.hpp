@@ -22,9 +22,9 @@ public:
     EPoller & operator=(const EPoller &) = delete;
     ~EPoller();
 
-    Status insert(const int &, const int &);
-    Status modify(const int &, const int &);
-    Status remove(const int &);
+    Status insert(const int fd, const unsigned events);
+    Status modify(const int fd, const unsigned events);
+    Status remove(const int fd);
     void poll(std::shared_ptr<ChannelMap> &, const unsigned & timeout = -1);
 
     const unsigned MaxEvent;
@@ -33,7 +33,7 @@ private:
     Status create();
 
     int epollFd;
-    std::vector<PollEvent> revents;
+    std::unique_ptr<PollEvent> revents;
 };
 
 }}

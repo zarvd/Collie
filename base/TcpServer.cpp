@@ -7,7 +7,7 @@
 
 namespace MiniHttp { namespace Base {
 
-TcpServer::TcpServer(const unsigned & port) :
+TcpServer::TcpServer(const unsigned port) :
     port(port),
     eventLoop(new EventLoop),
     acceptor(new Acceptor(eventLoop, std::unique_ptr<Socket>(new Socket(port)))) {

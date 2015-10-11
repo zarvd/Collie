@@ -7,14 +7,14 @@ namespace MiniHttp { namespace Base {
 
 EPoller::EPoller() :
     MaxEvent(64),
-    revents(MaxEvent) {
+    revents(new PollEvent[MaxEvent]) {
     Log(TRACE) << "EPoller constructing";
     create();
 }
 
 EPoller::EPoller(const unsigned& MaxEvent) :
     MaxEvent(MaxEvent),
-    revents(MaxEvent) {
+    revents(new PollEvent[MaxEvent]) {
     Log(TRACE) << "EPoller constructing";
     create();
 }
@@ -36,10 +36,12 @@ Status EPoller::create() {
 }
 
 
-Status EPoller::insert(const int& fd, const int& events){
+Status EPoller::insert(const int fd, const unsigned events) {
     Log(TRACE) << "EPoller insert " << fd << " with events " << events;
     PollEvent event;
-    event.events = events;
+    event.data.fd = fd;
+    // event.events = events;
+    event.events = events | (unsigned)Event::Type::EdgeTriggered;
     const int ret = epoll_ctl(epollFd, EPOLL_CTL_ADD, fd, &event);
     if(ret == -1) {
         Log(ERROR) << "EPoll add ctl failed: " << getErr();
@@ -48,10 +50,12 @@ Status EPoller::insert(const int& fd, const int& events){
     return Status::SUCCESS;
 }
 
-Status EPoller::modify(const int& fd, const int& events) {
+Status EPoller::modify(const int fd, const unsigned events) {
     Log(TRACE) << "EPoller modify " << fd << " with events " << events;
     PollEvent event;
-    event.events = events;
+    event.data.fd = fd;
+    // event.events = events;
+    event.events = events | (unsigned)Event::Type::EdgeTriggered;
     const int ret = epoll_ctl(epollFd, EPOLL_CTL_MOD, fd, &event);
     if(ret == -1) {
         Log(ERROR) << "EPoll mod ctl failed: " << getErr();
@@ -60,9 +64,12 @@ Status EPoller::modify(const int& fd, const int& events) {
     return Status::SUCCESS;
 }
 
-Status EPoller::remove(const int& fd) {
+Status EPoller::remove(const int fd) {
     Log(TRACE) << "EPoller remove " << fd << " with events ";
-    const int ret = epoll_ctl(epollFd, EPOLL_CTL_DEL, fd, NULL);
+    PollEvent event;
+    event.data.fd = fd;
+    // event.events = events | (unsigned)Event::Type::EdgeTriggered;
+    const int ret = epoll_ctl(epollFd, EPOLL_CTL_DEL, fd, &event);
     if(ret == -1) {
         Log(ERROR) << "EPoll del ctl failed: " << getErr();
         return Status::FAIL;
@@ -72,7 +79,7 @@ Status EPoller::remove(const int& fd) {
 
 void EPoller::poll(std::shared_ptr<ChannelMap> & channels, const unsigned & timeout) {
     Log(TRACE) << "EPoller polling " << epollFd;
-    int eventNum = epoll_wait(epollFd, &*revents.begin(), MaxEvent, timeout);
+    int eventNum = epoll_wait(epollFd, revents.get(), MaxEvent, timeout);
     if(eventNum == -1) {
         Log(ERROR) << "EPoll wait failed: " << getErr();
     }
@@ -80,13 +87,13 @@ void EPoller::poll(std::shared_ptr<ChannelMap> & channels, const unsigned & time
     Log(TRACE) << "EPoll get " << eventNum << " events";
 
     for(int idx = 0; idx < eventNum; ++ idx) {
-        const PollEvent & curEvent = revents[idx];
+        const PollEvent & curEvent = revents.get()[idx];
         if(*channels->find(curEvent.data.fd) != *channels->end()) {
-            Log(TRACE) << "Activating channel " << idx;
-            auto & channel = channels->at(curEvent.data.fd);
+            Log(TRACE) << "Activating channel " << curEvent.data.fd;
+            std::shared_ptr<Channel> channel = channels->at(curEvent.data.fd);
             channel->activate(curEvent.events);
         } else {
-            Log(WARN) << "channel " << idx << " is not existed";
+            Log(WARN) << "channel " << curEvent.data.fd << " is not existed";
         }
     }
 }

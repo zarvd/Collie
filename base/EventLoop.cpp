@@ -32,7 +32,9 @@ void EventLoop::updateChannel(std::shared_ptr<Channel> channel) {
     if(hasChannel(channel)) {
         poller->modify(channel->getFd(), channel->getEvents());
     } else {
-        poller->insert(channel->getFd(), channel->getEvents());
+        if(poller->insert(channel->getFd(), channel->getEvents()) == Status::SUCCESS) {
+            (*channels)[channel->getFd()] = channel;
+        }
     }
 }
 

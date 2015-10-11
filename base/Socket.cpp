@@ -41,7 +41,7 @@ void Socket::listen() const {
 }
 
 int Socket::accept(std::shared_ptr<SocketAddress> addr) const {
-    return accept(fd, addr);
+    return Socket::accept(fd, addr);
 }
 
 int Socket::accept(const int & fd, std::shared_ptr<SocketAddress> addr) {
@@ -70,7 +70,7 @@ std::string Socket::recv(const int & fd) {
     const unsigned msgLength = 8192;  // FIXME
     char msg[msgLength];
     ::recv(fd, msg, msgLength, 0);
-    Log(TRACE) << "Socket received: " << std::string(msg);
+    Log(TRACE) << "Socket received msg";
     return msg;
 }
 
@@ -78,7 +78,7 @@ void Socket::send(const int & fd, const std::string & msg) {
     char page[msg.length() + 1];
     std::strcpy(page, msg.c_str());
     ::send(fd, page, sizeof(page), 0);
-    Log(TRACE) << "Socket send: " << msg;
+    Log(TRACE) << "Socket send msg";
 }
 
 }}

@@ -1,5 +1,5 @@
 CC = clang++
-FLAG = -Wall -std=c++11 -g -O2 -pthread
+FLAG = -Wall -std=c++11 -g -O0 -pthread
 BASE_SRCS = $(wildcard ./base/*cpp)
 BASE_OBJS = $(BASE_SRCS:.cpp=.o)
 HTTP_SRCS = $(wildcard ./http/*.cpp)

@@ -9,27 +9,41 @@ Channel::Channel(std::shared_ptr<EventLoop> eventLoop, const int& fd) :
     fd(fd),
     events(0),
     eventLoop(eventLoop) {
-    // TODO set default close and error callback
+    Log(TRACE) << "Channel " << fd << " constructing";
+    closeCallback = [](const int fd) {
+        // TODO remove channel
+        Log(TRACE) << "Close channel " << fd;
+    };
+    errorCallback = [](const int fd) {
+        // TODO remove channel
+        Log(TRACE) << "Channel " << fd << " meets ERROR";
+    };
 }
 
-Channel::~Channel() {}
+Channel::~Channel() {
+    Log(TRACE) << "Channel " << fd << " destructing";
+}
 
 void Channel::activate(const unsigned & revents) const {
     if(Event::isError(revents)) {
-        Log(DEBUG) << "Activate ERROR callback";
+        Log(TRACE) << "Activate ERROR callback with events " << revents;
         errorCallback(fd);
     } else if(Event::isClose(revents)) {
-        Log(DEBUG) << "Activate CLOSE callback";
+        Log(TRACE) << "Activate CLOSE callback with events" << revents;
         closeCallback(fd);
     } else if(Event::isRead(revents)) {
         if(isRead()) {
-            Log(DEBUG) << "Activate READ callback";
+            Log(TRACE) << "Activate READ callback with events " << revents;
             readCallback(fd);
+        } else {
+            Log(WARN) << "READ callback is not available";
         }
     } else if(Event::isWrite(revents)) {
         if(isWrite()) {
-            Log(DEBUG) << "Activate WRITE callback";
+            Log(TRACE) << "Activate WRITE callback with events" << revents;
             writeCallback(fd);
+        } else {
+            Log(WARN) << "WRITE callback is not available";
         }
     }
 }

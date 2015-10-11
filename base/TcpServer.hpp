@@ -12,7 +12,7 @@ class EventLoop;
 
 class TcpServer {
 public:
-    explicit TcpServer(const unsigned & port);
+    explicit TcpServer(const unsigned port);
     TcpServer(const TcpServer &) = delete;
     TcpServer & operator=(const TcpServer &) = delete;
     ~TcpServer();

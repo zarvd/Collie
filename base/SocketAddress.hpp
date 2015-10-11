@@ -11,10 +11,9 @@ class SocketAddress final {
  public:
     typedef struct sockaddr_in Addr;
 
-    explicit SocketAddress(const Addr & addr) :
-        addr(addr) {}
-    SocketAddress(const SocketAddress & socketAddr) :
-        addr(socketAddr.addr) {}
+    SocketAddress() {}
+    explicit SocketAddress(const Addr & addr) : addr(addr) {}
+    SocketAddress(const SocketAddress & socketAddr) : addr(socketAddr.addr) {}
     SocketAddress & operator=(const SocketAddress & socketAddr) {
         addr = socketAddr.addr;
         return * this;
@@ -23,7 +22,7 @@ class SocketAddress final {
         this->addr = addr;
         return * this;
     }
-    ~SocketAddress();
+    ~SocketAddress() {}
 
     std::string getIP() const;
     std::string getHostName() const;
