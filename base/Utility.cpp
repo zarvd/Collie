@@ -1,7 +1,7 @@
 #include "Utility.hpp"
 
 
-namespace Utility {
+namespace MiniHttp { namespace Base { namespace Utility {
 
 std::string getAbsolutePath(const std::string& baseUrl, const std::string& absoluteUrl, const std::string& baseDir) {
     std::string relativeUrl, absoluteDir;
@@ -26,5 +26,4 @@ std::string getAbsolutePath(const std::string& baseUrl, const std::string& absol
         absoluteDir = baseDir + '/' + relativeUrl;
     }
     return absoluteDir;
-}
-}
+}}}}
