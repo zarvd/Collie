@@ -2,7 +2,7 @@
 #define EVENTLOOP_H
 
 #include <memory>
-#include <unordered_set>
+#include <map>
 
 
 namespace MiniHttp { namespace Base {
@@ -23,10 +23,10 @@ public:
     bool hasChannel(std::shared_ptr<Channel>) const;
 
 private:
-    typedef std::unordered_set<std::shared_ptr<Channel> > ChannelList;
+    typedef std::map<int, std::shared_ptr<Channel> > ChannelMap;
 
     std::unique_ptr<EPoller> poller;
-    ChannelList channelList;
+    std::shared_ptr<ChannelMap> channels;
     bool isLooping;
 };
 

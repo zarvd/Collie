@@ -11,15 +11,15 @@ TcpServer::TcpServer(const unsigned & port) : port(port) {}
 
 TcpServer::~TcpServer() {}
 
-void TcpServer::listen() {
+TcpServer & TcpServer::listen() {
     eventLoop.reset(new EventLoop);
     acceptor.reset(new Acceptor(eventLoop,
                                 std::unique_ptr<Socket>(new Socket(port))));
+    acceptor->accept();
+    return * this;
 }
 
 void TcpServer::start() {
-    acceptor->accept();
-    eventLoop->updateChannel(acceptor->getChannel());
     eventLoop->loop();
 }
 

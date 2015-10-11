@@ -19,7 +19,7 @@ public:
     TcpServer & operator=(const TcpServer &) = delete;
     ~TcpServer();
 
-    void listen();
+    TcpServer & listen();
     void start();
     void setConnectCallback(ConnectCallback & cb) {
         connectCallback = cb;

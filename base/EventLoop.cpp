@@ -1,33 +1,41 @@
-#include <algorithm>
+#include <vector>
 #include "EventLoop.hpp"
 #include "EPoller.hpp"
 #include "Channel.hpp"
 
 namespace MiniHttp { namespace Base {
 
-EventLoop::EventLoop() : poller(new EPoller(1024)), isLooping(false) {}
+EventLoop::EventLoop() :
+    poller(new EPoller(1024)),
+    channels(new ChannelMap),
+    isLooping(false) {}
 
 EventLoop::~EventLoop() {}
 
-void EventLoop::loop() {}
+void EventLoop::loop() {
+    isLooping = true;
+    while(true) {
+        poller->poll(channels);
+    }
+}
 
 void EventLoop::updateChannel(std::shared_ptr<Channel> channel) {
     if(hasChannel(channel)) {
         poller->modify(channel->getFd(), channel->getEvents());
     } else {
-        channelList.insert(channel);
+        poller->insert(channel->getFd(), channel->getEvents());
     }
 }
 
 void EventLoop::removeChannel(std::shared_ptr<Channel> channel) {
     if(hasChannel(channel)) {
         poller->remove(channel->getFd());
-        channelList.erase(channel);
+        channels->erase(channel->getFd());
     }
 }
 
 bool EventLoop::hasChannel(std::shared_ptr<Channel> channel) const {
-    return channelList.find(channel) != channelList.end();
+    return channels->find(channel->getFd()) != channels->end();
 }
 
 }}

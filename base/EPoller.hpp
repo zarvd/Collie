@@ -2,26 +2,30 @@
 #define EPOLLER_H
 
 #include <sys/epoll.h>
+#include <vector>
+#include <map>
 #include "../httpd.hpp"
 
 
 namespace MiniHttp { namespace Base {
 
+class Channel;
+
 class EPoller {
 public:
-    typedef struct epoll_event Event;
+    typedef struct epoll_event PollEvent;
+    typedef std::map<int, std::shared_ptr<Channel> > ChannelMap;
 
     EPoller();
-    explicit EPoller(const unsigned&);
-    EPoller(const EPoller&) = delete;
-    EPoller& operator=(const EPoller&) = delete;
+    explicit EPoller(const unsigned &);
+    EPoller(const EPoller &) = delete;
+    EPoller & operator=(const EPoller &) = delete;
     ~EPoller();
 
-    Status insert(const int&, const int&);
-    Status modify(const int&, const int&);
-    Status remove(const int&);
-    void wait(const unsigned& timeout = -1);
-    std::shared_ptr<Event> getEvents() const;
+    Status insert(const int &, const int &);
+    Status modify(const int &, const int &);
+    Status remove(const int &);
+    void poll(std::shared_ptr<ChannelMap> &, const unsigned & timeout = -1);
 
     const unsigned MaxEvent;
 
@@ -29,8 +33,7 @@ private:
     Status create();
 
     int epollFd;
-    std::shared_ptr<Event> eventQueue;
-    int eventNum;
+    std::vector<PollEvent> events;
 };
 
 }}

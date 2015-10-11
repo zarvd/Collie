@@ -9,20 +9,24 @@ Channel::Channel(std::shared_ptr<EventLoop> eventLoop, const int& fd) :
     events(0),
     eventLoop(eventLoop),
     inLoop(true) {
-    // set default close and error callback
+    // TODO set default close and error callback
 }
 
 Channel::~Channel() {}
 
-void Channel::update() {
-    if(inLoop) {
-        eventLoop->updateChannel(std::shared_ptr<Channel>(this));
-    }
-}
-
-void Channel::remove() {
-    if( ! inLoop) {
-        eventLoop->removeChannel(std::shared_ptr<Channel>(this));
+void Channel::activate(const unsigned & revents) const {
+    if(Event::isError(revents)) {
+        errorCallback();
+    } else if(Event::isClose(revents)) {
+        closeCallback();
+    } else if(Event::isRead(revents)) {
+        if(isRead()) {
+            readCallback();
+        }
+    } else if(Event::isWrite(revents)) {
+        if(isWrite()) {
+            writeCallback();
+        }
     }
 }
 
