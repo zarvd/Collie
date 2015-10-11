@@ -4,17 +4,19 @@
 #include "HttpServ.hpp"
 
 
-namespace Http {
-    // Request body
-    struct Request {
-        std::map<std::string, std::string> header;
-        Method method;
-        std::string url;
-        std::string httpVersion;
+namespace MiniHttp { namespace Http {
 
-        Request();
-        static Request parse(const std::string&);
-    };
-}
+// Request body
+class Request {
+public:
+    Request();
+    static Request parse(const std::string&);
 
+    std::map<std::string, std::string> header;
+    Method method;
+    std::string url;
+    std::string httpVersion;
+};
+
+}}
 #endif /* HTTP_REQUEST_H */

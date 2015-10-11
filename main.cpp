@@ -1,5 +1,7 @@
 #include "http/Application.hpp"
 
+using namespace MiniHttp;
+
 
 int main(int argc, char *argv[]) {
     try {

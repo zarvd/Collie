@@ -3,29 +3,34 @@
 
 #include <cstring>
 
-#include "HttpServ.hpp"
 #include "Request.hpp"
-#include "StaticFileHandler.hpp"
 #include "../base/TcpSocket.hpp"
 
 
-namespace Http {
-    class Application final {
-    public:
-        typedef std::function<void(Request)> RequestHandler;
-        typedef std::map<std::pair<std::string, Method>, RequestHandler> Router;
-        Application();
-        Status init(const unsigned&);
-        void run();
-        void setDefaultTCPHandler();
-        std::string generateHeader() const;
+namespace MiniHttp { namespace Http {
 
-    private:
-        std::unique_ptr<Socket::TcpSocket> tcpSocket;
-        Router router;
-        Socket::TcpSocket::Handler tcpHandler;
-    };
-}
+class Application {
+public:
+    typedef std::function<void(Request)> RequestHandler;
+    typedef std::map<std::pair<std::string, Method>, RequestHandler> Router;
 
+    Application();
+    Application(const Application &) = delete;
+    Application operator=(const Application &) = delete;
+    ~Application();
+
+    Status init(const unsigned&);
+    void run();
+    void setDefaultTCPHandler();
+    std::string generateHeader() const;
+
+private:
+
+    std::unique_ptr<Socket::TcpSocket> tcpSocket;
+    Router router;
+    Socket::TcpSocket::Handler tcpHandler;
+};
+
+}}
 
 #endif /* APPLICATION_H */

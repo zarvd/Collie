@@ -39,7 +39,6 @@ private:
     const int fd;  // file descriptor
     unsigned events;
     std::shared_ptr<EventLoop> eventLoop;
-    bool inLoop;
     EventCallback readCallback;
     EventCallback writeCallback;
     EventCallback closeCallback;

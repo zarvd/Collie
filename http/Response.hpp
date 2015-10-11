@@ -4,24 +4,26 @@
 #include "HttpServ.hpp"
 
 
-namespace Http {
-    class Response {
-    public:
-        Response() = delete;
-        explicit Response(const unsigned&);  // status code
-        explicit Response(const std::string&);  // content with default status 200
-        Response(const unsigned&, const std::string&);  // status code and content
-        virtual ~Response();
+namespace MiniHttp { namespace Http {
 
-        virtual std::string get() const;
-        unsigned getStatus() const;
-        static std::string genContent(const unsigned&);
+class Response {
+public:
+    Response() = delete;
+    explicit Response(const unsigned&);  // status code
+    explicit Response(const std::string&);  // content with default status 200
+    Response(const unsigned&, const std::string&);  // status code and content
+    virtual ~Response();
 
-    protected:
-        unsigned status;
-        std::string content;
-        std::map<std::string, std::string> headerField;  // TODO
-    };
-}
+    virtual std::string get() const;
+    unsigned getStatus() const;
+    static std::string genContent(const unsigned&);
+
+protected:
+    unsigned status;
+    std::string content;
+    std::map<std::string, std::string> headerField;  // TODO
+};
+
+}}
 
 #endif /* HTPP_RESPONSE_H */

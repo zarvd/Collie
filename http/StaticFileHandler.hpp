@@ -6,19 +6,23 @@
 #include "Response.hpp"
 
 
-namespace Http {
-    class StaticFileHandler final {
-    public:
-        StaticFileHandler(const std::string&, const std::string&);
-        ~StaticFileHandler();
+namespace MiniHttp { namespace Http {
 
-        Response view(const Request&);
-        std::string renderDirPage(const std::string&, const std::string&) const;
+class StaticFileHandler {
+public:
+    StaticFileHandler(const std::string &, const std::string &);
+    StaticFileHandler(const StaticFileHandler &) = delete;
+    StaticFileHandler operator=(const StaticFileHandler &) = delete;
+    ~StaticFileHandler();
 
-    private:
-        const std::string baseDir;
-        const std::string baseUrl;
-    };
-}
+    Response view(const Request &);
+    std::string renderDirPage(const std::string &, const std::string &) const;
+
+private:
+    const std::string baseDir;
+    const std::string baseUrl;
+};
+
+}}
 
 #endif /* HTTP_STATIC_FILE_HANDLER_H */

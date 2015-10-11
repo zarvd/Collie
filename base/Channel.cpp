@@ -7,8 +7,7 @@ namespace MiniHttp { namespace Base {
 Channel::Channel(std::shared_ptr<EventLoop> eventLoop, const int& fd) :
     fd(fd),
     events(0),
-    eventLoop(eventLoop),
-    inLoop(true) {
+    eventLoop(eventLoop) {
     // TODO set default close and error callback
 }
 
