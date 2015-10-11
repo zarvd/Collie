@@ -12,23 +12,23 @@ EventLoop::EventLoop() :
     channels(new ChannelMap),
     isLooping(false) {
 
-    Log(DEBUG) << "EventLoop constructing";
+    Log(TRACE) << "EventLoop constructing";
 }
 
 EventLoop::~EventLoop() {
-    Log(DEBUG) << "EventLoop destructing";
+    Log(TRACE) << "EventLoop destructing";
 }
 
 void EventLoop::loop() {
     isLooping = true;
     while(true) {
-        Log(DEBUG) << "EventLoop looping";
+        Log(TRACE) << "EventLoop looping";
         poller->poll(channels);
     }
 }
 
 void EventLoop::updateChannel(std::shared_ptr<Channel> channel) {
-    Log(DEBUG) << "EventLoop update channel " << channel->getFd();
+    Log(TRACE) << "EventLoop update channel " << channel->getFd();
     if(hasChannel(channel)) {
         poller->modify(channel->getFd(), channel->getEvents());
     } else {
@@ -39,7 +39,7 @@ void EventLoop::updateChannel(std::shared_ptr<Channel> channel) {
 }
 
 void EventLoop::removeChannel(std::shared_ptr<Channel> channel) {
-    Log(DEBUG) << "EventLoop remove channel " << channel->getFd();
+    Log(TRACE) << "EventLoop remove channel " << channel->getFd();
     if(hasChannel(channel)) {
         poller->remove(channel->getFd());
         channels->erase(channel->getFd());

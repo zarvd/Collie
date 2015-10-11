@@ -40,8 +40,8 @@ Status EPoller::insert(const int fd, const unsigned events) {
     Log(TRACE) << "EPoller insert " << fd << " with events " << events;
     PollEvent event;
     event.data.fd = fd;
-    // event.events = events;
-    event.events = events | (unsigned)Event::Type::EdgeTriggered;
+    event.events = events;
+    // event.events = events | (unsigned)Event::Type::EdgeTriggered;
     const int ret = epoll_ctl(epollFd, EPOLL_CTL_ADD, fd, &event);
     if(ret == -1) {
         Log(ERROR) << "EPoll add ctl failed: " << getErr();
@@ -54,8 +54,8 @@ Status EPoller::modify(const int fd, const unsigned events) {
     Log(TRACE) << "EPoller modify " << fd << " with events " << events;
     PollEvent event;
     event.data.fd = fd;
-    // event.events = events;
-    event.events = events | (unsigned)Event::Type::EdgeTriggered;
+    event.events = events;  // level-triggered
+    // event.events = events | (unsigned)Event::Type::EdgeTriggered;
     const int ret = epoll_ctl(epollFd, EPOLL_CTL_MOD, fd, &event);
     if(ret == -1) {
         Log(ERROR) << "EPoll mod ctl failed: " << getErr();

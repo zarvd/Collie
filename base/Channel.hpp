@@ -24,6 +24,7 @@ public:
     void setErrorCallback(const EventCallback & cb) { errorCallback = cb; }
     int getFd() const { return fd; }
     int getEvents() const { return events; }
+    std::shared_ptr<EventLoop> const getEventLoop() { return eventLoop; }
     bool isNoneEvent() const { return events == 0; }
     void enableRead() { Event::enableRead(events); }
     void disableRead() { Event::disableRead(events); }
