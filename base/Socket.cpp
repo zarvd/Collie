@@ -8,6 +8,8 @@ Socket::Socket(const unsigned& port) :
     port(port) {
 }
 
+Socket::~Socket() {}
+
 int Socket::socket(const unsigned& port) {
     struct sockaddr_in servAddr;
 
