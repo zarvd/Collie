@@ -6,6 +6,7 @@
 
 
 using Logger::LoggingHandler;
+using Logger::Level::TRACE;
 using Logger::Level::DEBUG;
 using Logger::Level::INFO;
 using Logger::Level::WARN;

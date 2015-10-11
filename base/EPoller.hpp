@@ -33,7 +33,7 @@ private:
     Status create();
 
     int epollFd;
-    std::vector<PollEvent> events;
+    std::vector<PollEvent> revents;
 };
 
 }}

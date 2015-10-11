@@ -7,20 +7,25 @@ namespace MiniHttp { namespace Base {
 
 EPoller::EPoller() :
     MaxEvent(64),
-    events(MaxEvent) {
+    revents(MaxEvent) {
+    Log(TRACE) << "EPoller constructing";
     create();
 }
 
 EPoller::EPoller(const unsigned& MaxEvent) :
     MaxEvent(MaxEvent),
-    events(MaxEvent) {
+    revents(MaxEvent) {
+    Log(TRACE) << "EPoller constructing";
     create();
 }
 
-EPoller::~EPoller() {}
+EPoller::~EPoller() {
+    Log(TRACE) << "EPoller destructing";
+}
 
 Status EPoller::create() {
     epollFd = epoll_create1(0);
+    Log(TRACE) << "EPoller create new epoll " << epollFd;
     if(epollFd == -1) {
         const std::string errMsg = strerror(errno);
         Log(ERROR) << "EPoll create failed: " << errMsg;
@@ -32,6 +37,7 @@ Status EPoller::create() {
 
 
 Status EPoller::insert(const int& fd, const int& events){
+    Log(TRACE) << "EPoller insert " << fd << " with events " << events;
     PollEvent event;
     event.events = events;
     const int ret = epoll_ctl(epollFd, EPOLL_CTL_ADD, fd, &event);
@@ -43,6 +49,7 @@ Status EPoller::insert(const int& fd, const int& events){
 }
 
 Status EPoller::modify(const int& fd, const int& events) {
+    Log(TRACE) << "EPoller modify " << fd << " with events " << events;
     PollEvent event;
     event.events = events;
     const int ret = epoll_ctl(epollFd, EPOLL_CTL_MOD, fd, &event);
@@ -54,6 +61,7 @@ Status EPoller::modify(const int& fd, const int& events) {
 }
 
 Status EPoller::remove(const int& fd) {
+    Log(TRACE) << "EPoller remove " << fd << " with events ";
     const int ret = epoll_ctl(epollFd, EPOLL_CTL_DEL, fd, NULL);
     if(ret == -1) {
         Log(ERROR) << "EPoll del ctl failed: " << getErr();
@@ -63,14 +71,23 @@ Status EPoller::remove(const int& fd) {
 }
 
 void EPoller::poll(std::shared_ptr<ChannelMap> & channels, const unsigned & timeout) {
-    int eventNum = epoll_wait(epollFd, &*events.begin(), MaxEvent, timeout);
+    Log(TRACE) << "EPoller polling " << epollFd;
+    int eventNum = epoll_wait(epollFd, &*revents.begin(), MaxEvent, timeout);
     if(eventNum == -1) {
         Log(ERROR) << "EPoll wait failed: " << getErr();
     }
+
+    Log(TRACE) << "EPoll get " << eventNum << " events";
+
     for(int idx = 0; idx < eventNum; ++ idx) {
-        const PollEvent & curEvent = events[idx];
-        auto & channel = channels->at(curEvent.data.fd);
-        channel->activate(curEvent.events);
+        const PollEvent & curEvent = revents[idx];
+        if(*channels->find(curEvent.data.fd) != *channels->end()) {
+            Log(TRACE) << "Activating channel " << idx;
+            auto & channel = channels->at(curEvent.data.fd);
+            channel->activate(curEvent.events);
+        } else {
+            Log(WARN) << "channel " << idx << " is not existed";
+        }
     }
 }
 

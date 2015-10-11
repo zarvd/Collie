@@ -16,17 +16,20 @@ Acceptor::~Acceptor() {}
 
 void Acceptor::accept() const {
     channel->enableRead();
-    channel->setReadCallback(std::bind(&Acceptor::connectCallback, this));
-}
+    channel->setReadCallback([this](const int &) {
+            std::shared_ptr<SocketAddress> addr;
+            int connFd = socket->accept(addr);
+            if(connFd > 0) {
+                connectCallback(connFd);
+                // std::shared_ptr<Channel> connChannel(new Channel(eventLoop, connFd));
+                // TODO setup the connection callback of this channel
+                // connChannel->setReadCallback([](const int & fd) {
+                //         const std::string msg = Socket::recv(fd);
 
-void Acceptor::connectCallback() const {
-    std::shared_ptr<SocketAddress> addr;
-    int connFd = socket->accept(addr);
-    if(connFd > 0) {
-        std::shared_ptr<Channel> connChannel(new Channel(eventLoop, connFd));
-        // TODO setup the connection callback of this channel
-        eventLoop->updateChannel(connChannel);
-    }
+                //     });
+                // eventLoop->updateChannel(connChannel);
+            }
+        });
 }
 
 }}

@@ -4,6 +4,7 @@
 #include <functional>
 #include <memory>
 #include "Event.hpp"
+#include "Callback.hpp"
 
 
 namespace MiniHttp { namespace Base {
@@ -12,10 +13,9 @@ class EventLoop;
 
 class Channel {
 public:
-    typedef std::function<void()> EventCallback;
 
     Channel(std::shared_ptr<EventLoop>, const int & fd);
-    Channel(const Channel&) = delete;  // non-copyable
+    Channel(const Channel&) = delete;
     Channel & operator=(const Channel &) = delete;
     ~Channel();
     void setReadCallback(const EventCallback & cb) { readCallback = cb; }

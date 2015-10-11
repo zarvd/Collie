@@ -8,7 +8,6 @@
 namespace MiniHttp { namespace Base {
 
 class Channel;
-
 class EPoller;
 
 class EventLoop {

@@ -1,3 +1,4 @@
+#include "../Httpd.hpp"
 #include "Channel.hpp"
 #include "EventLoop.hpp"
 
@@ -15,16 +16,20 @@ Channel::~Channel() {}
 
 void Channel::activate(const unsigned & revents) const {
     if(Event::isError(revents)) {
-        errorCallback();
+        Log(DEBUG) << "Activate ERROR callback";
+        errorCallback(fd);
     } else if(Event::isClose(revents)) {
-        closeCallback();
+        Log(DEBUG) << "Activate CLOSE callback";
+        closeCallback(fd);
     } else if(Event::isRead(revents)) {
         if(isRead()) {
-            readCallback();
+            Log(DEBUG) << "Activate READ callback";
+            readCallback(fd);
         }
     } else if(Event::isWrite(revents)) {
         if(isWrite()) {
-            writeCallback();
+            Log(DEBUG) << "Activate WRITE callback";
+            writeCallback(fd);
         }
     }
 }

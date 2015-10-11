@@ -7,19 +7,23 @@
 
 namespace MiniHttp { namespace Base {
 
-TcpServer::TcpServer(const unsigned & port) : port(port) {}
+TcpServer::TcpServer(const unsigned & port) :
+    port(port),
+    eventLoop(new EventLoop),
+    acceptor(new Acceptor(eventLoop, std::unique_ptr<Socket>(new Socket(port)))) {
 
-TcpServer::~TcpServer() {}
+    Log(TRACE) << "TcpServer constructing";
+}
 
-TcpServer & TcpServer::listen() {
-    eventLoop.reset(new EventLoop);
-    acceptor.reset(new Acceptor(eventLoop,
-                                std::unique_ptr<Socket>(new Socket(port))));
-    acceptor->accept();
-    return * this;
+TcpServer::~TcpServer() {
+    Log(TRACE) << "TcpServer destructing";
 }
 
 void TcpServer::start() {
+    Log(TRACE) << "TcpServer start";
+    acceptor->setConnectionCallback(connectCallback);
+    acceptor->accept();
+    eventLoop->updateChannel(acceptor->getChannel());
     eventLoop->loop();
 }
 

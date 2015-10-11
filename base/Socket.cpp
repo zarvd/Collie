@@ -6,9 +6,12 @@ namespace MiniHttp { namespace Base {
 Socket::Socket(const unsigned& port) :
     fd(socket(port)),
     port(port) {
+    Log(TRACE) << "Socket constructing";
 }
 
-Socket::~Socket() {}
+Socket::~Socket() {
+    Log(TRACE) << "Socket destructing";
+}
 
 int Socket::socket(const unsigned& port) {
     struct sockaddr_in servAddr;
@@ -26,10 +29,12 @@ int Socket::socket(const unsigned& port) {
     if(ret < 0) {
         Log(ERROR) << "bind(): " << getErr();
     }
+    Log(TRACE) << "Socket " << socketFd << " bound";
     return socketFd;
 }
 
 void Socket::listen() const {
+    Log(TRACE) << "Socket listening";
     if(::listen(fd, SOMAXCONN) < 0) {
         Log(ERROR) << "listen(): " << getErr();
     }
@@ -47,6 +52,7 @@ int Socket::accept(const int & fd, std::shared_ptr<SocketAddress> addr) {
     int connFd;
     connFd = ::accept(fd, (struct sockaddr *)&clientAddr, &clientAddrLen);
 
+    Log(TRACE) << "Socket accept connection " << connFd;
     if(connFd < 0) {
         Log(ERROR) << "accept(): " << getErr();
     }
@@ -56,7 +62,23 @@ int Socket::accept(const int & fd, std::shared_ptr<SocketAddress> addr) {
 }
 
 void Socket::close() {
+    Log(TRACE) << "Socket closed";
     ::close(fd);
+}
+
+std::string Socket::recv(const int & fd) {
+    const unsigned msgLength = 8192;  // FIXME
+    char msg[msgLength];
+    ::recv(fd, msg, msgLength, 0);
+    Log(TRACE) << "Socket received: " << std::string(msg);
+    return msg;
+}
+
+void Socket::send(const int & fd, const std::string & msg) {
+    char page[msg.length() + 1];
+    std::strcpy(page, msg.c_str());
+    ::send(fd, page, sizeof(page), 0);
+    Log(TRACE) << "Socket send: " << msg;
 }
 
 }}

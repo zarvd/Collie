@@ -29,6 +29,8 @@ public:
     void listen() const;
     int accept(std::shared_ptr<SocketAddress>) const;
     static int accept(const int & fd, std::shared_ptr<SocketAddress>);
+    static std::string recv(const int & fd);
+    static void send(const int & fd, const std::string & msg);
     void close();
 
 private:
