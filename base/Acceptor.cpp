@@ -9,7 +9,7 @@ namespace MiniHttp { namespace Base {
 Acceptor::Acceptor(std::shared_ptr<EventLoop> eventLoop, std::unique_ptr<Socket> socket) :
     socket(std::move(socket)),  // be careful about the parameter SOCKET, it is not available anymore
     eventLoop(eventLoop),
-    channel(new Channel(eventLoop, this->socket->getFd())){
+    channel(new Channel(eventLoop, this->socket->getFd())) {
 }
 
 Acceptor::~Acceptor() {}
