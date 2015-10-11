@@ -1,5 +1,5 @@
-#ifndef MINIHTTP_HTTP_APPLICATION_HPP
-#define MINIHTTP_HTTP_APPLICATION_HPP
+#ifndef MINIHTTP_HTTP_SERVER_HPP
+#define MINIHTTP_HTTP_SERVER_HPP
 
 #include <cstring>
 
@@ -9,15 +9,15 @@
 
 namespace MiniHttp { namespace Http {
 
-class Application {
+class Server {
 public:
     typedef std::function<void(Request)> RequestHandler;
     typedef std::map<std::pair<std::string, Method>, RequestHandler> Router;
 
-    Application();
-    Application(const Application &) = delete;
-    Application operator=(const Application &) = delete;
-    ~Application();
+    Server();
+    Server(const Server &) = delete;
+    Server operator=(const Server &) = delete;
+    ~Server();
 
     Status init(const unsigned&);
     void run();
@@ -33,4 +33,4 @@ private:
 
 }}
 
-#endif /* MINIHTTP_HTTP_APPLICATION_HPP */
+#endif /* MINIHTTP_HTTP_SERVER_HPP */

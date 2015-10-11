@@ -1,10 +1,10 @@
-#include "Application.hpp"
+#include "Server.hpp"
 #include "StaticFileHandler.hpp"
 
 
 namespace MiniHttp { namespace Http {
 
-Application::Application() :
+Server::Server() :
     tcpSocket(nullptr),
     tcpHandler(nullptr) {
 
@@ -12,9 +12,9 @@ Application::Application() :
     setDefaultTCPHandler();
 }
 
-Application::~Application() {}
+Server::~Server() {}
 
-void Application::setDefaultTCPHandler() {
+void Server::setDefaultTCPHandler() {
     // init default tcp handler
     tcpHandler = [this](const int& connFd) -> void {
         // FIXME parse header and set route
@@ -36,7 +36,7 @@ void Application::setDefaultTCPHandler() {
 /**
  * Initialize a HTTP handler before it runs
  */
-Status Application::init(const unsigned int& port) {
+Status Server::init(const unsigned int& port) {
     Log(DEBUG) << "HTTP handler trying to init";
     try {
         tcpSocket = std::unique_ptr<Socket::TcpSocket>(new Socket::TcpSocket);
@@ -54,7 +54,7 @@ Status Application::init(const unsigned int& port) {
 /**
  *
  */
-void Application::run() {
+void Server::run() {
     try {
         Log(INFO) << "HTTP Server running on port " << tcpSocket->getPort();
         tcpSocket->run();
@@ -64,7 +64,7 @@ void Application::run() {
     }
 }
 
-std::string Application::generateHeader() const {
+std::string Server::generateHeader() const {
     return "";
 }
 
