@@ -18,11 +18,11 @@ Acceptor::~Acceptor() {}
 
 void Acceptor::accept() const {
     channel->enableRead();
-    channel->setReadCallback([this](const int) {
+    channel->setReadCallback([this](const unsigned) {
             std::shared_ptr<SocketAddress> addr(new SocketAddress);
             int connFd = socket->accept(addr);
             if(connFd > 0) {
-                connectCallback(connFd);
+                acceptCallback(connFd, addr);
             }
         });
 }

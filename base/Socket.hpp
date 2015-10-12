@@ -1,16 +1,16 @@
-#ifndef SOCKET_H
-#define SOCKET_H
+#ifndef MINIHTTP_BASE_SOCKET_H
+#define MINIHTTP_BASE_SOCKET_H
 
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <memory>
-#include "../Httpd.hpp"
-#include "SocketAddress.hpp"
 
 
 namespace MiniHttp { namespace Base {
+
+class SocketAddress;
 
 class Socket {
 public:
@@ -25,7 +25,10 @@ public:
     int getPort() const {
         return port;
     }
-    static int socket(const unsigned& port);
+    std::shared_ptr<SocketAddress> getAddr() const {
+        return addr;
+    }
+    int socket(const unsigned& port);
     void listen() const;
     int accept(std::shared_ptr<SocketAddress>) const;
     static int accept(const int & fd, std::shared_ptr<SocketAddress>);
@@ -36,8 +39,9 @@ public:
 private:
     const int fd;
     const unsigned port;
+    std::shared_ptr<SocketAddress> addr;
 };
 
 }}
 
-#endif /* SOCKET_H */
+#endif /* MINIHTTP_BASE_SOCKET_H */

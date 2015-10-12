@@ -7,13 +7,15 @@
 
 namespace MiniHttp { namespace Base {
 
-class SocketAddress final {
- public:
+class SocketAddress {
+public:
     typedef struct sockaddr_in Addr;
 
     SocketAddress() {}
     explicit SocketAddress(const Addr & addr) : addr(addr) {}
     SocketAddress(const SocketAddress & socketAddr) : addr(socketAddr.addr) {}
+    ~SocketAddress() {}
+
     SocketAddress & operator=(const SocketAddress & socketAddr) {
         addr = socketAddr.addr;
         return * this;
@@ -22,12 +24,11 @@ class SocketAddress final {
         this->addr = addr;
         return * this;
     }
-    ~SocketAddress() {}
 
     std::string getIP() const;
     std::string getHostName() const;
 
- private:
+private:
 
     struct sockaddr_in addr;
 };

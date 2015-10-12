@@ -22,8 +22,8 @@ public:
     std::shared_ptr<Channel> getChannel() const {
         return channel;
     }
-    void setConnectionCallback(const ConnectCallback & cb) {
-        connectCallback = cb;
+    void setAcceptCallback(const AcceptCallback & cb) {
+        acceptCallback = cb;
     }
     void accept() const;
 
@@ -32,7 +32,7 @@ private:
     std::unique_ptr<Socket> socket;
     std::shared_ptr<EventLoop> eventLoop;
     std::shared_ptr<Channel> channel;
-    ConnectCallback connectCallback;
+    AcceptCallback acceptCallback;
 };
 
 }}

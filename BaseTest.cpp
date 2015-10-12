@@ -56,6 +56,8 @@ void testEventLoop(const unsigned port) {
                     connChannel->setWriteCallback([connChannel](const unsigned fd) {
                             Log(INFO) << "Connection " << fd << " is writing";
                             Socket::send(fd, "HTTP/1.1 200 OK\n"
+                                         "Content-Type: text/html\n"
+                                         "Content-Length: 21\n"
                                          "\n"
                                          "<h1>hello world!</h1>");
                             connChannel->disableWrite();
@@ -69,12 +71,19 @@ void testEventLoop(const unsigned port) {
                     Log(INFO) << "Connection " << fd << " is closed";
                     connChannel->remove();
                 });
+
+            // error event
+            connChannel->setErrorCallback([connChannel](const unsigned fd) {
+                    Log(INFO) << "Connection " << fd << " meets error";
+                    connChannel->remove();
+                });
         });
     eventLoop->loop();
 }
 
 void testTcpServer(const unsigned port) {
     TcpServer tcp(port);
+
     ConnectCallback acceptCB = [&tcp](const int connFd) {
         std::shared_ptr<Channel> connChannel(new Channel(tcp.getEventLoop(), connFd));
 
@@ -84,7 +93,8 @@ void testTcpServer(const unsigned port) {
             connChannel->enableWrite();
             connChannel->setWriteCallback([connChannel](const int fd) {
                     Socket::send(fd, "HTTP/1.1 404 Not Found\n"
-                                 "Connection: close\n"
+                                 "Content-Type: text/html\n"
+                                 "Content-Length: 22\n"
                                  "\n"
                                  "<h1> Hello,wold! </h1>");
                     connChannel->remove();
@@ -113,6 +123,7 @@ int main(int argc, char *argv[]) {
         port = atoi(argv[1]);
     }
     // testSocket(port);
-    testEventLoop(port);
+    // testEventLoop(port);
+    testTcpServer(port);
     return 0;
 }

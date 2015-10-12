@@ -1,4 +1,6 @@
 #include "Socket.hpp"
+#include "SocketAddress.hpp"
+#include "../Httpd.hpp"
 
 
 namespace MiniHttp { namespace Base {
@@ -16,9 +18,10 @@ Socket::~Socket() {
 int Socket::socket(const unsigned& port) {
     struct sockaddr_in servAddr;
 
+    // IPv4
     servAddr.sin_family = AF_INET;
     servAddr.sin_port = htons(port);
-    servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    servAddr.sin_addr.s_addr = htonl(INADDR_ANY);  // FIXME
 
     int socketFd = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if(socketFd < 0) {
@@ -30,6 +33,9 @@ int Socket::socket(const unsigned& port) {
         Log(ERROR) << "bind(): " << getErr();
     }
     Log(TRACE) << "Socket " << socketFd << " bound";
+
+    // local address
+    addr = std::shared_ptr<SocketAddress>(new SocketAddress(servAddr));
     return socketFd;
 }
 
