@@ -6,6 +6,7 @@
 namespace MiniHttp { namespace Base {
 
 Channel::Channel(std::shared_ptr<EventLoop> eventLoop, const int& fd) :
+    inEventLoop(false),
     fd(fd),
     events(0),
     eventLoop(eventLoop) {
@@ -22,6 +23,22 @@ Channel::Channel(std::shared_ptr<EventLoop> eventLoop, const int& fd) :
 
 Channel::~Channel() {
     Log(TRACE) << "Channel " << fd << " destructing";
+}
+
+void Channel::goInEventLoop() {
+    if( ! inEventLoop) {
+        inEventLoop = true;
+    } else {
+        Log(WARN) << "Channel " << fd << " is already in a EventLoop";
+    }
+}
+
+void Channel::goOutEventLoop() {
+    if(inEventLoop) {
+        inEventLoop = false;
+    } else {
+        Log(WARN) << "Channel " << fd << " is not in a EventLoop";
+    }
 }
 
 void Channel::activate(const unsigned & revents) const {
@@ -54,7 +71,7 @@ void Channel::update() const {
 
 void Channel::remove() const {
     close(fd);  // FIXME
-    // eventLoop->removeChannel(fd);
+    eventLoop->removeChannel(fd);
 }
 
 }}

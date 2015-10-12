@@ -25,20 +25,29 @@ public:
     int getFd() const { return fd; }
     int getEvents() const { return events; }
     std::shared_ptr<EventLoop> const getEventLoop() { return eventLoop; }
+
+    bool getInEventLoop() const { return inEventLoop; }
+    void goInEventLoop();
+    void goOutEventLoop();
+
     bool isNoneEvent() const { return events == 0; }
+    bool isRead() const { return Event::isRead(events); }
+    bool isWrite() const { return Event::isWrite(events); }
+
     void enableRead() { Event::enableRead(events); update(); }
     void disableRead() { Event::disableRead(events); update(); }
-    bool isRead() const { return Event::isRead(events); }
     void enableWrite() { Event::enableWrite(events); update(); }
-    void disableWrite() { Event::disableRead(events); update(); }
+    void disableWrite() { Event::disableWrite(events); update(); }
     void disableAll() { events = 0; update(); }
-    bool isWrite() const { return Event::isWrite(events); }
+
     void activate(const unsigned & revents) const;
+
     void remove() const;
     void update() const;
 
 private:
 
+    bool inEventLoop;
     const int fd;  // file descriptor
     unsigned events;
     std::shared_ptr<EventLoop> eventLoop;

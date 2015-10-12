@@ -6,8 +6,8 @@
 
 namespace MiniHttp { namespace Base {
 
-typedef std::function<void(const unsigned &)> ConnectCallback;
-typedef std::function<void(const unsigned &)> EventCallback;
+typedef std::function<void(const unsigned)> ConnectCallback;
+typedef std::function<void(const unsigned)> EventCallback;
 
 }}
 

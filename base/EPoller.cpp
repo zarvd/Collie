@@ -65,11 +65,9 @@ Status EPoller::modify(const int fd, const unsigned events) {
 }
 
 Status EPoller::remove(const int fd) {
-    Log(TRACE) << "EPoller remove " << fd << " with events ";
-    PollEvent event;
-    event.data.fd = fd;
-    // event.events = events | (unsigned)Event::Type::EdgeTriggered;
-    const int ret = epoll_ctl(epollFd, EPOLL_CTL_DEL, fd, &event);
+    Log(TRACE) << "EPoller remove " << fd;
+    // Since Linux 2.6.9, event can be specified as NULL when using EPOLL_CTL_DEL.
+    const int ret = epoll_ctl(epollFd, EPOLL_CTL_DEL, fd, NULL);
     if(ret == -1) {
         Log(ERROR) << "EPoll del ctl failed: " << getErr();
         return Status::FAIL;
