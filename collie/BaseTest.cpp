@@ -1,10 +1,10 @@
-#include "Httpd.hpp"
+#include "base/Global.hpp"
 #include "base/TcpServer.hpp"
 #include "base/Channel.hpp"
 #include "base/EventLoop.hpp"
 #include "base/Socket.hpp"
 
-using namespace MiniHttp::Base;
+using namespace Collie::Base;
 
 
 void testSocket(const unsigned port) {

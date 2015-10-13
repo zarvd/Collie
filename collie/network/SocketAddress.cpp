@@ -1,7 +1,7 @@
 #include "SocketAddress.hpp"
 
 
-namespace MiniHttp { namespace Base {
+namespace Collie { namespace Network {
 
 std::string SocketAddress::getIP() const {
     return "";

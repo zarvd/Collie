@@ -1,17 +1,18 @@
-#ifndef TCPSERVER_H
-#define TCPSERVER_H
+#ifndef COLLIE_NETWORK_TCP_TCPSERVER_H
+#define COLLIE_NETWORK_TCP_TCPSERVER_H
 
 #include <memory>
-#include "Callback.hpp"
 
 
-namespace MiniHttp { namespace Base {
+namespace Collie { namespace Network { namespace Tcp {
 
 class Acceptor;
 class EventLoop;
 
 class TcpServer {
 public:
+    typedef std::function<void(const unsigned)> ConnectCallback;
+
     explicit TcpServer(const unsigned port);
     TcpServer(const TcpServer &) = delete;
     TcpServer & operator=(const TcpServer &) = delete;
@@ -38,7 +39,6 @@ private:
     ConnectCallback connectCallback;
 };
 
-}}
+}}}
 
-
-#endif /* TCPSERVER_H */
+#endif /* COLLIE_NETWORK_TCP_TCPSERVER_H */
