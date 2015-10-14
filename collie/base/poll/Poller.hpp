@@ -11,9 +11,9 @@ namespace Collie { namespace Base { namespace Poll {
  */
 class Poller {
 public:
-    typedef std::function<void(const unsigned fd, const unsigned revents)> PollCallback;
+    using PollCallback = std::function<void(const unsigned fd, const unsigned revents)>;
 
-    explicit Poller(const unsigned & maxEvent) :
+    explicit Poller(const unsigned & maxEvent) noexcept :
         MaxEvent(maxEvent), fd(-1) {}
     Poller(const Poller &) = delete;
     Poller & operator=(const Poller &) = delete;

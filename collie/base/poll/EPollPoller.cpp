@@ -34,6 +34,7 @@ void EPollPoller::insert(const int fd, const unsigned events) {
     const int ret = epoll_ctl(epollFd, EPOLL_CTL_ADD, fd, &event);
     if(ret == -1) {
         Log(ERROR) << "EPoll add ctl failed: " << getErr();
+        throw Exception::EPollPollError(EXC_DETAIL);
     }
 }
 

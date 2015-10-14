@@ -3,6 +3,7 @@
 
 #include <cstring>
 #include "../logging/Logger.hpp"
+#include "Exception.hpp"
 
 namespace Collie {
 

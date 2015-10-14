@@ -1,6 +1,7 @@
 #ifndef COLLIE_BASE_POLL_POLLPOLLER_H
 #define COLLIE_BASE_POLL_POLLPOLLER_H
 
+#include <memory>
 #include "Poller.hpp"
 
 
@@ -17,8 +18,16 @@ public:
     void insert(const int fd, const unsigned events) override;
     void modify(const int fd, const unsigned events) override;
     void remove(const int fd) override;
-    void poll(std::shared_ptr<ChannelMap>,
-              const int & timeout = -1) override;
+    void poll(PollCallback cb, const int & timeout = -1) override;
+
+    virtual void enableRead(unsigned & events) const override;
+    virtual void disableRead(unsigned & events) const override;
+    virtual void enableWrite(unsigned & events) const override;
+    virtual void disableWrite(unsigned & events) const override;
+    virtual bool isRead(const unsigned & events) const override;
+    virtual bool isWrite(const unsigned & events) const override;
+    virtual bool isError(const unsigned & events) const override;
+    virtual bool isClose(const unsigned & events) const override;
 
 private:
     void create() override;

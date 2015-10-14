@@ -5,10 +5,15 @@
 #include <map>
 
 
-namespace Collie { namespace Base { namespace Event {
+namespace Collie { namespace Base {
+
+namespace Poll {
+class Poller;
+}
+
+namespace Event {
 
 class Channel;
-class Poller;
 
 class EventLoop {
 public:
@@ -38,7 +43,7 @@ public:
 private:
     using ChannelMap = std::map<int, std::shared_ptr<Channel>>;
 
-    std::unique_ptr<Poller> poller;
+    std::unique_ptr<Poll::Poller> poller;
     std::shared_ptr<ChannelMap> channels;
     bool isLooping;
 };

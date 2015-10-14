@@ -1,14 +1,15 @@
 #include <vector>
+#include "../Global.hpp"
 #include "EventLoop.hpp"
-#include "EPoller.hpp"
+#include "../poll/EPollPoller.hpp"
+#include "../poll/PollPoller.hpp"
 #include "Channel.hpp"
-#include "../Httpd.hpp"
 
 
 namespace Collie { namespace Base { namespace Event {
 
 EventLoop::EventLoop() :
-    poller(new EPoller(1024)),
+    poller(new Poll::EPollPoller(1024)),
     channels(new ChannelMap),
     isLooping(false) {
 
@@ -23,7 +24,7 @@ void EventLoop::loop() {
     isLooping = true;
     while(true) {
         Log(TRACE) << "EventLoop looping";
-        poller->poll(channels);
+        // poller->poll(channels);
     }
 }
 
@@ -32,10 +33,9 @@ void EventLoop::updateChannel(std::shared_ptr<Channel> channel) {
     if(hasChannel(channel)) {
         poller->modify(channel->getFd(), channel->getEvents());
     } else {
-        if(poller->insert(channel->getFd(), channel->getEvents()) == Status::SUCCESS) {
-            (*channels)[channel->getFd()] = channel;
-            channel->goInEventLoop();
-        }
+        poller->insert(channel->getFd(), channel->getEvents());
+        (*channels)[channel->getFd()] = channel;
+        channel->goInEventLoop();
     }
 }
 
