@@ -18,7 +18,7 @@ class Channel;
 class EventLoop {
 public:
 
-    EventLoop();
+    EventLoop() noexcept;
     EventLoop(const EventLoop &) = delete;
     EventLoop & operator=(const EventLoop &) = delete;
     ~EventLoop();
@@ -31,14 +31,14 @@ public:
     void removeChannel(const int fd);
 
     // link to poller event method
-    void enableEventRead(unsigned & events) const;
-    void disableEventRead(unsigned & events) const;
-    void enableEventWrite(unsigned & events) const;
-    void disableEventWrite(unsigned & events) const;
-    bool isEventRead(const unsigned & events) const;
-    bool isEventWrite(const unsigned & events) const;
-    bool isEventError(const unsigned & events) const;
-    bool isEventClose(const unsigned & events) const;
+    void enableEventRead(unsigned & events) const noexcept;
+    void disableEventRead(unsigned & events) const noexcept;
+    void enableEventWrite(unsigned & events) const noexcept;
+    void disableEventWrite(unsigned & events) const noexcept;
+    bool isEventRead(const unsigned & events) const noexcept;
+    bool isEventWrite(const unsigned & events) const noexcept;
+    bool isEventError(const unsigned & events) const noexcept;
+    bool isEventClose(const unsigned & events) const noexcept;
 
 private:
     using ChannelMap = std::map<int, std::shared_ptr<Channel>>;

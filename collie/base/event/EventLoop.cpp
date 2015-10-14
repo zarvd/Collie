@@ -8,7 +8,7 @@
 
 namespace Collie { namespace Base { namespace Event {
 
-EventLoop::EventLoop() :
+EventLoop::EventLoop() noexcept :
     poller(new Poll::EPollPoller(1024)),
     channels(new ChannelMap),
     isLooping(false) {
@@ -25,6 +25,10 @@ void EventLoop::loop() {
     while(true) {
         Log(TRACE) << "EventLoop looping";
         // poller->poll(channels);
+        poller->poll([this](const unsigned fd, const unsigned revents) {
+                // find channel
+                // activate channel according to event type
+            });
     }
 }
 

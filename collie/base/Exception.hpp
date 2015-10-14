@@ -16,11 +16,8 @@ inline std::string getDetail(const std::string & file,
 
 class RuntimeError : public std::runtime_error {
 public:
-    RuntimeError() :
-        std::runtime_error("Runtime error"), msg("Unknown") {}
-
-    explicit RuntimeError(const std::string & msg) :
-        std::runtime_error(msg), msg(msg) {}
+    RuntimeError() noexcept : std::runtime_error("Runtime error"), msg("Unknown") {}
+    explicit RuntimeError(const std::string & msg) noexcept : std::runtime_error(msg), msg(msg) {}
 
     const char* what() const noexcept override {
         return msg.c_str();
@@ -31,9 +28,8 @@ protected:
 
 class EPollPollError : public RuntimeError {
 public:
-    EPollPollError() : RuntimeError() {}
-    explicit EPollPollError(const std::string & msg) :
-        RuntimeError(msg) {}
+    EPollPollError() noexcept : RuntimeError() {}
+    explicit EPollPollError(const std::string & msg) noexcept : RuntimeError(msg) {}
 };
 
 }}
