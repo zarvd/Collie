@@ -1,12 +1,12 @@
-#ifndef COLLIE_BASE_EXCEPTION_H
-#define COLLIE_BASE_EXCEPTION_H
+#ifndef COLLIE_EXCEPTION_H
+#define COLLIE_EXCEPTION_H
 
 #include <exception>
 #include <stdexcept>
 
-namespace Collie { namespace Base { namespace Exception {
+namespace Collie { namespace Exception {
 
-#define EXC_DETAIL Collie::Base::Exception::getDetail(__FILE__, __LINE__, __func__)
+#define EXC_DETAIL Collie::Exception::getDetail(__FILE__, __LINE__, __func__)
 
 inline std::string getDetail(const std::string & file,
                              const unsigned & line,
@@ -32,10 +32,10 @@ protected:
 class EPollPollError : public RuntimeError {
 public:
     EPollPollError() : RuntimeError() {}
-    explicit EPollPollError(const std::string & method) :
-        RuntimeError(method) {}
+    explicit EPollPollError(const std::string & msg) :
+        RuntimeError(msg) {}
 };
 
-}}}
+}}
 
-#endif /* COLLIE_BASE_EXCEPTION_H */
+#endif /* COLLIE_EXCEPTION_H */
