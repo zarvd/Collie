@@ -1,9 +1,9 @@
-#include "../Httpd.hpp"
+#include "../Global.hpp"
 #include "Channel.hpp"
 #include "EventLoop.hpp"
 
 
-namespace MiniHttp { namespace Base {
+namespace Collie { namespace Base { namespace Event {
 
 Channel::Channel(std::shared_ptr<EventLoop> eventLoop, const int& fd) :
     inEventLoop(false),
@@ -11,6 +11,8 @@ Channel::Channel(std::shared_ptr<EventLoop> eventLoop, const int& fd) :
     events(0),
     eventLoop(eventLoop) {
     Log(TRACE) << "Channel " << fd << " constructing";
+
+    // default callback
     closeCallback = [](const int fd) {
         // TODO remove channel
         Log(TRACE) << "Close channel " << fd;
@@ -42,20 +44,20 @@ void Channel::goOutEventLoop() {
 }
 
 void Channel::activate(const unsigned & revents) const {
-    if(Event::isError(revents)) {
+    if(eventLoop->isEventError(revents)) {
         Log(TRACE) << "Activate ERROR callback with events " << revents;
         errorCallback(fd);
-    } else if(Event::isClose(revents)) {
+    } else if(eventLoop->isEventClose(revents)) {
         Log(TRACE) << "Activate CLOSE callback with events" << revents;
         closeCallback(fd);
-    } else if(Event::isRead(revents)) {
+    } else if(eventLoop->isEventRead(revents)) {
         if(isRead()) {
             Log(TRACE) << "Activate READ callback with events " << revents;
             readCallback(fd);
         } else {
             Log(WARN) << "READ callback is not available";
         }
-    } else if(Event::isWrite(revents)) {
+    } else if(eventLoop->isEventWrite(revents)) {
         if(isWrite()) {
             Log(TRACE) << "Activate WRITE callback with events" << revents;
             writeCallback(fd);
@@ -74,4 +76,4 @@ void Channel::remove() const {
     eventLoop->removeChannel(fd);
 }
 
-}}
+}}}

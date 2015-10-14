@@ -24,14 +24,14 @@ public:
     virtual void remove(const int fd);
     virtual void poll(PollCallback cb, const int & timeout = -1);
 
-    virtual void enableRead(unsigned & events);
-    virtual void disableRead(unsigned & events);
-    virtual void enableWrite(unsigned & events);
-    virtual void disableWrite(unsigned & events);
-    virtual bool isRead(const unsigned & events);
-    virtual bool isWrite(const unsigned & events);
-    virtual bool isError(const unsigned & events);
-    virtual bool isClose(const unsigned & events);
+    virtual void enableRead(unsigned & events) const;
+    virtual void disableRead(unsigned & events) const;
+    virtual void enableWrite(unsigned & events) const;
+    virtual void disableWrite(unsigned & events) const;
+    virtual bool isRead(const unsigned & events) const;
+    virtual bool isWrite(const unsigned & events) const;
+    virtual bool isError(const unsigned & events) const;
+    virtual bool isClose(const unsigned & events) const;
 
     const unsigned MaxEvent;
 

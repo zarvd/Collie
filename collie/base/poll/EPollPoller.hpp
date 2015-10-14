@@ -36,21 +36,21 @@ public:
         Priority = EPOLLPRI
     };
 
-    void enableRead(unsigned & events) override {
+    void enableRead(unsigned & events) const override {
         events |= (unsigned)Type::Read; }
-    void disableRead(unsigned & events) override {
+    void disableRead(unsigned & events) const override {
         events &= ~(unsigned)Type::Read; }
-    void enableWrite(unsigned & events) override {
+    void enableWrite(unsigned & events) const override {
         events |= (unsigned)Type::Write; }
-    void disableWrite(unsigned & events) override {
+    void disableWrite(unsigned & events) const override {
         events &= ~(unsigned)Type::Write; }
-    bool isRead(const unsigned & events) override {
+    bool isRead(const unsigned & events) const override {
         return (unsigned)Type::Read & events; }
-    bool isWrite(const unsigned & events) override {
+    bool isWrite(const unsigned & events) const override {
         return (unsigned)Type::Write & events; }
-    bool isError(const unsigned & events) override {
+    bool isError(const unsigned & events) const override {
         return (unsigned)Type::Error & events; }
-    bool isClose(const unsigned & events) override {
+    bool isClose(const unsigned & events) const override {
         return (unsigned)Type::Close & events; }
 
     // const unsigned MaxEvent;

@@ -5,7 +5,7 @@
 #include "../Httpd.hpp"
 
 
-namespace MiniHttp { namespace Base {
+namespace Collie { namespace Base { namespace Event {
 
 EventLoop::EventLoop() :
     poller(new EPoller(1024)),
@@ -77,4 +77,4 @@ bool EventLoop::hasChannel(std::shared_ptr<Channel> channel) const {
     return channels->find(channel->getFd()) != channels->end();
 }
 
-}}
+}}}
