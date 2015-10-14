@@ -21,6 +21,7 @@ void EPollPoller::create() {
     if(epollFd == -1) {
         const std::string errMsg = strerror(errno);
         Log(ERROR) << "EPoll create failed: " << errMsg;
+        throw Exception::EPollPollError(EXC_DETAIL);
     }
 }
 
@@ -47,6 +48,7 @@ void EPollPoller::modify(const int fd, const unsigned events) {
     const int ret = epoll_ctl(epollFd, EPOLL_CTL_MOD, fd, &event);
     if(ret == -1) {
         Log(ERROR) << "EPoll mod ctl failed: " << getErr();
+        throw Exception::EPollPollError(EXC_DETAIL);
     }
 }
 
@@ -56,6 +58,7 @@ void EPollPoller::remove(const int fd) {
     const int ret = epoll_ctl(epollFd, EPOLL_CTL_DEL, fd, NULL);
     if(ret == -1) {
         Log(ERROR) << "EPoll del ctl failed: " << getErr();
+        throw Exception::EPollPollError(EXC_DETAIL);
     }
 }
 
@@ -64,6 +67,7 @@ void EPollPoller::poll(PollCallback cb, const int & timeout) {
     int eventNum = epoll_wait(epollFd, revents.get(), MaxEvent, timeout);
     if(eventNum == -1) {
         Log(ERROR) << "EPoll wait failed: " << getErr();
+        throw Exception::EPollPollError(EXC_DETAIL);
     }
 
     Log(TRACE) << "EPoll get " << eventNum << " events";

@@ -14,7 +14,7 @@ namespace Collie { namespace Base { namespace Poll {
 
 class EPollPoller : public Poller {
 public:
-    typedef struct epoll_event Event;
+    using Event = struct epoll_event;
 
     explicit EPollPoller(const unsigned & maxEvent);
     EPollPoller(const EPollPoller &) = delete;

@@ -13,7 +13,7 @@ namespace Collie { namespace Base {
 
 class ThreadPool {
 public:
-    typedef std::function<void()> Task;
+    using Task = std::function<void()>;
 
     explicit ThreadPool(const unsigned &);
     ThreadPool(const ThreadPool &) = delete;
