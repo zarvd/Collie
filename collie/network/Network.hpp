@@ -6,7 +6,7 @@
 
 namespace Collie { namespace Network {
 
-enum class IP {V4, V6};
+enum class IP {V4, V6, Unknown};
 
 }}
 

@@ -24,19 +24,22 @@ public:
     SocketAddress & operator=(const AddrV4 & addr);
 
     std::string getIP() const;
+    std::string getIPVersion() const;
     std::string getHostName() const;
     AddrV4 getAddrV4() const;
     AddrV6 getAddrV6() const;
 
     // TODO detect host's type(ip, domain) and ip version
     // then create sockaddr_in or sockaddr_in6
-    static std::shared_ptr<SocketAddress> getSocketAddress(const std::string & host,
-                                          const unsigned & port);
+    // Note: it will block
+    static std::shared_ptr<SocketAddress> getSocketAddress(const std::string & host, const unsigned & port);
 
-    const IP ipVersion;
 
 private:
+    SocketAddress();
 
+    std::string ip;
+    IP ipVersion;
     AddrV4 addrV4;
     AddrV6 addrV6;
 };
