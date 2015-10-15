@@ -6,7 +6,7 @@
 
 namespace Collie { namespace Network { namespace Tcp {
 
-TcpSocket::TcpSocket(const unsigned& port, std::shared_ptr<SocketAddress> addr) : Socket(port, addr) {
+TcpSocket::TcpSocket(std::shared_ptr<SocketAddress> addr) : Socket(addr) {
     Log(TRACE) << "TcpSocket is constructing";
 }
 
@@ -15,7 +15,7 @@ TcpSocket::~TcpSocket() {
 }
 
 void TcpSocket::listen() {
-    if(addr->ipVersion == IP::V4) {
+    if(addr->getIPVersion() == IP::V4) {
         listenV4();
     } else {
         listenV6();
@@ -32,19 +32,22 @@ void TcpSocket::listenV4() {
 
     fd = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if(fd < 0) {
-        Log(ERROR) << "socket(): " << getErr();
+        Log(ERROR) << "socket(): " << Exception::getErr();
+        THROW_SYS;
     }
 
     int ret = bind(fd, (struct sockaddr *)&servAddr, sizeof(servAddr));
     if(ret < 0) {
-        Log(ERROR) << "bind(): " << getErr();
+        Log(ERROR) << "bind(): " << Exception::getErr();
+        THROW_SYS;
     }
     Log(TRACE) << "Socket " << fd << " is binding";
 
     Log(TRACE) << "Socket listening";
 
     if(::listen(fd, SOMAXCONN) < 0) {
-        Log(ERROR) << "listen(): " << getErr();
+        Log(ERROR) << "listen(): " << Exception::getErr();
+        THROW_SYS;
     }
 }
 
@@ -62,7 +65,8 @@ int TcpSocket::accept(const int & fd, std::shared_ptr<SocketAddress> connAddr) {
 
     Log(TRACE) << "Socket accept connection " << connFd;
     if(connFd < 0) {
-        Log(ERROR) << "accept(): " << getErr();
+        Log(ERROR) << "accept(): " << Exception::getErr();
+        THROW_SYS;
     }
     *connAddr = clientAddr;
 

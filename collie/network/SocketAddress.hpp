@@ -24,7 +24,7 @@ public:
     SocketAddress & operator=(const AddrV4 & addr);
 
     std::string getIP() const;
-    std::string getIPVersion() const;
+    IP getIPVersion() const;
     std::string getHostName() const;
     AddrV4 getAddrV4() const;
     AddrV6 getAddrV6() const;
