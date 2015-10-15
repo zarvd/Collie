@@ -13,8 +13,6 @@ using Logger::Level::INFO;
 using Logger::Level::WARN;
 using Logger::Level::ERROR;
 
-enum class Status {FAIL, SUCCESS};
-
 }
 
 #endif /* COLLIE_BASE_GLOBAL_H */
