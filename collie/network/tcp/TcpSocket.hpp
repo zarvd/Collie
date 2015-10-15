@@ -8,8 +8,7 @@ namespace Collie { namespace Network { namespace Tcp {
 
 class TcpSocket : public Socket {
 public:
-    TcpSocket(const unsigned & port,
-              std::shared_ptr<SocketAddress>);
+    explicit TcpSocket(std::shared_ptr<SocketAddress>);
     TcpSocket(const TcpSocket &) = delete;
     TcpSocket operator=(const TcpSocket &) = delete;
     ~TcpSocket() override;

@@ -2,6 +2,7 @@
 #define COLLIE_NETWORK_SOCKETADDRESS_H
 
 #include <string>
+#include <memory>
 #include <arpa/inet.h>
 
 
@@ -29,7 +30,7 @@ public:
 
     // TODO detect host's type(ip, domain) and ip version
     // then create sockaddr_in or sockaddr_in6
-    static SocketAddress getSocketAddress(const std::string & host,
+    static std::shared_ptr<SocketAddress> getSocketAddress(const std::string & host,
                                           const unsigned & port);
 
     const IP ipVersion;
