@@ -1,7 +1,6 @@
 #ifndef COLLIE_BASE_GLOBAL_H
 #define COLLIE_BASE_GLOBAL_H
 
-#include <cstring>
 #include "../logging/Logger.hpp"
 #include "Exception.hpp"
 
@@ -15,10 +14,6 @@ using Logger::Level::WARN;
 using Logger::Level::ERROR;
 
 enum class Status {FAIL, SUCCESS};
-
-inline std::string getErr() {
-    return std::string(strerror(errno));
-}
 
 }
 

@@ -51,6 +51,7 @@ void EventLoop::updateChannel(const int fd) {
         poller->modify(channel->getFd(), channel->getEvents());
     } else {
         Log(WARN) << "Channel " << fd << " is not in EventLoop";
+        THROW_NOTFOUND;
     }
 }
 
@@ -62,6 +63,7 @@ void EventLoop::removeChannel(std::shared_ptr<Channel> channel) {
         channel->goOutEventLoop();
     } else {
         Log(WARN) << "EventLoop does NOT have channel " << channel->getFd();
+        THROW_NOTFOUND;
     }
 }
 
@@ -74,6 +76,7 @@ void EventLoop::removeChannel(const int fd) {
         channel->goOutEventLoop();
     } else {
         Log(WARN) << "Channel " << fd << " is not in EventLoop";
+        THROW_NOTFOUND;
     }
 }
 

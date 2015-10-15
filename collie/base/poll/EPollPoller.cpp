@@ -19,9 +19,8 @@ void EPollPoller::create() {
     epollFd = epoll_create1(0);
     Log(TRACE) << "EPoller create new epoll " << epollFd;
     if(epollFd == -1) {
-        const std::string errMsg = strerror(errno);
-        Log(ERROR) << "EPoll create failed: " << errMsg;
-        throw Exception::EPollPollError(EXC_DETAIL);
+        Log(ERROR) << "EPoll create failed: " << Exception::getErr();
+        THROW_SYS;
     }
 }
 
@@ -34,8 +33,8 @@ void EPollPoller::insert(const int fd, const unsigned events) {
     // event.events = events | (unsigned)Event::Type::EdgeTriggered;
     const int ret = epoll_ctl(epollFd, EPOLL_CTL_ADD, fd, &event);
     if(ret == -1) {
-        Log(ERROR) << "EPoll add ctl failed: " << getErr();
-        throw Exception::EPollPollError(EXC_DETAIL);
+        Log(ERROR) << "EPoll add ctl failed: " << Exception::getErr();
+        THROW_SYS;
     }
 }
 
@@ -47,8 +46,8 @@ void EPollPoller::modify(const int fd, const unsigned events) {
     // event.events = events | (unsigned)Event::Type::EdgeTriggered;
     const int ret = epoll_ctl(epollFd, EPOLL_CTL_MOD, fd, &event);
     if(ret == -1) {
-        Log(ERROR) << "EPoll mod ctl failed: " << getErr();
-        throw Exception::EPollPollError(EXC_DETAIL);
+        Log(ERROR) << "EPoll mod ctl failed: " << Exception::getErr();
+        THROW_SYS;
     }
 }
 
@@ -57,8 +56,8 @@ void EPollPoller::remove(const int fd) {
     // Since Linux 2.6.9, event can be specified as NULL when using EPOLL_CTL_DEL.
     const int ret = epoll_ctl(epollFd, EPOLL_CTL_DEL, fd, NULL);
     if(ret == -1) {
-        Log(ERROR) << "EPoll del ctl failed: " << getErr();
-        throw Exception::EPollPollError(EXC_DETAIL);
+        Log(ERROR) << "EPoll del ctl failed: " << Exception::getErr();
+        THROW_SYS;
     }
 }
 
@@ -66,8 +65,8 @@ void EPollPoller::poll(PollCallback cb, const int & timeout) {
     Log(TRACE) << "EPoller polling " << epollFd;
     int eventNum = epoll_wait(epollFd, revents.get(), MaxEvent, timeout);
     if(eventNum == -1) {
-        Log(ERROR) << "EPoll wait failed: " << getErr();
-        throw Exception::EPollPollError(EXC_DETAIL);
+        Log(ERROR) << "EPoll wait failed: " << Exception::getErr();
+        THROW_SYS;
     }
 
     Log(TRACE) << "EPoll get " << eventNum << " events";
