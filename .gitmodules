@@ -1,3 +1,0 @@
-[submodule "logging"]
-	path = collie/logging
-	url = https://github.com/Gallonchoi/Logging-plus-plus.git

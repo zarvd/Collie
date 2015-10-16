@@ -1,12 +1,12 @@
 #ifndef COLLIE_BASE_GLOBAL_H
 #define COLLIE_BASE_GLOBAL_H
 
-#include "../logging/Logger.hpp"
+#include <logger/Logger.hpp>
 #include "Exception.hpp"
 
 namespace Collie {
 
-using Logger::LoggingHandler;
+using Logger::logger;
 using Logger::Level::TRACE;
 using Logger::Level::DEBUG;
 using Logger::Level::INFO;
