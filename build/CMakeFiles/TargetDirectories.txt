@@ -1,1 +1,0 @@
-/home/gallon/WorkSpace/private/Collie/build/lib/CMakeFiles/collie.dir
