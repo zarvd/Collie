@@ -1,10 +1,10 @@
-#include "../../../include/Global.hpp"
-#include "../../../include/network/tcp/Connector.hpp"
-#include "../../../include/network/tcp/TcpSocket.hpp"
-#include "../../../include/network/SocketAddress.hpp"
+#include "../../include/Global.hpp"
+#include "../../include/tcp/Connector.hpp"
+#include "../../include/tcp/TcpSocket.hpp"
+#include "../../include/SocketAddress.hpp"
 
 
-namespace Collie { namespace Network { namespace Tcp {
+namespace Collie { namespace Tcp {
 
 Connector::Connector(std::shared_ptr<SocketAddress> addr) :
     remoteAddr(addr) {
@@ -25,4 +25,4 @@ Connector::connect() {
     connectCallback(tcpSocket->getFd());
 }
 
-}}}
+}}

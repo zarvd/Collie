@@ -1,5 +1,5 @@
-#ifndef COLLIE_NETWORK_TCP_ACCEPTOR_H
-#define COLLIE_NETWORK_TCP_ACCEPTOR_H
+#ifndef COLLIE_TCP_ACCEPTOR_H
+#define COLLIE_TCP_ACCEPTOR_H
 
 #include <memory>
 #include <functional>
@@ -12,8 +12,6 @@ class EventLoop;
 class Channel;
 }
 
-namespace Network {
-
 class SocketAddress;
 
 namespace Tcp {
@@ -22,7 +20,8 @@ class TcpSocket;
 
 class Acceptor {
 public:
-    using AcceptCallback = std::function<void(const int, std::shared_ptr<SocketAddress>)>;
+    using AcceptCallback = std::function<void(const unsigned & connFd,
+                                              std::shared_ptr<SocketAddress> remoteAddr)>;
 
     Acceptor(std::shared_ptr<SocketAddress>, std::shared_ptr<Event::EventLoop>);
     Acceptor(const Acceptor &) = delete;
@@ -46,6 +45,6 @@ private:
     AcceptCallback acceptCallback;
 };
 
-}}}
+}}
 
-#endif /* COLLIE_NETWORK_TCP_ACCEPTOR_H */
+#endif /* COLLIE_TCP_ACCEPTOR_H */

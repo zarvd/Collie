@@ -1,10 +1,10 @@
 #include <netinet/in.h>
-#include "../../../include/network/tcp/TcpSocket.hpp"
-#include "../../../include/network/SocketAddress.hpp"
-#include "../../../include/network/Network.hpp"
+#include "../../include/tcp/TcpSocket.hpp"
+#include "../../include/SocketAddress.hpp"
+#include "../../include/Global.hpp"
 
 
-namespace Collie { namespace Network { namespace Tcp {
+namespace Collie { namespace Tcp {
 
 TcpSocket::TcpSocket() :
     Socket(),
@@ -133,4 +133,4 @@ TcpSocket::send(const int & connFd, const std::string & msg, const int & sendFla
     Log(TRACE) << "Socket send msg";
 }
 
-}}}
+}}

@@ -1,5 +1,5 @@
-#ifndef COLLIE_BASE_THREADPOOL_H
-#define COLLIE_BASE_THREADPOOL_H
+#ifndef COLLIE_THREADPOOL_H
+#define COLLIE_THREADPOOL_H
 
 #include <functional>
 #include <thread>
@@ -35,4 +35,4 @@ private:
 
 }
 
-#endif /* COLLIE_BASE_THREADPOOL_H */
+#endif /* COLLIE_THREADPOOL_H */

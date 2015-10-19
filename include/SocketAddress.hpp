@@ -1,12 +1,12 @@
-#ifndef COLLIE_NETWORK_SOCKETADDRESS_H
-#define COLLIE_NETWORK_SOCKETADDRESS_H
+#ifndef COLLIE_SOCKETADDRESS_H
+#define COLLIE_SOCKETADDRESS_H
 
 #include <string>
 #include <memory>
 #include <arpa/inet.h>
 
 
-namespace Collie { namespace Network {
+namespace Collie {
 
 enum class IP;
 
@@ -43,6 +43,6 @@ private:
     AddrV6 addrV6;
 };
 
-}}
+}
 
-#endif /* COLLIE_NETWORK_SOCKETADDRESS_H */
+#endif /* COLLIE_SOCKETADDRESS_H */

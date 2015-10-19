@@ -1,10 +1,10 @@
-#ifndef COLLIE_NETWORK_TCP_CONNECTOR_H
-#define COLLIE_NETWORK_TCP_CONNECTOR_H
+#ifndef COLLIE_TCP_CONNECTOR_H
+#define COLLIE_TCP_CONNECTOR_H
 
 #include <functional>
 #include <memory>
 
-namespace Collie { namespace Network {
+namespace Collie {
 
 class SocketAddress;
 
@@ -34,6 +34,6 @@ private:
     ConnectCallback connectCallback;
 };
 
-}}}
+}}
 
-#endif /* COLLIE_NETWORK_TCP_CONNECTOR_H */
+#endif /* COLLIE_TCP_CONNECTOR_H */

@@ -1,12 +1,12 @@
-#ifndef COLLIE_NETWORK_SOCKET_H
-#define COLLIE_NETWORK_SOCKET_H
+#ifndef COLLIE_SOCKET_H
+#define COLLIE_SOCKET_H
 
 #include <sys/socket.h>
 #include <memory>
 #include <netinet/in.h>
 
 
-namespace Collie { namespace Network {
+namespace Collie {
 
 enum class IP;
 class SocketAddress;
@@ -21,7 +21,7 @@ public:
     Socket();  // client constructor
     explicit Socket(std::shared_ptr<SocketAddress>);  // server constructor
     Socket(const Socket &) = delete;
-    Socket & operator=(const Socket&) = delete;
+    Socket & operator=(const Socket &) = delete;
     virtual ~Socket() = 0;
 
     // getter
@@ -41,6 +41,6 @@ protected:
     std::shared_ptr<SocketAddress> localAddr;
 };
 
-}}
+}
 
-#endif /* COLLIE_NETWORK_SOCKET_H */
+#endif /* COLLIE_SOCKET_H */

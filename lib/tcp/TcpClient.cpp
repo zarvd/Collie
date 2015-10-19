@@ -1,10 +1,10 @@
-#include "../../../include/Global.hpp"
-#include "../../../include/network/tcp/TcpClient.hpp"
-#include "../../../include/network/tcp/Connector.hpp"
-#include "../../../include/network/SocketAddress.hpp"
+#include "../../include/Global.hpp"
+#include "../../include/tcp/TcpClient.hpp"
+#include "../../include/tcp/Connector.hpp"
+#include "../../include/SocketAddress.hpp"
 
 
-namespace Collie { namespace Network { namespace Tcp {
+namespace Collie { namespace Tcp {
 
 TcpClient::TcpClient() {}
 
@@ -21,4 +21,4 @@ TcpClient::connect(const std::string & host, const unsigned & port) {
     connector->setConnectCallback(connectCallback);
 }
 
-}}}
+}}

@@ -1,9 +1,9 @@
-#include "../../include/network/Socket.hpp"
-#include "../../include/network/SocketAddress.hpp"
-#include "../../include/network/Network.hpp"
+#include "../include/Global.hpp"
+#include "../include/Socket.hpp"
+#include "../include/SocketAddress.hpp"
 
 
-namespace Collie { namespace Network {
+namespace Collie {
 
 Socket::Socket() :
     type(Type::Client),
@@ -27,4 +27,4 @@ void Socket::close() {
     ::close(fd);
 }
 
-}}
+}

@@ -1,24 +1,27 @@
-#ifndef COLLIE_NETWORK_TCP_TCPSERVER_H
-#define COLLIE_NETWORK_TCP_TCPSERVER_H
+#ifndef COLLIE_TCP_TCPSERVER_H
+#define COLLIE_TCP_TCPSERVER_H
 
 #include <memory>
-
+#include <string>
 
 namespace Collie {
 
-namespace Base {
+namespace Event {
 class EventLoop;
 }
 
-namespace Network { namespace Tcp {
+class SocketAddress;
+
+namespace Tcp {
 
 class Acceptor;
+class TcpConnection;
 
 class TcpServer {
 public:
-    using ConnectCallback = std::function<void(const unsigned)>;
+    using ConnectCallback = std::function<void(std::shared_ptr<TcpConnection>)>;
 
-    explicit TcpServer(const unsigned port);
+    explicit TcpServer(const std::string & host, const unsigned & port);
     TcpServer(const TcpServer &) = delete;
     TcpServer & operator=(const TcpServer &) = delete;
     ~TcpServer();
@@ -31,19 +34,20 @@ public:
         messageCallback = cb;
     }
     unsigned getPort() const { return port; }
-    std::shared_ptr<Base::EventLoop> getEventLoop() const { return eventLoop; }
+    std::shared_ptr<Event::EventLoop> getEventLoop() const { return eventLoop; }
 
 private:
     void newConnection();
 
-
+    const std::string host;
     const unsigned port;
-    std::shared_ptr<Base::EventLoop> eventLoop;
+    std::shared_ptr<SocketAddress> localAddr;
+    std::shared_ptr<Event::EventLoop> eventLoop;
     std::unique_ptr<Acceptor> acceptor;
-    ConnectCallback messageCallback;
     ConnectCallback connectCallback;
+    ConnectCallback messageCallback;
 };
 
-}}}
+}}
 
-#endif /* COLLIE_NETWORK_TCP_TCPSERVER_H */
+#endif /* COLLIE_TCP_TCPSERVER_H */

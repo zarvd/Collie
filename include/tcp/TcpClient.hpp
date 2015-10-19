@@ -1,11 +1,11 @@
-#ifndef COLLIE_NETWORK_TCP_TCPCLIENT_H
-#define COLLIE_NETWORK_TCP_TCPCLIENT_H
+#ifndef COLLIE_TCP_TCPCLIENT_H
+#define COLLIE_TCP_TCPCLIENT_H
 
 #include <functional>
 #include <memory>
 #include <string>
 
-namespace Collie { namespace Network {
+namespace Collie {
 
 class SocketAddress;
 
@@ -33,6 +33,6 @@ private:
     std::shared_ptr<SocketAddress> remoteAddr;
 };
 
-}}}
+}}
 
-#endif /* COLLIE_NETWORK_TCP_TCPCLIENT_H */
+#endif /* COLLIE_TCP_TCPCLIENT_H */

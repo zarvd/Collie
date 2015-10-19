@@ -1,11 +1,11 @@
-#include "../../../include/network/tcp/Acceptor.hpp"
-#include "../../../include/event/EventLoop.hpp"
-#include "../../../include/network/tcp/TcpSocket.hpp"
-#include "../../../include/event/Channel.hpp"
-#include "../../../include/network/SocketAddress.hpp"
+#include "../../include/tcp/Acceptor.hpp"
+#include "../../include/event/EventLoop.hpp"
+#include "../../include/tcp/TcpSocket.hpp"
+#include "../../include/event/Channel.hpp"
+#include "../../include/SocketAddress.hpp"
 
 
-namespace Collie { namespace Network { namespace Tcp {
+namespace Collie { namespace Tcp {
 
 Acceptor::Acceptor(std::shared_ptr<SocketAddress> addr,
                    std::shared_ptr<Event::EventLoop> eventLoop) :
@@ -34,4 +34,4 @@ Acceptor::accept() {
         });
 }
 
-}}}
+}}

@@ -1,10 +1,10 @@
-#ifndef COLLIE_NETWORK_TCP_TCPSOCKET_H
-#define COLLIE_NETWORK_TCP_TCPSOCKET_H
+#ifndef COLLIE_TCP_TCPSOCKET_H
+#define COLLIE_TCP_TCPSOCKET_H
 
 #include "../Socket.hpp"
 
 
-namespace Collie { namespace Network { namespace Tcp {
+namespace Collie { namespace Tcp {
 
 class TcpSocket : public Socket {
 public:
@@ -35,8 +35,8 @@ private:
     int recvFlag;
 };
 
-}}}
+}}
 
 
 
-#endif /* COLLIE_NETWORK_TCP_TCPSOCKET_H */
+#endif /* COLLIE_TCP_TCPSOCKET_H */
