@@ -1,16 +1,20 @@
 #include "../../include/tcp/TcpConnection.hpp"
 #include "../../include/tcp/TcpSocket.hpp"
 #include "../../include/SocketAddress.hpp"
+#include "../../include/event/EventLoop.hpp"
 #include "../../include/event/Channel.hpp"
 #include <functional>
 
 
 namespace Collie { namespace Tcp {
 
-TcpConnection::TcpConnection(std::shared_ptr<Event::Channel> channel,
+TcpConnection::TcpConnection(std::shared_ptr<Event::EventLoop> eventLoop,
+                             const unsigned fd,
                              std::shared_ptr<SocketAddress> localAddr,
                              std::shared_ptr<SocketAddress> remoteAddr) :
-    channel(channel),
+    connFd(fd),
+    eventLoop(eventLoop),
+    channel(new Event::Channel(eventLoop, connFd)),
     localAddr(localAddr),
     remoteAddr(remoteAddr) {
 
@@ -20,6 +24,7 @@ TcpConnection::TcpConnection(std::shared_ptr<Event::Channel> channel,
     channel->setErrorCallback(std::bind(&TcpConnection::handleError, this));
     channel->enableRead();
     channel->enableWrite();
+    eventLoop->updateChannel(channel);
 }
 
 TcpConnection::~TcpConnection() {
