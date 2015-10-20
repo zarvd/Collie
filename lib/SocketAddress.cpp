@@ -1,9 +1,9 @@
 #include <netdb.h>
-#include "Network.hpp"
-#include "SocketAddress.hpp"
+#include "../include/Global.hpp"
+#include "../include/SocketAddress.hpp"
 
 
-namespace Collie { namespace Network {
+namespace Collie {
 
 std::string SocketAddress::getIP() const {
     return "";
@@ -66,4 +66,5 @@ std::shared_ptr<SocketAddress> SocketAddress::getSocketAddress(const std::string
 
     return addr;
 }
-}}
+
+}

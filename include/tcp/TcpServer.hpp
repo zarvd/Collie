@@ -19,7 +19,8 @@ class TcpConnection;
 
 class TcpServer {
 public:
-    using ConnectCallback = std::function<void(std::shared_ptr<TcpConnection>)>;
+    using OnMessageCallback = std::function<void(std::shared_ptr<TcpConnection>)>;
+    using ConnectedCallback = std::function<void()>;
 
     explicit TcpServer(const std::string & host, const unsigned & port);
     TcpServer(const TcpServer &) = delete;
@@ -27,25 +28,22 @@ public:
     ~TcpServer();
 
     void start();
-    void setConnectCallback(const ConnectCallback & cb) {
-        connectCallback = cb;
-    }
-    void setMessageCallback(const ConnectCallback & cb) {
-        messageCallback = cb;
-    }
+    void setConnectedCallback(const ConnectedCallback & cb) { connectedCallback = cb; }
+    void setConnectedCallback(const ConnectedCallback && cb) { connectedCallback = std::move(cb); }
+    void setOnMessageCallback(const OnMessageCallback & cb) { onMessageCallback = cb; }
+    void setOnMessageCallback(const OnMessageCallback && cb) { onMessageCallback = std::move(cb); }
     unsigned getPort() const { return port; }
     std::shared_ptr<Event::EventLoop> getEventLoop() const { return eventLoop; }
 
 private:
-    void newConnection();
-
+    void newConnection(const unsigned & connFd, std::shared_ptr<SocketAddress> remoteAddr);
     const std::string host;
     const unsigned port;
     std::shared_ptr<SocketAddress> localAddr;
     std::shared_ptr<Event::EventLoop> eventLoop;
     std::unique_ptr<Acceptor> acceptor;
-    ConnectCallback connectCallback;
-    ConnectCallback messageCallback;
+    ConnectedCallback connectedCallback;
+    OnMessageCallback onMessageCallback;
 };
 
 }}

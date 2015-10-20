@@ -28,38 +28,24 @@ void
 TcpServer::start() {
     Log(TRACE) << "TcpServer start";
 
+    using namespace std::placeholders;
     // setup acceptor
-    acceptor->setAcceptCallback([this](const unsigned & connFd,
-                                       std::shared_ptr<SocketAddress> remoteAddr) {
-            Log(INFO) << "TcpServer accept fd(" << connFd << ") ip(" << remoteAddr->getIP() << ")";
-
-            // new connection channel
-            std::shared_ptr<Event::Channel> connChannel(new Event::Channel(this->eventLoop, connFd));
-            // add this channel to event loop
-            this->eventLoop->updateChannel(connChannel);
-
-            // read event
-            connChannel->setReadCallback([this, connChannel](const unsigned fd) {
-                    std::shared_ptr<TcpConnection> connection(new TcpConnection());
-                    this->connectCallback(connection);
-                });
-
-            // close event
-            connChannel->setCloseCallback([connChannel](const unsigned fd) {
-                    Log(INFO) << "Connection " << fd << " is closed";
-                    connChannel->remove();
-                });
-
-            // error event
-            connChannel->setErrorCallback([connChannel](const unsigned fd) {
-                    Log(INFO) << "Connection " << fd << " meets error";
-                    connChannel->remove();
-                });
-
-        });
+    acceptor->setAcceptCallback(std::bind(&TcpServer::newConnection, this, _1, _2));
     acceptor->accept();
     eventLoop->updateChannel(acceptor->getChannel());
     eventLoop->loop();
+}
+
+void
+TcpServer::newConnection(const unsigned &connFd, std::shared_ptr<SocketAddress> remoteAddr) {
+    Log(INFO) << "TcpServer accept fd(" << connFd << ") ip(" << remoteAddr->getIP() << ")";
+
+    // new connection
+    std::shared_ptr<TcpConnection> connection(new TcpConnection(this->eventLoop, connFd, this->localAddr, remoteAddr));
+    connection->setMessageCallback(onMessageCallback);
+
+    // user callback
+    connectedCallback();
 }
 
 }}

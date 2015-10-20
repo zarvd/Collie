@@ -9,6 +9,7 @@ namespace Collie {
 
 namespace Event {
 
+class EventLoop;
 class Channel;
 
 }
@@ -17,29 +18,43 @@ class SocketAddress;
 
 namespace Tcp {
 
-class TcpConnection {
+class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
 public:
+    using MessageCallback = std::function<void(std::shared_ptr<TcpConnection>)>;
 
-    TcpConnection(std::shared_ptr<Event::Channel> channel,
+    TcpConnection(std::shared_ptr<Event::EventLoop> eventLoop,
+                  const unsigned fd,
                   std::shared_ptr<SocketAddress> localAddr,
                   std::shared_ptr<SocketAddress> remoteAddr);
-
     TcpConnection(const TcpConnection &) = delete;
-    TcpConnection operator=(const TcpConnection &) = delete;
+    TcpConnection & operator=(const TcpConnection &) = delete;
     ~TcpConnection();
 
     std::shared_ptr<Event::Channel> getChannel() const { return channel; }
     std::shared_ptr<SocketAddress> getLocalAddr() const { return localAddr; }
     std::shared_ptr<SocketAddress> getRemoteAddr() const { return remoteAddr; }
+    void setMessageCallback(const MessageCallback & cb) { messageCallback = cb; }
+    void setMessageCallback(const MessageCallback && cb) { messageCallback = std::move(cb); }
 
-    std::string recv();
+    void disconnect();
+    std::string recvAll();
     void send(const std::string &);
 
 private:
+    void handleRead();
+    void handleWrite();
+    void handleClose();
+    void handleError();
 
+    bool connected;
+    const unsigned connFd;
+    std::shared_ptr<Event::EventLoop> eventLoop;
+    std::shared_ptr<Event::Channel> channel;
     std::shared_ptr<SocketAddress> localAddr;
     std::shared_ptr<SocketAddress> remoteAddr;
-    std::shared_ptr<Event::Channel> channel;
+    std::string inputBuffer;
+    std::string outputBuffer;
+    MessageCallback messageCallback;
 };
 
 }}
