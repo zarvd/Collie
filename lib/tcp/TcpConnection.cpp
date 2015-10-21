@@ -63,11 +63,9 @@ TcpConnection::handleRead() {
         inputBuffer.clear();
     } else {
         channel->disableRead();
-        channel->update();
     }
     if(outputBuffer.size() > 0) {
         channel->enableWrite();
-        channel->update();
     }
 }
 
@@ -78,7 +76,6 @@ TcpConnection::handleWrite() {
         outputBuffer.clear();
     }
     channel->disableWrite();
-    channel->update();
 }
 
 void

@@ -58,27 +58,32 @@ Channel::isWrite() const {
 void
 Channel::enableRead() {
     eventLoop->enableEventRead(events);
+    update();
 }
 
 void
 Channel::disableRead() {
     eventLoop->disableEventRead(events);
+    update();
 }
 
 void
 Channel::enableWrite() {
     eventLoop->enableEventWrite(events);
+    update();
 }
 
 void
 Channel::disableWrite() {
     eventLoop->disableEventWrite(events);
+    update();
 }
 
 void
 Channel::disableAll() {
     // FIXME
     events = 0;
+    update();
 }
 
 void
@@ -127,14 +132,14 @@ Channel::activate(const unsigned & revents) const {
 }
 
 void
-Channel::update() const {
-    eventLoop->updateChannel(fd);
+Channel::update() {
+    eventLoop->updateChannel(shared_from_this());
 }
 
 void
-Channel::remove() const {
+Channel::remove() {
     close(fd);  // FIXME
-    eventLoop->removeChannel(fd);
+    eventLoop->removeChannel(shared_from_this());
 }
 
 }}

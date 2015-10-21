@@ -43,7 +43,7 @@ TcpServer::newConnection(const unsigned & connFd, std::shared_ptr<SocketAddress>
     // new connection
     std::shared_ptr<TcpConnection> connection(new TcpConnection(this->eventLoop, connFd, this->localAddr, remoteAddr));
     connection->setMessageCallback(onMessageCallback);
-    clients.push_back(connection);
+    clients.push_back(connection);  // FIXME
 
     // user callback
     if(connectedCallback) connectedCallback();

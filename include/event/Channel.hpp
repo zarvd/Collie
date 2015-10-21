@@ -9,7 +9,7 @@ namespace Collie { namespace Event {
 
 class EventLoop;
 
-class Channel {
+class Channel : public std::enable_shared_from_this<Channel> {
 public:
     using EventCallback = std::function<void()>;
 
@@ -46,8 +46,8 @@ public:
     void disableAll();
 
     void activate(const unsigned & revents) const;
-    void remove() const;
-    void update() const;
+    void remove();
+    void update();
 
 private:
 
