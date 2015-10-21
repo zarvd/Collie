@@ -59,6 +59,11 @@ TcpSocket::listenV4() {
 }
 
 void
+TcpSocket::listenV6() {
+    // TODO
+}
+
+void
 TcpSocket::connect(std::shared_ptr<SocketAddress> servAddr) {
     if(servAddr->getIPVersion() == IP::V4) {
         connectV4(servAddr);
@@ -80,6 +85,11 @@ TcpSocket::connectV4(std::shared_ptr<SocketAddress> servAddr) {
         Log(ERROR) << "connect(): " << Exception::getErr();
         THROW_SYS;
     }
+}
+
+void
+TcpSocket::connectV6(std::shared_ptr<SocketAddress>) {
+    // TODO
 }
 
 int
@@ -113,6 +123,9 @@ TcpSocket::recv(const int & connFd) {
 
 std::string
 TcpSocket::recv(const int & connFd, const int & recvFlag) {
+    if(connFd < 2) {
+        Log(WARN) << "Illegal connection fd " << connFd;
+    }
     const unsigned msgLength = 8192;  // FIXME
     char msg[msgLength];
     ::recv(connFd, msg, msgLength, recvFlag);

@@ -11,7 +11,7 @@ public:
     TcpSocket();  // client constructor
     explicit TcpSocket(std::shared_ptr<SocketAddress> servAddr);  // server constructor
     TcpSocket(const TcpSocket &) = delete;
-    TcpSocket operator=(const TcpSocket &) = delete;
+    TcpSocket & operator=(const TcpSocket &) = delete;
     ~TcpSocket() override;
 
     void listen() override;

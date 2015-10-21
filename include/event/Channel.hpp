@@ -35,8 +35,8 @@ public:
     void goInEventLoop();
     void goOutEventLoop();
 
-    bool isNoneEvent() const;
-    bool isRead() const ;
+    bool isNoneEvent() const { return events == 0; }
+    bool isRead() const;
     bool isWrite() const;
 
     void enableRead();

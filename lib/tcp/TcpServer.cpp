@@ -37,15 +37,16 @@ TcpServer::start() {
 }
 
 void
-TcpServer::newConnection(const unsigned &connFd, std::shared_ptr<SocketAddress> remoteAddr) {
+TcpServer::newConnection(const unsigned & connFd, std::shared_ptr<SocketAddress> remoteAddr) {
     Log(INFO) << "TcpServer accept fd(" << connFd << ") ip(" << remoteAddr->getIP() << ")";
 
     // new connection
     std::shared_ptr<TcpConnection> connection(new TcpConnection(this->eventLoop, connFd, this->localAddr, remoteAddr));
     connection->setMessageCallback(onMessageCallback);
+    clients.push_back(connection);
 
     // user callback
-    connectedCallback();
+    if(connectedCallback) connectedCallback();
 }
 
 }}

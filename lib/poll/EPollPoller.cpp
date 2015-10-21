@@ -78,14 +78,12 @@ EPollPoller::poll(PollCallback cb, const int & timeout) {
 
     for(int idx = 0; idx < eventNum; ++ idx) {
         const Event & curEvent = revents.get()[idx];
-        cb(curEvent.data.fd, curEvent.events);  // XXX
-        // if(*channels->find(curEvent.data.fd) != *channels->end()) {
-        //     Log(TRACE) << "Activating channel " << curEvent.data.fd;
-        //     std::shared_ptr<Channel> channel = channels->at(curEvent.data.fd);
-        //     // channel->activate(curEvent.events);
-        // } else {
-        //     Log(WARN) << "channel " << curEvent.data.fd << " is not existed";
-        // }
+        if(cb) {
+            cb(curEvent.data.fd, curEvent.events);  // XXX
+        } else {
+            Log(ERROR) << "PollCallback is not callable";
+            THROW_NOTFOUND;
+        }
     }
 }
 

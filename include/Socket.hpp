@@ -28,10 +28,10 @@ public:
     int getFd() const { return fd; }
     std::shared_ptr<SocketAddress> getLocalAddr() const { return localAddr; }
 
-    virtual void listen();
-    virtual void connect(std::shared_ptr<SocketAddress>);
-    void setNonBlocking();
-    void setBlocking();
+    virtual void listen() = 0;
+    virtual void connect(std::shared_ptr<SocketAddress>) = 0;
+    // void setNonBlocking();
+    // void setBlocking();
     void close();
 
 protected:

@@ -6,11 +6,28 @@
 namespace Collie {
 
 std::string SocketAddress::getIP() const {
+    // TODO
     return "";
 }
 
 std::string SocketAddress::getHostName() const {
+    // TODO
     return "";
+}
+
+SocketAddress & SocketAddress::operator=(const SocketAddress & that) {
+    ip = that.ip;
+    ipVersion = that.ipVersion;
+    addrV4 = that.addrV4;
+    addrV6 = that.addrV6;
+    return * this;
+}
+
+SocketAddress & SocketAddress::operator=(const AddrV4 & addr) {
+    // TODO
+    ipVersion = IP::V4;
+    addrV4 = addr;
+    return * this;
 }
 
 std::shared_ptr<SocketAddress> SocketAddress::getSocketAddress(const std::string & host, const unsigned & port) {

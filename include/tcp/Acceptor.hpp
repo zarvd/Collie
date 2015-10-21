@@ -38,6 +38,9 @@ public:
 
 private:
 
+    void handleRead();
+    void handleError();
+
     std::unique_ptr<TcpSocket> tcpSocket;
     std::shared_ptr<SocketAddress> localAddr;
     std::shared_ptr<Event::EventLoop> eventLoop;

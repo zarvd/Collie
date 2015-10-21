@@ -29,6 +29,13 @@ EventLoop::loop() {
         poller->poll([this](const unsigned fd, const unsigned revents) {
                 // find channel
                 // activate channel according to event type
+                auto it = this->channels->find(fd);
+                if(it != this->channels->end()) {
+                    auto channel = it->second;
+                    channel->activate(revents);
+                } else {
+                    Log(WARN) << "Unknown channel " << fd;
+                }
             });
     }
 }
