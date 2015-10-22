@@ -18,7 +18,7 @@ main(int argc, char *argv[]) {
     unsigned port = 8080;
     if(argc == 2) port = std::stoul(argv[1]);
 
-    TcpServer server("127.0.0.1", port);
+    TcpServer server("0.0.0.0", port);
     server.setOnMessageCallback([](std::shared_ptr<TcpConnection> conn) {
             const std::string content = conn->recvAll();
 

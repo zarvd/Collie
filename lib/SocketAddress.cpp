@@ -5,33 +5,30 @@
 
 namespace Collie {
 
-std::string SocketAddress::getIP() const {
-    // TODO
-    return "";
-}
-
-std::string SocketAddress::getHostName() const {
-    // TODO
-    return "";
-}
-
-SocketAddress & SocketAddress::operator=(const SocketAddress & that) {
+SocketAddress &
+SocketAddress::operator=(const SocketAddress & that) {
     ip = that.ip;
+    port = that.port;
     ipVersion = that.ipVersion;
     addrV4 = that.addrV4;
     addrV6 = that.addrV6;
     return * this;
 }
 
-SocketAddress & SocketAddress::operator=(const AddrV4 & addr) {
+SocketAddress &
+SocketAddress::operator=(const AddrV4 & addr) {
     // TODO
     ipVersion = IP::V4;
     addrV4 = addr;
+    char ipv4[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &(addrV4.sin_addr), ipv4, INET_ADDRSTRLEN);
+    ip = ipv4;
+    port = ntohs(addr.sin_port);
     return * this;
 }
 
-std::shared_ptr<SocketAddress> SocketAddress::getSocketAddress(const std::string & host, const unsigned & port) {
-
+std::shared_ptr<SocketAddress>
+SocketAddress::getSocketAddress(const std::string & host, const unsigned & port) {
 
     std::shared_ptr<SocketAddress> addr(new SocketAddress);
 
@@ -50,6 +47,7 @@ std::shared_ptr<SocketAddress> SocketAddress::getSocketAddress(const std::string
                 THROW_INVALID_ARGUMENT;
             }
             addr->ip = ipv4;
+            addr->port = port;
             addr->ipVersion = IP::V4;
             addr->addrV4.sin_family = AF_INET;
             addr->addrV4.sin_port = htons(port);
@@ -67,6 +65,7 @@ std::shared_ptr<SocketAddress> SocketAddress::getSocketAddress(const std::string
                 THROW_INVALID_ARGUMENT;
             }
             addr->ip = ipv6;
+            addr->port = port;
             addr->ipVersion = IP::V6;
             addr->addrV6.sin6_family = AF_INET6;
             addr->addrV6.sin6_port = htons(port);
