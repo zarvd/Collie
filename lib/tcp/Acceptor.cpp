@@ -11,20 +11,28 @@ namespace Collie { namespace Tcp {
 Acceptor::Acceptor(std::shared_ptr<SocketAddress> addr,
                    std::shared_ptr<Event::EventLoop> eventLoop) :
     localAddr(addr),
-    eventLoop(eventLoop) {}
+    eventLoop(eventLoop) {
+    Log(TRACE) << "Acceptor constructing";
+}
 
-Acceptor::~Acceptor() {}
+Acceptor::~Acceptor() {
+    Log(TRACE) << "Acceptor destructing";
+}
 
 void
 Acceptor::socket() {
+    // create socket and listen
     tcpSocket.reset(new TcpSocket(localAddr));
     tcpSocket->listen();
+    // create channel
     channel.reset(new Event::Channel(eventLoop, tcpSocket->getFd()));
 }
 
 void
 Acceptor::accept() {
     if( ! channel) socket();
+    // update channel and set acceptCallback
+    eventLoop->updateChannel(channel);
     channel->enableRead();
     channel->setReadCallback(std::bind(&Acceptor::handleRead, this));
 }

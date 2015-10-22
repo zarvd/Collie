@@ -8,7 +8,8 @@ using Collie::Tcp::TcpServer;
 using Collie::Tcp::TcpConnection;
 using namespace Collie;
 
-int main(int argc, char *argv[]) {
+int
+main(int argc, char *argv[]) {
 
     auto & logger = Logger::LogHandler::getHandler();
     logger.setLogLevel(TRACE);
@@ -21,12 +22,12 @@ int main(int argc, char *argv[]) {
     server.setOnMessageCallback([](std::shared_ptr<TcpConnection> conn) {
             const std::string content = conn->recvAll();
 
-            std::cout << content << std::endl;
-            conn->send("HTTP/1.1 200 OK\n"
-                       "Content-Type:text/html; charset=UTF-8\n"
+            conn->send("HTTP/1.1 404 Not Found\n"
+                       "Content-Type:text/html;\n"
                        "Content-Length:21\n"
                        "\n"
                        "<h1>hello, world</h1>");
+            conn->disconnect();
         });
     server.start();
     return 0;

@@ -26,13 +26,12 @@ TcpServer::~TcpServer() {
 
 void
 TcpServer::start() {
-    Log(TRACE) << "TcpServer start";
+    Log(INFO) << "TcpServer start";
 
     using namespace std::placeholders;
     // setup acceptor
     acceptor->setAcceptCallback(std::bind(&TcpServer::newConnection, this, _1, _2));
     acceptor->accept();
-    eventLoop->updateChannel(acceptor->getChannel());
     eventLoop->loop();
 }
 

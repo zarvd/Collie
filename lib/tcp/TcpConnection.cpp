@@ -21,12 +21,12 @@ TcpConnection::TcpConnection(std::shared_ptr<Event::EventLoop> eventLoop,
     localAddr(localAddr),
     remoteAddr(remoteAddr) {
 
+    // set channel callback and enable reading
     channel->setReadCallback(std::bind(&TcpConnection::handleRead, this));
     channel->setWriteCallback(std::bind(&TcpConnection::handleWrite, this));
     channel->setCloseCallback(std::bind(&TcpConnection::handleClose, this));
     channel->setErrorCallback(std::bind(&TcpConnection::handleError, this));
     channel->enableRead();
-    eventLoop->updateChannel(channel);
     Log(TRACE) << "Tcp Connection constructing";
 }
 
@@ -37,6 +37,11 @@ TcpConnection::~TcpConnection() {
 void
 TcpConnection::disconnect() {
     connected = false;
+    if(outputBuffer.size() == 0) shutdown();
+}
+
+void
+TcpConnection::shutdown() {
     channel->remove();
 }
 
@@ -76,6 +81,7 @@ TcpConnection::handleWrite() {
         outputBuffer.clear();
     }
     channel->disableWrite();
+    if( ! connected) shutdown();
 }
 
 void

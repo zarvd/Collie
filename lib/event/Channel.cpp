@@ -138,7 +138,6 @@ Channel::update() {
 
 void
 Channel::remove() {
-    close(fd);  // FIXME
     eventLoop->removeChannel(shared_from_this());
 }
 

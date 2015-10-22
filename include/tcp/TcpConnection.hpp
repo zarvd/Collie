@@ -42,6 +42,7 @@ public:
     void send(const std::string &);
 
 private:
+    void shutdown();
     void handleRead();
     void handleWrite();
     void handleClose();

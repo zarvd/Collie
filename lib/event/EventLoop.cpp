@@ -53,41 +53,15 @@ EventLoop::updateChannel(std::shared_ptr<Channel> channel) {
 }
 
 void
-EventLoop::updateChannel(const int fd) {
-    Log(TRACE) << "EventLoop update channel(fd) " << fd;
-    if(channels->find(fd) != channels->end()) {
-        // FIXME
-        auto channel = channels->at(fd);
-        poller->modify(channel->getFd(), channel->getEvents());
-    } else {
-        Log(WARN) << "Channel " << fd << " is not in EventLoop";
-        THROW_NOTFOUND;
-    }
-}
-
-void
 EventLoop::removeChannel(std::shared_ptr<Channel> channel) {
     Log(TRACE) << "EventLoop remove channel " << channel->getFd();
     if(hasChannel(channel)) {
         poller->remove(channel->getFd());
         channels->erase(channel->getFd());
         channel->goOutEventLoop();
+        ::close(channel->getFd());
     } else {
         Log(WARN) << "EventLoop does NOT have channel " << channel->getFd();
-        THROW_NOTFOUND;
-    }
-}
-
-void
-EventLoop::removeChannel(const int fd) {
-    if(channels->find(fd) != channels->end()) {
-        // FIXME
-        auto channel = channels->at(fd);
-        poller->remove(channel->getFd());
-        channels->erase(fd);
-        channel->goOutEventLoop();
-    } else {
-        Log(WARN) << "Channel " << fd << " is not in EventLoop";
         THROW_NOTFOUND;
     }
 }
