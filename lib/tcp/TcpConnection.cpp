@@ -43,6 +43,7 @@ TcpConnection::disconnect() {
 void
 TcpConnection::shutdown() {
     channel->remove();
+    shutdownCallback(shared_from_this());
 }
 
 std::string

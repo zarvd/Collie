@@ -22,6 +22,7 @@ namespace Tcp {
 class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
 public:
     using MessageCallback = std::function<void(std::shared_ptr<TcpConnection>)>;
+    using EventCallback = std::function<void(std::shared_ptr<TcpConnection>)>;
 
     TcpConnection(std::shared_ptr<Event::EventLoop> eventLoop,
                   const unsigned fd,
@@ -36,6 +37,9 @@ public:
     std::shared_ptr<SocketAddress> getRemoteAddr() const { return remoteAddr; }
     void setMessageCallback(const MessageCallback & cb) { messageCallback = cb; }
     void setMessageCallback(const MessageCallback && cb) { messageCallback = std::move(cb); }
+
+    void setShutdownCallback(const EventCallback & cb) { shutdownCallback = cb; }
+    void setShutdownCallback(const EventCallback && cb) { shutdownCallback = std::move(cb); }
 
     void disconnect();
     std::string recvAll();
@@ -57,6 +61,7 @@ private:
     std::string inputBuffer;
     std::string outputBuffer;
     MessageCallback messageCallback;
+    EventCallback shutdownCallback;
 };
 
 }}

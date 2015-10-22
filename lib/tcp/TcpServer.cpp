@@ -42,7 +42,11 @@ TcpServer::newConnection(const unsigned & connFd, std::shared_ptr<SocketAddress>
     // new connection
     std::shared_ptr<TcpConnection> connection(new TcpConnection(this->eventLoop, connFd, this->localAddr, remoteAddr));
     connection->setMessageCallback(onMessageCallback);
-    clients.push_back(connection);  // FIXME
+    clients.insert(connection);  // FIXME
+    connection->setShutdownCallback([this](std::shared_ptr<TcpConnection> conn) {
+            Log(INFO) << "Connection close";
+            this->clients.erase(conn);  // remove connection
+        });
 
     // user callback
     if(connectedCallback) connectedCallback();

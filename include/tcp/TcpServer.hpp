@@ -3,7 +3,7 @@
 
 #include <memory>
 #include <string>
-#include <vector>
+#include <set>
 
 namespace Collie {
 
@@ -39,7 +39,7 @@ public:
 private:
     void newConnection(const unsigned & connFd, std::shared_ptr<SocketAddress> remoteAddr);
 
-    std::vector<std::shared_ptr<TcpConnection> > clients;
+    std::set<std::shared_ptr<TcpConnection> > clients;
     const std::string host;
     const unsigned port;
     std::shared_ptr<SocketAddress> localAddr;
