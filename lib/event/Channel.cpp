@@ -1,6 +1,7 @@
 #include "../../include/Global.hpp"
 #include "../../include/event/Channel.hpp"
 #include "../../include/event/EventLoop.hpp"
+#include <unistd.h>
 
 
 namespace Collie { namespace Event {

@@ -2,13 +2,21 @@
 #include "../../include/tcp/TcpClient.hpp"
 #include "../../include/tcp/Connector.hpp"
 #include "../../include/SocketAddress.hpp"
+#include "../../include/event/EventLoop.hpp"
 
 
 namespace Collie { namespace Tcp {
 
-TcpClient::TcpClient() {}
+TcpClient::TcpClient() :
+    eventLoop(new Event::EventLoop){
 
-TcpClient::~TcpClient() {}
+    Log(TRACE) << "TcpClient is constructing";
+}
+
+TcpClient::~TcpClient() {
+
+    Log(TRACE) << "TcpClient is destructing";
+}
 
 void
 TcpClient::connect(const std::string & host, const unsigned & port) {
@@ -17,7 +25,7 @@ TcpClient::connect(const std::string & host, const unsigned & port) {
         THROW_INVALID_ARGUMENT;
     }
     remoteAddr = SocketAddress::getSocketAddress(host, port);
-    connector.reset(new Connector(remoteAddr));
+    connector.reset(new Connector(remoteAddr, eventLoop));
     connector->setConnectCallback(connectCallback);
 }
 

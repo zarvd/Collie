@@ -23,7 +23,7 @@ class Connector {
 public:
     using ConnectCallback = std::function<void(std::shared_ptr<TcpConnection>)>;
 
-    explicit Connector(std::shared_ptr<SocketAddress>, std::shared_ptr<Event::EventLoop>);
+    Connector(std::shared_ptr<SocketAddress>, std::shared_ptr<Event::EventLoop>);
     Connector(const Connector &) = delete;
     Connector & operator=(const Connector &) = delete;
     ~Connector();

@@ -1,10 +1,10 @@
 #include <iostream>
 #include <string>
-#include "../include/tcp/TcpServer.hpp"
+#include "../include/tcp/TcpClient.hpp"
 #include "../include/tcp/TcpConnection.hpp"
 #include "../include/Global.hpp"
 
-using Collie::Tcp::TcpServer;
+using Collie::Tcp::TcpClient;
 using Collie::Tcp::TcpConnection;
 using namespace Collie;
 
@@ -15,17 +15,15 @@ main(int argc, char *argv[]) {
     logger.setLogLevel(TRACE);
     logger.init();
 
-    unsigned port = 8080;
-    if(argc == 2) port = std::stoul(argv[1]);
 
-    TcpServer server("0.0.0.0", port);
-    server.setOnMessageCallback([](std::shared_ptr<TcpConnection> conn) {
+    TcpClient client;
+    client.setConnectCallback([](std::shared_ptr<TcpConnection> conn) {
+            conn->send("Hello, here is client");
             const std::string content = conn->recvAll();
-
             std::cout << content << std::endl;
-            conn->send("Hi, here is server");
+            conn->disconnect();
         });
-    server.start();
+    client.connect("127.0.0.1", 8080);
     return 0;
 }
 

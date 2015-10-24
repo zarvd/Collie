@@ -1,7 +1,7 @@
 #include "../include/Global.hpp"
 #include "../include/Socket.hpp"
 #include "../include/SocketAddress.hpp"
-
+#include <unistd.h>
 
 namespace Collie {
 

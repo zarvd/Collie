@@ -13,6 +13,8 @@ set(NETWORK_SRC
   tcp/TcpServer.cpp
   tcp/TcpSocket.cpp
   tcp/Acceptor.cpp
+  tcp/TcpClient.cpp
+  tcp/Connector.cpp
   )
 
 set(LIB_SRC ${BASE_SRC} ${NETWORK_SRC})

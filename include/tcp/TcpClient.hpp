@@ -7,6 +7,12 @@
 
 namespace Collie {
 
+namespace Event {
+
+class EventLoop;
+
+}
+
 class SocketAddress;
 
 namespace Tcp {
@@ -32,6 +38,7 @@ private:
     std::unique_ptr<Connector> connector;
     ConnectCallback connectCallback;
     std::shared_ptr<SocketAddress> remoteAddr;
+    std::shared_ptr<Event::EventLoop> eventLoop;
 };
 
 }}
