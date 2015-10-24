@@ -25,6 +25,9 @@ Channel::Channel(std::shared_ptr<EventLoop> eventLoop, const int& fd) :
 
 Channel::~Channel() {
     Log(TRACE) << "Channel " << fd << " destructing";
+    if(::close(fd) == -1) {
+        Log(WARN) << "Channel " << fd << " is already closed";
+    }
 }
 
 void
