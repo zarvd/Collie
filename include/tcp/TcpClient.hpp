@@ -12,10 +12,11 @@ class SocketAddress;
 namespace Tcp {
 
 class Connector;
+class TcpConnection;
 
 class TcpClient {
 public:
-    using ConnectCallback = std::function<void(const unsigned &)>;
+    using ConnectCallback = std::function<void(std::shared_ptr<TcpConnection>)>;
 
     TcpClient();
     TcpClient(const TcpClient &) = delete;

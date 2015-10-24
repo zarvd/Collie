@@ -7,7 +7,8 @@ namespace Collie {
 
 Socket::Socket() :
     type(Type::Client),
-    fd(-1) {
+    fd(-1),
+    localAddr(new SocketAddress) {
     Log(TRACE) << "Client socket constructing";
 }
 
