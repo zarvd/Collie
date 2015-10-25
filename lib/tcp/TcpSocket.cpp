@@ -85,6 +85,10 @@ TcpSocket::connectV4(std::shared_ptr<SocketAddress> servAddr) {
         Log(ERROR) << "connect(): " << Exception::getErr();
         THROW_SYS;
     }
+    struct sockaddr_in local;
+    int addrLen = sizeof(local);
+    ::getsockname(fd, (struct sockaddr *) &local, (socklen_t *) &addrLen);
+    *localAddr = local;
 }
 
 void

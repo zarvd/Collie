@@ -32,7 +32,8 @@ Connector::connect() {
                                                           tcpSocket->getFd(),
                                                           tcpSocket->getLocalAddr(),
                                                           remoteAddr));
-    connectCallback(conn);
+    conn->setMessageCallback(connectCallback);
+    eventLoop->loop();
 }
 
 }}

@@ -27,6 +27,7 @@ TcpConnection::TcpConnection(std::shared_ptr<Event::EventLoop> eventLoop,
     channel->setCloseCallback(std::bind(&TcpConnection::handleClose, this));
     channel->setErrorCallback(std::bind(&TcpConnection::handleError, this));
     channel->enableRead();
+    channel->enableWrite();
     Log(TRACE) << "Tcp Connection constructing";
 }
 
@@ -43,7 +44,7 @@ TcpConnection::disconnect() {
 void
 TcpConnection::shutdown() {
     channel->remove();
-    shutdownCallback(shared_from_this());
+    if(shutdownCallback) shutdownCallback(shared_from_this());
 }
 
 std::string
@@ -58,6 +59,7 @@ void
 TcpConnection::send(const std::string & buffer) {
     // FIXME
     outputBuffer += buffer;
+    channel->enableWrite();
 }
 
 void
@@ -78,6 +80,7 @@ TcpConnection::handleRead() {
 void
 TcpConnection::handleWrite() {
     if(outputBuffer.size() > 0) {
+        // FIXME slice outputBuffer
         TcpSocket::send(channel->getFd(), outputBuffer, 0);
         outputBuffer.clear();
     }

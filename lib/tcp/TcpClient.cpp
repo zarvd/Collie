@@ -27,6 +27,7 @@ TcpClient::connect(const std::string & host, const unsigned & port) {
     remoteAddr = SocketAddress::getSocketAddress(host, port);
     connector.reset(new Connector(remoteAddr, eventLoop));
     connector->setConnectCallback(connectCallback);
+    connector->connect();
 }
 
 }}
