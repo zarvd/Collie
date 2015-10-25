@@ -27,8 +27,6 @@ public:
     void updateChannel(std::shared_ptr<Channel>);  // update or insert
     void removeChannel(std::shared_ptr<Channel>);
     bool hasChannel(std::shared_ptr<Channel>) const;
-    void updateChannel(const int fd);  // only update
-    void removeChannel(const int fd);
 
     // link to poller event method
     void enableEventRead(unsigned & events) const noexcept;

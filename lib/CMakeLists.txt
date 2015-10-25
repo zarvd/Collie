@@ -1,5 +1,4 @@
 set(BASE_SRC
-  Utils.cpp
   event/EventLoop.cpp
   event/Channel.cpp
   poll/Poller.cpp
