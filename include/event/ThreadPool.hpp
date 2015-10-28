@@ -21,7 +21,7 @@ public:
     ThreadPool & operator=(const ThreadPool &) = delete;
     ~ThreadPool();
 
-    void pushChannel(std::unique_ptr<Channel>);  // only accept unique_ptr for protecting channel life control
+    void pushChannel(std::shared_ptr<Channel>);
     void shutDown();
     void startEventLoop();
 

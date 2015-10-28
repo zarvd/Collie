@@ -30,9 +30,9 @@ ThreadPool::shutDown() {
 }
 
 void
-ThreadPool::pushChannel(std::unique_ptr<Channel> channel) {
+ThreadPool::pushChannel(std::shared_ptr<Channel> channel) {
     std::lock_guard<std::mutex> lock(channelMtx);
-    channels.push_back(std::move(channel));
+    channels.push_back(channel);
     channelCondition.notify_all();
 }
 
@@ -43,6 +43,21 @@ ThreadPool::startEventLoop() {
 void
 ThreadPool::runInThread() {
     std::shared_ptr<EventLoop> eventLoop(new EventLoop);
+    std::deque<std::shared_ptr<Channel> > channelsInThisThread;
+    while(true) {
+        {
+            std::unique_lock<std::mutex> lock(channelMtx);
+            channelCondition.wait(lock);
+
+            channelsInThisThread.swap(channels);
+        }
+        for(auto channel : channelsInThisThread) {
+            channel->setEventLoop(eventLoop);
+            channel->update();
+        }
+        channelsInThisThread.clear();
+        eventLoop->loopNonBlocking();
+    }
 }
 
 }}
