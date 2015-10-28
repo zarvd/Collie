@@ -23,7 +23,7 @@ public:
     EventLoop & operator=(const EventLoop &) = delete;
     ~EventLoop();
 
-    void loop();
+    void loop();  // main method
     void updateChannel(std::shared_ptr<Channel>);  // update or insert
     void removeChannel(std::shared_ptr<Channel>);
     bool hasChannel(std::shared_ptr<Channel>) const;
