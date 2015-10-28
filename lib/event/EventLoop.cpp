@@ -48,7 +48,6 @@ EventLoop::updateChannel(std::shared_ptr<Channel> channel) {
     } else {
         poller->insert(channel->getFd(), channel->getEvents());
         (*channels)[channel->getFd()] = channel;
-        channel->goInEventLoop();
     }
 }
 
@@ -58,7 +57,6 @@ EventLoop::removeChannel(std::shared_ptr<Channel> channel) {
     if(hasChannel(channel)) {
         poller->remove(channel->getFd());
         channels->erase(channel->getFd());
-        channel->goOutEventLoop();
     } else {
         Log(WARN) << "EventLoop does NOT have channel " << channel->getFd();
         THROW_NOTFOUND;
@@ -91,22 +89,22 @@ EventLoop::disableEventWrite(unsigned & events) const noexcept {
 }
 
 bool
-EventLoop::isEventRead(const unsigned & events) const noexcept {
+EventLoop::isEventRead(const unsigned events) const noexcept {
     return poller->isRead(events);
 }
 
 bool
-EventLoop::isEventWrite(const unsigned & events) const noexcept {
+EventLoop::isEventWrite(const unsigned events) const noexcept {
     return poller->isWrite(events);
 }
 
 bool
-EventLoop::isEventError(const unsigned & events) const noexcept {
+EventLoop::isEventError(const unsigned events) const noexcept {
     return poller->isError(events);
 }
 
 bool
-EventLoop::isEventClose(const unsigned & events) const noexcept {
+EventLoop::isEventClose(const unsigned events) const noexcept {
     return poller->isClose(events);
 }
 

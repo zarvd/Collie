@@ -10,14 +10,11 @@
 
 namespace Collie { namespace Tcp {
 
-TcpConnection::TcpConnection(std::shared_ptr<Event::EventLoop> eventLoop,
-                             const unsigned fd,
+TcpConnection::TcpConnection(std::shared_ptr<Event::Channel> channel,
                              std::shared_ptr<SocketAddress> localAddr,
                              std::shared_ptr<SocketAddress> remoteAddr) :
     connected(true),
-    connFd(fd),
-    eventLoop(eventLoop),
-    channel(new Event::Channel(eventLoop, connFd)),
+    channel(channel),
     localAddr(localAddr),
     remoteAddr(remoteAddr) {
 

@@ -11,7 +11,7 @@
 namespace Collie { namespace Tcp {
 
 TcpServer::TcpServer(const std::string & host,
-                     const unsigned & port) :
+                     const unsigned port) :
     host(host),
     port(port),
     localAddr(SocketAddress::getSocketAddress(host, port)),
@@ -36,11 +36,17 @@ TcpServer::start() {
 }
 
 void
-TcpServer::newConnection(const unsigned & connFd, std::shared_ptr<SocketAddress> remoteAddr) {
+TcpServer::newConnection(const unsigned connFd, std::shared_ptr<SocketAddress> remoteAddr) {
     Log(INFO) << "TcpServer accept fd(" << connFd << ") ip(" << remoteAddr->getIP() << ")";
 
+    // new channel
+    std::shared_ptr<Event::Channel> channel(new Event::Channel(connFd));
+    channel->setEventLoop(this->eventLoop);  // FIXME get thread pool event loop
+
     // new connection
-    std::shared_ptr<TcpConnection> connection(new TcpConnection(this->eventLoop, connFd, this->localAddr, remoteAddr));
+    std::shared_ptr<TcpConnection> connection(new TcpConnection(channel,
+                                                                this->localAddr,
+                                                                remoteAddr));
     connection->setMessageCallback(onMessageCallback);
     clients.insert(connection);  // FIXME
     connection->setShutdownCallback([this](std::shared_ptr<TcpConnection> conn) {

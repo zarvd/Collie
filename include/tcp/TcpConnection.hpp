@@ -24,8 +24,7 @@ public:
     using MessageCallback = std::function<void(std::shared_ptr<TcpConnection>)>;
     using EventCallback = std::function<void(std::shared_ptr<TcpConnection>)>;
 
-    TcpConnection(std::shared_ptr<Event::EventLoop> eventLoop,
-                  const unsigned fd,
+    TcpConnection(std::shared_ptr<Event::Channel> channel,
                   std::shared_ptr<SocketAddress> localAddr,
                   std::shared_ptr<SocketAddress> remoteAddr);
     TcpConnection(const TcpConnection &) = delete;
@@ -53,8 +52,6 @@ private:
     void handleError();
 
     bool connected;
-    const unsigned connFd;
-    std::shared_ptr<Event::EventLoop> eventLoop;
     std::shared_ptr<Event::Channel> channel;
     std::shared_ptr<SocketAddress> localAddr;
     std::shared_ptr<SocketAddress> remoteAddr;

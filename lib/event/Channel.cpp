@@ -6,11 +6,10 @@
 
 namespace Collie { namespace Event {
 
-Channel::Channel(std::shared_ptr<EventLoop> eventLoop, const int& fd) :
+Channel::Channel(const int fd) :
     inEventLoop(false),
     fd(fd),
-    events(0),
-    eventLoop(eventLoop) {
+    events(0) {
     Log(TRACE) << "Channel " << fd << " constructing";
 
     // default callback
@@ -32,20 +31,12 @@ Channel::~Channel() {
 }
 
 void
-Channel::goInEventLoop() {
-    if( ! inEventLoop) {
-        inEventLoop = true;
-    } else {
-        Log(WARN) << "Channel " << fd << " is already in a EventLoop";
-    }
-}
-
-void
-Channel::goOutEventLoop() {
+Channel::setEventLoop(std::shared_ptr<EventLoop> eventLoop) {
     if(inEventLoop) {
-        inEventLoop = false;
+        Log(WARN) << "Channel" << fd << " is already in eventLoop";
     } else {
-        Log(WARN) << "Channel " << fd << " is not in a EventLoop";
+        this->eventLoop = eventLoop;
+        inEventLoop = true;
     }
 }
 
@@ -91,7 +82,7 @@ Channel::disableAll() {
 }
 
 void
-Channel::activate(const unsigned & revents) const {
+Channel::activate(const unsigned revents) const {
     if(eventLoop->isEventError(revents)) {
         Log(TRACE) << "Activate ERROR callback with events " << revents;
         if(errorCallback) {

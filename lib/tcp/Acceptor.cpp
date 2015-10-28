@@ -25,7 +25,8 @@ Acceptor::socket() {
     tcpSocket.reset(new TcpSocket(localAddr));
     tcpSocket->listen();
     // create channel
-    channel.reset(new Event::Channel(eventLoop, tcpSocket->getFd()));
+    channel.reset(new Event::Channel(tcpSocket->getFd()));
+    channel->setEventLoop(eventLoop);
 }
 
 void

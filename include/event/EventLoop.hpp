@@ -24,6 +24,7 @@ public:
     ~EventLoop();
 
     void loop();  // main method
+    void loopNonBlocking();
     void updateChannel(std::shared_ptr<Channel>);  // update or insert
     void removeChannel(std::shared_ptr<Channel>);
     bool hasChannel(std::shared_ptr<Channel>) const;
@@ -33,13 +34,13 @@ public:
     void disableEventRead(unsigned & events) const noexcept;
     void enableEventWrite(unsigned & events) const noexcept;
     void disableEventWrite(unsigned & events) const noexcept;
-    bool isEventRead(const unsigned & events) const noexcept;
-    bool isEventWrite(const unsigned & events) const noexcept;
-    bool isEventError(const unsigned & events) const noexcept;
-    bool isEventClose(const unsigned & events) const noexcept;
+    bool isEventRead(const unsigned events) const noexcept;
+    bool isEventWrite(const unsigned events) const noexcept;
+    bool isEventError(const unsigned events) const noexcept;
+    bool isEventClose(const unsigned events) const noexcept;
 
 private:
-    using ChannelMap = std::map<int, std::shared_ptr<Channel>>;
+    using ChannelMap = std::map<int, std::shared_ptr<Channel> >;
 
     std::unique_ptr<Poll::Poller> poller;
     std::shared_ptr<ChannelMap> channels;

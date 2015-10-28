@@ -18,19 +18,19 @@ ThreadPool::~ThreadPool() {
 
 void
 ThreadPool::shutDown() {
-    // send terminate signal to threads
-    std::lock_guard<std::mutex> lock(channelMtx);
+    {
+        // send terminate signal to threads
+        std::lock_guard<std::mutex> lock(channelMtx);
 
-    terminate = true;
-
-    for(auto& thread : threadPool) {
+        terminate = true;
+    }
+    for(auto & thread : threadPool) {
         thread.join();
     }
 }
 
 void
 ThreadPool::pushChannel(std::unique_ptr<Channel> channel) {
-
     std::lock_guard<std::mutex> lock(channelMtx);
     channels.push_back(std::move(channel));
     channelCondition.notify_all();
@@ -43,7 +43,6 @@ ThreadPool::startEventLoop() {
 void
 ThreadPool::runInThread() {
     std::shared_ptr<EventLoop> eventLoop(new EventLoop);
-    
 }
 
 }}

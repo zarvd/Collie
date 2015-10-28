@@ -23,7 +23,7 @@ public:
     using OnMessageCallback = std::function<void(std::shared_ptr<TcpConnection>)>;
     using ConnectedCallback = std::function<void()>;
 
-    explicit TcpServer(const std::string & host, const unsigned & port);
+    explicit TcpServer(const std::string & host, const unsigned port);
     TcpServer(const TcpServer &) = delete;
     TcpServer & operator=(const TcpServer &) = delete;
     ~TcpServer();
@@ -37,7 +37,7 @@ public:
     std::shared_ptr<Event::EventLoop> getEventLoop() const { return eventLoop; }
 
 private:
-    void newConnection(const unsigned & connFd, std::shared_ptr<SocketAddress> remoteAddr);
+    void newConnection(const unsigned connFd, std::shared_ptr<SocketAddress> remoteAddr);
 
     std::set<std::shared_ptr<TcpConnection> > clients;
     const std::string host;

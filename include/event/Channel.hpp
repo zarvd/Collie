@@ -13,7 +13,7 @@ class Channel : public std::enable_shared_from_this<Channel> {
 public:
     using EventCallback = std::function<void()>;
 
-    Channel(std::shared_ptr<EventLoop>, const int & fd);
+    explicit Channel(const int fd);
     Channel(const Channel&) = delete;
     Channel & operator=(const Channel &) = delete;
     ~Channel();
@@ -29,11 +29,8 @@ public:
 
     int getFd() const { return fd; }
     int getEvents() const { return events; }
-    std::shared_ptr<EventLoop> const getEventLoop() { return eventLoop; }
-
-    bool getInEventLoop() const { return inEventLoop; }
-    void goInEventLoop();
-    void goOutEventLoop();
+    void setEventLoop(std::shared_ptr<EventLoop>);
+    std::shared_ptr<EventLoop> getEventLoop() const { return eventLoop; }
 
     bool isNoneEvent() const { return events == 0; }
     bool isRead() const;
@@ -45,13 +42,13 @@ public:
     void disableWrite();
     void disableAll();
 
-    void activate(const unsigned & revents) const;
+    void activate(const unsigned revents) const;
     void remove();
     void update();
 
 private:
 
-    bool inEventLoop;
+    bool inEventLoop;  // whether eventLoop is setting up
     const int fd;  // file descriptor
     unsigned events;
     std::shared_ptr<EventLoop> eventLoop;
