@@ -34,6 +34,7 @@ void
 Channel::setEventLoop(std::shared_ptr<EventLoop> eventLoop) {
     if(inEventLoop) {
         Log(WARN) << "Channel" << fd << " is already in eventLoop";
+        // FIXME throw exception
     } else {
         this->eventLoop = eventLoop;
         inEventLoop = true;

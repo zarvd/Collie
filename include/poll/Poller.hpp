@@ -21,16 +21,16 @@ public:
     virtual void insert(const int fd, const unsigned events) = 0;
     virtual void modify(const int fd, const unsigned events) = 0;
     virtual void remove(const int fd) = 0;
-    virtual void poll(PollCallback cb, const int & timeout = -1) = 0;
+    virtual void poll(PollCallback cb, const int timeout = -1) = 0;
 
     virtual void enableRead(unsigned & events) const noexcept = 0;
     virtual void disableRead(unsigned & events) const noexcept = 0;
     virtual void enableWrite(unsigned & events) const noexcept = 0;
     virtual void disableWrite(unsigned & events) const noexcept = 0;
-    virtual bool isRead(const unsigned & events) const noexcept = 0;
-    virtual bool isWrite(const unsigned & events) const noexcept = 0;
-    virtual bool isError(const unsigned & events) const noexcept = 0;
-    virtual bool isClose(const unsigned & events) const noexcept = 0;
+    virtual bool isRead(const unsigned events) const noexcept = 0;
+    virtual bool isWrite(const unsigned events) const noexcept = 0;
+    virtual bool isError(const unsigned events) const noexcept = 0;
+    virtual bool isClose(const unsigned events) const noexcept = 0;
 
     const unsigned MaxEvent;
 

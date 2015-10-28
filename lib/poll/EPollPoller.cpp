@@ -4,11 +4,12 @@
 
 namespace Collie { namespace Poll {
 
-EPollPoller::EPollPoller(const unsigned& maxEvent) :
+EPollPoller::EPollPoller(const unsigned maxEvent) :
     Poller(maxEvent),
+    isInit(false),
+    epollFd(-1),
     revents(new Event[MaxEvent]) {
     Log(TRACE) << "EPoller constructing";
-    create();
 }
 
 EPollPoller::~EPollPoller() {
@@ -23,11 +24,16 @@ EPollPoller::create() {
         Log(ERROR) << "EPoll create failed: " << Exception::getErr();
         THROW_SYS;
     }
+    isInit = true;
 }
 
 
 void
 EPollPoller::insert(const int fd, const unsigned events) {
+    if( ! isInit) {
+        Log(ERROR) << "EPoll is not inited";
+        THROW_INVALID_ARGUMENT;
+    }
     Log(TRACE) << "EPoller insert " << fd << " with events " << events;
     Event event;
     event.data.fd = fd;
@@ -42,6 +48,10 @@ EPollPoller::insert(const int fd, const unsigned events) {
 
 void
 EPollPoller::modify(const int fd, const unsigned events) {
+    if( ! isInit) {
+        Log(ERROR) << "EPoll is not inited";
+        THROW_INVALID_ARGUMENT;
+    }
     Log(TRACE) << "EPoller modify " << fd << " with events " << events;
     Event event;
     event.data.fd = fd;
@@ -56,6 +66,10 @@ EPollPoller::modify(const int fd, const unsigned events) {
 
 void
 EPollPoller::remove(const int fd) {
+    if( ! isInit) {
+        Log(ERROR) << "EPoll is not inited";
+        THROW_INVALID_ARGUMENT;
+    }
     Log(TRACE) << "EPoller remove " << fd;
     // Since Linux 2.6.9, event can be specified as NULL when using EPOLL_CTL_DEL.
     const int ret = epoll_ctl(epollFd, EPOLL_CTL_DEL, fd, NULL);
@@ -66,7 +80,11 @@ EPollPoller::remove(const int fd) {
 }
 
 void
-EPollPoller::poll(PollCallback cb, const int & timeout) {
+EPollPoller::poll(PollCallback cb, const int timeout) {
+    if( ! isInit) {
+        Log(ERROR) << "EPoll is not inited";
+        THROW_INVALID_ARGUMENT;
+    }
     Log(TRACE) << "EPoller polling " << epollFd;
     int eventNum = epoll_wait(epollFd, revents.get(), MaxEvent, timeout);
     if(eventNum == -1) {
