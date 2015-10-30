@@ -5,7 +5,8 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
-#include <deque>
+#include <ctime>
+#include <chrono>
 #include <vector>
 
 
@@ -30,8 +31,9 @@ private:
 
     std::mutex channelMtx;
     std::condition_variable channelCondition;
+    std::chrono::milliseconds freshFrequency;
     std::vector<std::thread> threadPool;
-    std::deque<std::shared_ptr<Channel> > channels;
+    std::vector<std::shared_ptr<Channel> > channels;
     bool terminate;
 };
 
