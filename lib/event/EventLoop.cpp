@@ -24,7 +24,7 @@ EventLoop::loop() {
     while(true) {
         Log(TRACE) << "EventLoop looping";
         using namespace std::placeholders;
-        poller->poll(std::bind(&EventLoop::pollerCallback, this, _1, _2));
+        poller->poll(std::bind(&EventLoop::pollCallback, this, _1, _2));
    }
 }
 
@@ -32,11 +32,11 @@ void
 EventLoop::loopNonBlocking() {
     Log(TRACE) << "EventLoop is looping";
     using namespace std::placeholders;
-    poller->poll(std::bind(&EventLoop::pollerCallback, this, _1, _2));  // should be non blocking
+    poller->poll(std::bind(&EventLoop::pollCallback, this, _1, _2), 0);  // should be non blocking
 }
 
 void
-EventLoop::pollerCallback(const unsigned fd, const unsigned revents) {
+EventLoop::pollCallback(const unsigned fd, const unsigned revents) {
     // find channel
     // activate channel according to event type
     auto it = this->channels->find(fd);
