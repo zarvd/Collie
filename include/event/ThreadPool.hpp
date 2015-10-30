@@ -30,8 +30,6 @@ private:
     void runInThread();
 
     std::mutex channelMtx;
-    std::condition_variable channelCondition;
-    std::chrono::milliseconds freshFrequency;
     std::vector<std::thread> threadPool;
     std::vector<std::shared_ptr<Channel> > channels;
     bool terminate;

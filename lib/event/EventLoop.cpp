@@ -10,8 +10,7 @@ namespace Collie { namespace Event {
 
 EventLoop::EventLoop() noexcept :
     poller(new Poll::EPollPoller(1024)),
-    channels(new ChannelMap),
-    isLooping(false) {
+    channels(new ChannelMap) {
 
     Log(TRACE) << "EventLoop constructing";
 }
@@ -22,21 +21,30 @@ EventLoop::~EventLoop() {
 
 void
 EventLoop::loop() {
-    isLooping = true;
     while(true) {
         Log(TRACE) << "EventLoop looping";
-        // poller->poll(channels);
-        poller->poll([this](const unsigned fd, const unsigned revents) {
-                // find channel
-                // activate channel according to event type
-                auto it = this->channels->find(fd);
-                if(it != this->channels->end()) {
-                    auto channel = it->second;
-                    channel->activate(revents);
-                } else {
-                    Log(WARN) << "Unknown channel " << fd;
-                }
-            });
+        using namespace std::placeholders;
+        poller->poll(std::bind(&EventLoop::pollerCallback, this, _1, _2));
+   }
+}
+
+void
+EventLoop::loopNonBlocking() {
+    Log(TRACE) << "EventLoop is looping";
+    using namespace std::placeholders;
+    poller->poll(std::bind(&EventLoop::pollerCallback, this, _1, _2));  // should be non blocking
+}
+
+void
+EventLoop::pollerCallback(const unsigned fd, const unsigned revents) {
+    // find channel
+    // activate channel according to event type
+    auto it = this->channels->find(fd);
+    if(it != this->channels->end()) {
+        auto channel = it->second;
+        channel->activate(revents);
+    } else {
+        Log(WARN) << "Unknown channel " << fd;
     }
 }
 

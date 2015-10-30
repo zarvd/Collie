@@ -42,9 +42,10 @@ public:
 private:
     using ChannelMap = std::map<int, std::shared_ptr<Channel> >;
 
+    void pollerCallback(const unsigned fd, const unsigned revents);
+
     std::unique_ptr<Poll::Poller> poller;
     std::shared_ptr<ChannelMap> channels;
-    bool isLooping;
 };
 
 }}

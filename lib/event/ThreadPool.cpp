@@ -6,7 +6,6 @@
 namespace Collie { namespace Event {
 
 ThreadPool::ThreadPool(const unsigned threadNum) :
-    freshFrequency(1),
     terminate(false) {
     for(unsigned i = 0; i < threadNum; ++ i) {
         threadPool.push_back(std::thread(&ThreadPool::runInThread, this));
@@ -25,7 +24,6 @@ ThreadPool::shutDown() {
 
         terminate = true;
     }
-    channelCondition.notify_all();
     for(auto & thread : threadPool) {
         thread.join();
     }
@@ -35,7 +33,6 @@ void
 ThreadPool::pushChannel(std::shared_ptr<Channel> channel) {
     std::lock_guard<std::mutex> lock(channelMtx);
     channels.push_back(channel);
-    channelCondition.notify_all();
 }
 
 void
@@ -44,21 +41,23 @@ ThreadPool::startEventLoop() {
 
 void
 ThreadPool::runInThread() {
+    // one loop per thread
     std::shared_ptr<EventLoop> eventLoop(new EventLoop);
     std::vector<std::shared_ptr<Channel> > channelsInThisThread;
     while(true) {
-        {
-            std::unique_lock<std::mutex> lock(channelMtx);
-            channelCondition.wait_for(lock, freshFrequency);
-            if(terminate) exit(0);
+        // Non blocking try lock mutex
+        if(channelMtx.try_lock()) {
+            if(terminate && channels.empty()) exit(0);
             // FIXME dispatch channel more flexible
             channelsInThisThread.swap(channels);
+            channelMtx.unlock();
+
+            for(auto & channel : channelsInThisThread) {
+                channel->setEventLoop(eventLoop);
+                channel->update();
+            }
+            channelsInThisThread.clear();
         }
-        for(auto & channel : channelsInThisThread) {
-            channel->setEventLoop(eventLoop);
-            channel->update();
-        }
-        channelsInThisThread.clear();
         eventLoop->loopNonBlocking();
     }
 }
