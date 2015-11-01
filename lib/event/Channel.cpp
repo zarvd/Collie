@@ -12,20 +12,23 @@ Channel::Channel(const int fd) :
     events(0) {
     Log(TRACE) << "Channel " << fd << " constructing";
 
-    // default callback
+    // default error and close callback
     closeCallback = [this]() {
         // TODO remove channel
         Log(TRACE) << "Close channel " << this->getFd();
+        this->remove();
     };
     errorCallback = [this]() {
         // TODO remove channel
         Log(TRACE) << "Channel " << this->getFd() << " meets ERROR";
+        this->remove();
     };
 }
 
 Channel::~Channel() {
     Log(TRACE) << "Channel " << fd << " destructing";
     if(::close(fd) == -1) {
+        // close socket
         Log(WARN) << "Channel " << fd << " is already closed";
     }
 }
@@ -85,6 +88,7 @@ Channel::disableAll() {
 void
 Channel::activate(const unsigned revents) const {
     if(eventLoop->isEventError(revents)) {
+        // error event
         Log(TRACE) << "Activate ERROR callback with events " << revents;
         if(errorCallback) {
             errorCallback();
@@ -93,6 +97,7 @@ Channel::activate(const unsigned revents) const {
             THROW_NOTFOUND;
         }
     } else if(eventLoop->isEventClose(revents)) {
+        // close event
         Log(TRACE) << "Activate CLOSE callback with events" << revents;
         if(closeCallback) {
             closeCallback();
@@ -100,29 +105,34 @@ Channel::activate(const unsigned revents) const {
             Log(ERROR) << "closeCallback is not callable";
             THROW_NOTFOUND;
         }
-    } else if(eventLoop->isEventRead(revents)) {
-        if(isRead()) {
-            Log(TRACE) << "Activate READ callback with events " << revents;
-            if(readCallback) {
-                readCallback();
+    } else {
+        // read event
+        if(eventLoop->isEventRead(revents)) {
+            if(isRead()) {
+                Log(TRACE) << "Activate READ callback with events " << revents;
+                if(readCallback) {
+                    readCallback();
+                } else {
+                    Log(ERROR) << "readCallback is not callable";
+                    THROW_NOTFOUND;
+                }
             } else {
-                Log(ERROR) << "readCallback is not callable";
-                THROW_NOTFOUND;
+                Log(WARN) << "READ callback is not available";
             }
-        } else {
-            Log(WARN) << "READ callback is not available";
         }
-    } else if(eventLoop->isEventWrite(revents)) {
-        if(isWrite()) {
-            Log(TRACE) << "Activate WRITE callback with events" << revents;
-            if(writeCallback) {
-                writeCallback();
+        // write event
+        if(eventLoop->isEventWrite(revents)) {
+            if(isWrite()) {
+                Log(TRACE) << "Activate WRITE callback with events" << revents;
+                if(writeCallback) {
+                    writeCallback();
+                } else {
+                    Log(ERROR) << "writeCallback is not callable";
+                    THROW_NOTFOUND;
+                }
             } else {
-                Log(ERROR) << "writeCallback is not callable";
-                THROW_NOTFOUND;
+                Log(WARN) << "WRITE callback is not available";
             }
-        } else {
-            Log(WARN) << "WRITE callback is not available";
         }
     }
 }

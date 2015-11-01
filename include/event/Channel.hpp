@@ -13,7 +13,7 @@ class Channel : public std::enable_shared_from_this<Channel> {
 public:
     using EventCallback = std::function<void()>;
 
-    explicit Channel(const int fd);
+    explicit Channel(const int fd);  // channel control socket life
     Channel(const Channel&) = delete;
     Channel & operator=(const Channel &) = delete;
     ~Channel();

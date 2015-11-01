@@ -18,7 +18,7 @@ class Channel;
 class EventLoop {
 public:
 
-    EventLoop() noexcept;
+    EventLoop();
     EventLoop(const EventLoop &) = delete;
     EventLoop & operator=(const EventLoop &) = delete;
     ~EventLoop();
@@ -45,7 +45,7 @@ private:
     void pollCallback(const unsigned fd, const unsigned revents);
 
     std::unique_ptr<Poll::Poller> poller;
-    std::shared_ptr<ChannelMap> channels;
+    ChannelMap channels;
 };
 
 }}
