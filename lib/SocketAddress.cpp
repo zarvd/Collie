@@ -5,6 +5,11 @@
 
 namespace Collie {
 
+SocketAddress::SocketAddress() :
+    ip(),
+    port() {}
+SocketAddress::~SocketAddress() {}
+
 SocketAddress &
 SocketAddress::operator=(const SocketAddress & that) {
     ip = that.ip;
@@ -24,6 +29,12 @@ SocketAddress::operator=(const AddrV4 & addr) {
     inet_ntop(AF_INET, &(addrV4.sin_addr), ipv4, INET_ADDRSTRLEN);
     ip = ipv4;
     port = ntohs(addr.sin_port);
+    return * this;
+}
+
+SocketAddress &
+SocketAddress::operator=(const AddrV6 &) {
+    // TODO
     return * this;
 }
 

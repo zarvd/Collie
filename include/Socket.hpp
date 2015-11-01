@@ -30,8 +30,6 @@ public:
 
     virtual void listen() = 0;
     virtual void connect(std::shared_ptr<SocketAddress>) = 0;
-    // void setNonBlocking();
-    // void setBlocking();
     void close();
 
 protected:

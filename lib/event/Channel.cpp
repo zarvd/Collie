@@ -30,6 +30,7 @@ Channel::~Channel() {
     if(::close(fd) == -1) {
         // close socket
         Log(WARN) << "Channel " << fd << " is already closed";
+        // don't throw
     }
 }
 

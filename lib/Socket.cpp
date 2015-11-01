@@ -23,7 +23,8 @@ Socket::~Socket() {
     Log(TRACE) << "Socket destructing";
 }
 
-void Socket::close() {
+void
+Socket::close() {
     Log(TRACE) << "Socket closed";
     ::close(fd);
 }

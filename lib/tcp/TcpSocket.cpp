@@ -25,6 +25,16 @@ TcpSocket::~TcpSocket() {
 }
 
 void
+TcpSocket::setSendFlag(const int flag) {
+    sendFlag = flag;
+}
+
+void
+TcpSocket::setRecvFlag(const int flag) {
+    recvFlag = flag;
+}
+
+void
 TcpSocket::listen() {
     if(localAddr->getIPVersion() == IP::V4) {
         listenV4();

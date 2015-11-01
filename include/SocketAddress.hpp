@@ -15,14 +15,15 @@ public:
     typedef struct sockaddr_in AddrV4;
     typedef struct sockaddr_in6 AddrV6;
 
-    SocketAddress() {}
-    explicit SocketAddress(const AddrV4 &);
-    explicit SocketAddress(const AddrV6 &);
+    SocketAddress();
+    // explicit SocketAddress(const AddrV4 &);
+    // explicit SocketAddress(const AddrV6 &);
     SocketAddress(const SocketAddress &);
-    ~SocketAddress() {};
+    ~SocketAddress();
 
     SocketAddress & operator=(const SocketAddress &);
-    SocketAddress & operator=(const AddrV4 & addr);
+    SocketAddress & operator=(const AddrV4 &);
+    SocketAddress & operator=(const AddrV6 &);
 
     std::string getIP() const { return ip; }
     unsigned getPort() const { return port; }
