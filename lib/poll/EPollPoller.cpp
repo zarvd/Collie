@@ -38,8 +38,7 @@ EPollPoller::insert(const int fd, const unsigned events) {
     Event event;
     event.data.fd = fd;
     event.events = events;
-    // event.events = events | (unsigned)Event::Type::EdgeTriggered;
-    const int ret = epoll_ctl(epollFd, EPOLL_CTL_ADD, fd, &event);
+    const int ret = epoll_ctl(epollFd, EPOLL_CTL_ADD, fd, &event);  // default level-triggered
     if(ret == -1) {
         Log(ERROR) << "EPoll add ctl failed: " << Exception::getErr();
         THROW_SYS;
@@ -56,7 +55,6 @@ EPollPoller::modify(const int fd, const unsigned events) {
     Event event;
     event.data.fd = fd;
     event.events = events;  // level-triggered
-    // event.events = events | (unsigned)Event::Type::EdgeTriggered;
     const int ret = epoll_ctl(epollFd, EPOLL_CTL_MOD, fd, &event);
     if(ret == -1) {
         Log(ERROR) << "EPoll mod ctl failed: " << Exception::getErr();

@@ -8,9 +8,9 @@
 
 namespace Collie { namespace Event {
 
-EventLoop::EventLoop() noexcept :
-    poller(new Poll::EPollPoller(1024)),
-    channels(new ChannelMap) {
+EventLoop::EventLoop() :
+    poller(new Poll::EPollPoller(1024)) {
+    // FIXME the number of event
 
     Log(TRACE) << "EventLoop constructing";
 }
@@ -38,10 +38,10 @@ EventLoop::loopNonBlocking() {
 void
 EventLoop::pollCallback(const unsigned fd, const unsigned revents) {
     // find channel
-    // activate channel according to event type
-    auto it = this->channels->find(fd);
-    if(it != this->channels->end()) {
+    auto it = this->channels.find(fd);
+    if(it != this->channels.end()) {
         auto channel = it->second;
+        // activate channel according to the type of events
         channel->activate(revents);
     } else {
         Log(WARN) << "Unknown channel " << fd;
@@ -55,7 +55,7 @@ EventLoop::updateChannel(std::shared_ptr<Channel> channel) {
         poller->modify(channel->getFd(), channel->getEvents());
     } else {
         poller->insert(channel->getFd(), channel->getEvents());
-        (*channels)[channel->getFd()] = channel;
+        channels[channel->getFd()] = channel;
     }
 }
 
@@ -63,8 +63,8 @@ void
 EventLoop::removeChannel(std::shared_ptr<Channel> channel) {
     Log(TRACE) << "EventLoop remove channel " << channel->getFd();
     if(hasChannel(channel)) {
-        poller->remove(channel->getFd());
-        channels->erase(channel->getFd());
+        poller->remove(channel->getFd());  // remove channel from poller
+        channels.erase(channel->getFd());  // remove from loop
     } else {
         Log(WARN) << "EventLoop does NOT have channel " << channel->getFd();
         THROW_NOTFOUND;
@@ -73,7 +73,7 @@ EventLoop::removeChannel(std::shared_ptr<Channel> channel) {
 
 bool
 EventLoop::hasChannel(std::shared_ptr<Channel> channel) const {
-    return channels->find(channel->getFd()) != channels->end();
+    return channels.find(channel->getFd()) != channels.end();
 }
 
 void
