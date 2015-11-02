@@ -60,7 +60,7 @@ TcpSocket::listenV4() {
     }
     Log(TRACE) << "Socket " << fd << " is binding";
 
-    Log(TRACE) << "Socket listening";
+    Log(TRACE) << "Socket is listening";
 
     if(::listen(fd, SOMAXCONN) < 0) {
         Log(ERROR) << "listen(): " << Exception::getErr();
@@ -112,7 +112,8 @@ TcpSocket::accept(std::shared_ptr<SocketAddress> connAddr) const {
 }
 
 int
-TcpSocket::accept(const int & fd, std::shared_ptr<SocketAddress> connAddr) {
+TcpSocket::accept(const int fd, std::shared_ptr<SocketAddress> connAddr) {
+    // IPv4
     struct sockaddr_in clientAddr;
     socklen_t clientAddrLen;
     clientAddrLen = sizeof(clientAddr);
@@ -131,12 +132,12 @@ TcpSocket::accept(const int & fd, std::shared_ptr<SocketAddress> connAddr) {
 }
 
 std::string
-TcpSocket::recv(const int & connFd) {
+TcpSocket::recv(const int connFd) {
     return recv(connFd, recvFlag);
 }
 
 std::string
-TcpSocket::recv(const int & connFd, const int & recvFlag) {
+TcpSocket::recv(const int connFd, const int recvFlag) {
     if(connFd < 2) {
         Log(WARN) << "Illegal connection fd " << connFd;
     }
@@ -148,12 +149,12 @@ TcpSocket::recv(const int & connFd, const int & recvFlag) {
 }
 
 void
-TcpSocket::send(const int & connFd, const std::string & msg) {
+TcpSocket::send(const int connFd, const std::string & msg) {
     send(connFd, msg, sendFlag);
 }
 
 void
-TcpSocket::send(const int & connFd, const std::string & msg, const int & sendFlag) {
+TcpSocket::send(const int connFd, const std::string & msg, const int sendFlag) {
     char content[msg.length() + 1];
     std::strcpy(content, msg.c_str());
     ::send(connFd, content, sizeof(content), sendFlag);
