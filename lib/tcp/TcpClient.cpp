@@ -4,23 +4,19 @@
 #include "../../include/SocketAddress.hpp"
 #include "../../include/event/EventLoop.hpp"
 
+namespace Collie {
+namespace Tcp {
 
-namespace Collie { namespace Tcp {
-
-TcpClient::TcpClient() :
-    eventLoop(new Event::EventLoop){
+TcpClient::TcpClient() : eventLoop(new Event::EventLoop) {
 
     Log(TRACE) << "TcpClient is constructing";
 }
 
-TcpClient::~TcpClient() {
-
-    Log(TRACE) << "TcpClient is destructing";
-}
+TcpClient::~TcpClient() { Log(TRACE) << "TcpClient is destructing"; }
 
 void
 TcpClient::connect(const std::string & host, const unsigned & port) {
-    if( ! connectCallback) {
+    if(!connectCallback) {
         Log(ERROR) << "TcpClient connectCallback is not callable";
         THROW_INVALID_ARGUMENT;
     }
@@ -29,5 +25,5 @@ TcpClient::connect(const std::string & host, const unsigned & port) {
     connector->setConnectCallback(connectCallback);
     connector->connect();
 }
-
-}}
+}
+}

@@ -7,16 +7,16 @@
 #include <functional>
 #include <algorithm>
 
-
-namespace Collie { namespace Tcp {
+namespace Collie {
+namespace Tcp {
 
 TcpConnection::TcpConnection(std::shared_ptr<Event::Channel> channel,
                              std::shared_ptr<SocketAddress> localAddr,
-                             std::shared_ptr<SocketAddress> remoteAddr) :
-    connected(true),
-    channel(channel),
-    localAddr(localAddr),
-    remoteAddr(remoteAddr) {
+                             std::shared_ptr<SocketAddress> remoteAddr)
+    : connected(true),
+      channel(channel),
+      localAddr(localAddr),
+      remoteAddr(remoteAddr) {
 
     // set channel callback and enable reading
     channel->setReadCallback(std::bind(&TcpConnection::handleRead, this));
@@ -28,9 +28,7 @@ TcpConnection::TcpConnection(std::shared_ptr<Event::Channel> channel,
     Log(TRACE) << "Tcp Connection constructing";
 }
 
-TcpConnection::~TcpConnection() {
-    Log(TRACE) << "Tcp Connection destructing";
-}
+TcpConnection::~TcpConnection() { Log(TRACE) << "Tcp Connection destructing"; }
 
 void
 TcpConnection::disconnect() {
@@ -82,7 +80,7 @@ TcpConnection::handleWrite() {
         outputBuffer.clear();
     }
     channel->disableWrite();
-    if( ! connected) shutdown();
+    if(!connected) shutdown();
 }
 
 void
@@ -94,5 +92,5 @@ void
 TcpConnection::handleError() {
     disconnect();
 }
-
-}}
+}
+}

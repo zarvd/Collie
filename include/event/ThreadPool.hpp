@@ -6,8 +6,8 @@
 #include <mutex>
 #include <vector>
 
-
-namespace Collie { namespace Event {
+namespace Collie {
+namespace Event {
 
 class EventLoop;
 class Channel;
@@ -27,10 +27,10 @@ private:
 
     std::mutex channelMtx;
     std::vector<std::thread> threadPool;
-    std::vector<std::shared_ptr<Channel> > channels;
+    std::vector<std::shared_ptr<Channel>> channels;
     bool terminate;
 };
-
-}}
+}
+}
 
 #endif /* COLLIE_EVENT_THREADPOOL_H */

@@ -20,7 +20,6 @@ public:
 private:
     std::string content;
 };
-
 }
 
 #endif /* COLLIE_BUFFER_H */

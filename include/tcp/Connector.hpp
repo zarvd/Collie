@@ -9,7 +9,6 @@ namespace Collie {
 namespace Event {
 
 class EventLoop;
-
 }
 
 class SocketAddress;
@@ -23,7 +22,8 @@ class Connector {
 public:
     using ConnectCallback = std::function<void(std::shared_ptr<TcpConnection>)>;
 
-    Connector(std::shared_ptr<SocketAddress>, std::shared_ptr<Event::EventLoop>);
+    Connector(std::shared_ptr<SocketAddress>,
+              std::shared_ptr<Event::EventLoop>);
     Connector(const Connector &) = delete;
     Connector & operator=(const Connector &) = delete;
     ~Connector();
@@ -41,7 +41,7 @@ private:
     std::shared_ptr<SocketAddress> remoteAddr;
     ConnectCallback connectCallback;
 };
-
-}}
+}
+}
 
 #endif /* COLLIE_TCP_CONNECTOR_H */

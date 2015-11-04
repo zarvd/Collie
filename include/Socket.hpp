@@ -5,7 +5,6 @@
 #include <memory>
 #include <netinet/in.h>
 
-
 namespace Collie {
 
 enum class IP;
@@ -16,10 +15,10 @@ class SocketAddress;
  */
 class Socket {
 public:
-    enum class Type {Client, Server};
+    enum class Type { Client, Server };
 
-    Socket();  // client constructor
-    explicit Socket(std::shared_ptr<SocketAddress>);  // server constructor
+    Socket();                                        // client constructor
+    explicit Socket(std::shared_ptr<SocketAddress>); // server constructor
     Socket(const Socket &) = delete;
     Socket & operator=(const Socket &) = delete;
     virtual ~Socket() = 0;
@@ -33,12 +32,10 @@ public:
     void close();
 
 protected:
-
     const Type type;
     int fd;
     std::shared_ptr<SocketAddress> localAddr;
 };
-
 }
 
 #endif /* COLLIE_SOCKET_H */

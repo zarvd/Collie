@@ -3,21 +3,20 @@
 #include "../../include/event/Channel.hpp"
 #include "../../include/Global.hpp"
 
+namespace Collie {
+namespace Event {
 
-namespace Collie { namespace Event {
-
-ThreadPool::ThreadPool(const unsigned threadNum) :
-    terminate(false) {
+ThreadPool::ThreadPool(const unsigned threadNum) : terminate(false) {
     Log(TRACE) << "ThreadPool is constructing";
     Log(TRACE) << "Thread pool create " << threadNum << " threads";
-    for(unsigned i = 0; i < threadNum; ++ i) {
+    for(unsigned i = 0; i < threadNum; ++i) {
         threadPool.push_back(std::thread(&ThreadPool::runInThread, this));
     }
 }
 
 ThreadPool::~ThreadPool() {
     Log(TRACE) << "ThreadPool is destructing";
-    if( ! terminate) shutDown();
+    if(!terminate) shutDown();
 }
 
 void
@@ -44,7 +43,7 @@ void
 ThreadPool::runInThread() {
     // one loop per thread
     std::shared_ptr<EventLoop> eventLoop(new EventLoop);
-    std::vector<std::shared_ptr<Channel> > channelsInThisThread;
+    std::vector<std::shared_ptr<Channel>> channelsInThisThread;
     while(true) {
         // Non blocking try lock mutex
         if(channelMtx.try_lock()) {
@@ -70,5 +69,5 @@ ThreadPool::runInThread() {
         eventLoop->loopNonBlocking();
     }
 }
-
-}}
+}
+}

@@ -3,17 +3,19 @@
 
 #include <functional>
 
-
-namespace Collie { namespace Poll {
+namespace Collie {
+namespace Poll {
 
 /**
  * Abstract class
  */
 class Poller {
 public:
-    using PollCallback = std::function<void(const unsigned fd, const unsigned revents)>;
+    using PollCallback =
+        std::function<void(const unsigned fd, const unsigned revents)>;
 
-    explicit Poller(const unsigned & maxEvent) noexcept : MaxEvent(maxEvent), fd(-1) {}
+    explicit Poller(const unsigned & maxEvent) noexcept : MaxEvent(maxEvent),
+                                                          fd(-1) {}
     Poller(const Poller &) = delete;
     Poller & operator=(const Poller &) = delete;
     virtual ~Poller() = 0;
@@ -36,11 +38,9 @@ public:
     const unsigned MaxEvent;
 
 protected:
-
     int fd;
 };
-
-}}
-
+}
+}
 
 #endif /* COLLIE_POLL_POLLER_H */

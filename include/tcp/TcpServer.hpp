@@ -21,7 +21,8 @@ class TcpConnection;
 
 class TcpServer {
 public:
-    using OnMessageCallback = std::function<void(std::shared_ptr<TcpConnection>)>;
+    using OnMessageCallback =
+        std::function<void(std::shared_ptr<TcpConnection>)>;
     using ConnectedCallback = std::function<void()>;
 
     TcpServer(const std::string & host, const unsigned port);
@@ -32,10 +33,18 @@ public:
     void start();
     void multiThread(const int threadNum = 1);
     // setter
-    void setConnectedCallback(const ConnectedCallback & cb) { connectedCallback = cb; }
-    void setConnectedCallback(const ConnectedCallback && cb) { connectedCallback = std::move(cb); }
-    void setOnMessageCallback(const OnMessageCallback & cb) { onMessageCallback = cb; }
-    void setOnMessageCallback(const OnMessageCallback && cb) { onMessageCallback = std::move(cb); }
+    void setConnectedCallback(const ConnectedCallback & cb) {
+        connectedCallback = cb;
+    }
+    void setConnectedCallback(const ConnectedCallback && cb) {
+        connectedCallback = std::move(cb);
+    }
+    void setOnMessageCallback(const OnMessageCallback & cb) {
+        onMessageCallback = cb;
+    }
+    void setOnMessageCallback(const OnMessageCallback && cb) {
+        onMessageCallback = std::move(cb);
+    }
     // getter
     unsigned getPort() const { return port; }
     std::shared_ptr<Event::EventLoop> getEventLoop() const { return eventLoop; }
@@ -47,7 +56,7 @@ private:
                                   std::shared_ptr<SocketAddress> remoteAddr);
 
     bool isMultiThread;
-    std::set<std::shared_ptr<TcpConnection> > connections;
+    std::set<std::shared_ptr<TcpConnection>> connections;
     const std::string host;
     const unsigned port;
     std::shared_ptr<SocketAddress> localAddr;
@@ -57,7 +66,7 @@ private:
     ConnectedCallback connectedCallback;
     OnMessageCallback onMessageCallback;
 };
-
-}}
+}
+}
 
 #endif /* COLLIE_TCP_TCPSERVER_H */

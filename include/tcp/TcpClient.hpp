@@ -10,7 +10,6 @@ namespace Collie {
 namespace Event {
 
 class EventLoop;
-
 }
 
 class SocketAddress;
@@ -40,7 +39,7 @@ private:
     std::shared_ptr<SocketAddress> remoteAddr;
     std::shared_ptr<Event::EventLoop> eventLoop;
 };
-
-}}
+}
+}
 
 #endif /* COLLIE_TCP_TCPCLIENT_H */

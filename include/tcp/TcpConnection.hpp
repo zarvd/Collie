@@ -5,14 +5,12 @@
 #include <memory>
 #include <list>
 
-
 namespace Collie {
 
 namespace Event {
 
 class EventLoop;
 class Channel;
-
 }
 
 class SocketAddress;
@@ -34,11 +32,19 @@ public:
     std::shared_ptr<Event::Channel> getChannel() const { return channel; }
     std::shared_ptr<SocketAddress> getLocalAddr() const { return localAddr; }
     std::shared_ptr<SocketAddress> getRemoteAddr() const { return remoteAddr; }
-    void setMessageCallback(const MessageCallback & cb) { messageCallback = cb; }
-    void setMessageCallback(const MessageCallback && cb) { messageCallback = std::move(cb); }
+    void setMessageCallback(const MessageCallback & cb) {
+        messageCallback = cb;
+    }
+    void setMessageCallback(const MessageCallback && cb) {
+        messageCallback = std::move(cb);
+    }
 
-    void setShutdownCallback(const EventCallback & cb) { shutdownCallback = cb; }
-    void setShutdownCallback(const EventCallback && cb) { shutdownCallback = std::move(cb); }
+    void setShutdownCallback(const EventCallback & cb) {
+        shutdownCallback = cb;
+    }
+    void setShutdownCallback(const EventCallback && cb) {
+        shutdownCallback = std::move(cb);
+    }
 
     void disconnect();
     std::string recvAll();
@@ -60,7 +66,7 @@ private:
     MessageCallback messageCallback;
     EventCallback shutdownCallback;
 };
-
-}}
+}
+}
 
 #endif /* COLLIE_TCP_TCPCONNECTION_H */

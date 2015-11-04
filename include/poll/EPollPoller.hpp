@@ -27,7 +27,7 @@ public:
 
     enum class Type : unsigned {
         Read = EPOLLIN,
-            Write = EPOLLOUT,
+        Write = EPOLLOUT,
         Error = EPOLLERR,
         Close = EPOLLHUP,
         OngShot = EPOLLONESHOT,

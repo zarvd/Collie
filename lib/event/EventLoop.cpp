@@ -5,20 +5,17 @@
 #include "../../include/event/EventLoop.hpp"
 #include "../../include/event/Channel.hpp"
 
+namespace Collie {
+namespace Event {
 
-namespace Collie { namespace Event {
-
-EventLoop::EventLoop() :
-    poller(new Poll::EPollPoller(1024)) {
+EventLoop::EventLoop() : poller(new Poll::EPollPoller(1024)) {
     // FIXME the number of event
     poller->create();
 
     Log(TRACE) << "EventLoop constructing";
 }
 
-EventLoop::~EventLoop() {
-    Log(TRACE) << "EventLoop destructing";
-}
+EventLoop::~EventLoop() { Log(TRACE) << "EventLoop destructing"; }
 
 void
 EventLoop::loop() {
@@ -26,14 +23,15 @@ EventLoop::loop() {
         Log(TRACE) << "EventLoop looping";
         using namespace std::placeholders;
         poller->poll(std::bind(&EventLoop::pollCallback, this, _1, _2));
-   }
+    }
 }
 
 void
 EventLoop::loopNonBlocking() {
     Log(TRACE) << "EventLoop is looping";
     using namespace std::placeholders;
-    poller->poll(std::bind(&EventLoop::pollCallback, this, _1, _2), 0);  // should be non blocking
+    poller->poll(std::bind(&EventLoop::pollCallback, this, _1, _2),
+                 0); // should be non blocking
 }
 
 void
@@ -52,7 +50,7 @@ EventLoop::pollCallback(const unsigned fd, const unsigned revents) {
 void
 EventLoop::updateChannel(std::shared_ptr<Channel> channel) {
     Log(TRACE) << "EventLoop update channel " << channel->getFd();
-   if(hasChannel(channel)) {
+    if(hasChannel(channel)) {
         poller->modify(channel->getFd(), channel->getEvents());
     } else {
         poller->insert(channel->getFd(), channel->getEvents());
@@ -64,8 +62,8 @@ void
 EventLoop::removeChannel(std::shared_ptr<Channel> channel) {
     Log(TRACE) << "EventLoop remove channel " << channel->getFd();
     if(hasChannel(channel)) {
-        poller->remove(channel->getFd());  // remove channel from poller
-        channels.erase(channel->getFd());  // remove from loop
+        poller->remove(channel->getFd()); // remove channel from poller
+        channels.erase(channel->getFd()); // remove from loop
     } else {
         Log(WARN) << "EventLoop does NOT have channel " << channel->getFd();
         THROW_NOTFOUND;
@@ -116,5 +114,5 @@ bool
 EventLoop::isEventClose(const unsigned events) const noexcept {
     return poller->isClose(events);
 }
-
-}}
+}
+}

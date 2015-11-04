@@ -4,7 +4,6 @@
 #include <memory>
 #include <map>
 
-
 namespace Collie {
 
 namespace Poll {
@@ -17,15 +16,14 @@ class Channel;
 
 class EventLoop {
 public:
-
     EventLoop();
     EventLoop(const EventLoop &) = delete;
     EventLoop & operator=(const EventLoop &) = delete;
     ~EventLoop();
 
-    void loop();  // main method
+    void loop(); // main method
     void loopNonBlocking();
-    void updateChannel(std::shared_ptr<Channel>);  // update or insert
+    void updateChannel(std::shared_ptr<Channel>); // update or insert
     void removeChannel(std::shared_ptr<Channel>);
     bool hasChannel(std::shared_ptr<Channel>) const;
 
@@ -40,14 +38,14 @@ public:
     bool isEventClose(const unsigned events) const noexcept;
 
 private:
-    using ChannelMap = std::map<int, std::shared_ptr<Channel> >;
+    using ChannelMap = std::map<int, std::shared_ptr<Channel>>;
 
     void pollCallback(const unsigned fd, const unsigned revents);
 
     std::unique_ptr<Poll::Poller> poller;
     ChannelMap channels;
 };
-
-}}
+}
+}
 
 #endif /* COLLIE_EVENT_EVENTLOOP_H */

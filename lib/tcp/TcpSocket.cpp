@@ -3,26 +3,19 @@
 #include "../../include/SocketAddress.hpp"
 #include "../../include/Global.hpp"
 
+namespace Collie {
+namespace Tcp {
 
-namespace Collie { namespace Tcp {
-
-TcpSocket::TcpSocket() :
-    Socket(),
-    sendFlag(0),
-    recvFlag(0) {
+TcpSocket::TcpSocket() : Socket(), sendFlag(0), recvFlag(0) {
     Log(TRACE) << "TcpSocket client is constructing";
 }
 
-TcpSocket::TcpSocket(std::shared_ptr<SocketAddress> addr) :
-    Socket(addr),
-    sendFlag(0),
-    recvFlag(0) {
+TcpSocket::TcpSocket(std::shared_ptr<SocketAddress> addr)
+    : Socket(addr), sendFlag(0), recvFlag(0) {
     Log(TRACE) << "TcpSocket server is constructing";
 }
 
-TcpSocket::~TcpSocket() {
-    Log(TRACE) << "TcpSocket is destructing";
-}
+TcpSocket::~TcpSocket() { Log(TRACE) << "TcpSocket is destructing"; }
 
 void
 TcpSocket::setSendFlag(const int flag) {
@@ -45,7 +38,7 @@ TcpSocket::listen() {
 
 void
 TcpSocket::listenV4() {
-    if( ! localAddr) {
+    if(!localAddr) {
         Log(ERROR) << "local address is null";
         THROW_INVALID_ARGUMENT;
     }
@@ -101,12 +94,11 @@ TcpSocket::connectV4(std::shared_ptr<SocketAddress> servAddr) {
     }
     struct sockaddr_in local;
     int addrLen = sizeof(local);
-    ::getsockname(fd, (struct sockaddr *) &local, (socklen_t *) &addrLen);
+    ::getsockname(fd, (struct sockaddr *)&local, (socklen_t *)&addrLen);
     *localAddr = local;
 }
 
-void
-TcpSocket::connectV6(std::shared_ptr<SocketAddress>) {
+void TcpSocket::connectV6(std::shared_ptr<SocketAddress>) {
     // TODO
 }
 
@@ -145,7 +137,7 @@ TcpSocket::recv(const int connFd, const int recvFlag) {
     if(connFd < 2) {
         Log(WARN) << "Illegal connection fd " << connFd;
     }
-    const unsigned msgLength = 8192;  // FIXME
+    const unsigned msgLength = 8192; // FIXME
     char msg[msgLength];
     ::recv(connFd, msg, msgLength, recvFlag);
     Log(TRACE) << "Socket received msg";
@@ -164,5 +156,5 @@ TcpSocket::send(const int connFd, const std::string & msg, const int sendFlag) {
     ::send(connFd, content, sizeof(content), sendFlag);
     Log(TRACE) << "Socket send msg";
 }
-
-}}
+}
+}

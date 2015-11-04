@@ -4,8 +4,8 @@
 #include <memory>
 #include "Poller.hpp"
 
-
-namespace Collie { namespace Poll {
+namespace Collie {
+namespace Poll {
 
 // TODO
 class PollPoller : public Poller {
@@ -34,7 +34,7 @@ private:
 
     int pollFd;
 };
-
-}}
+}
+}
 
 #endif /* COLLIE_POLL_POLLPOLLER_H */

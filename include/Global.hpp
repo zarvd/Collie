@@ -12,8 +12,7 @@ using Logger::Level::INFO;
 using Logger::Level::WARN;
 using Logger::Level::ERROR;
 
-enum class IP {V4, V6, Unknown};
-
+enum class IP { V4, V6, Unknown };
 }
 
 #endif /* COLLIE_GLOBAL_H */

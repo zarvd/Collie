@@ -3,13 +3,10 @@
 #include "../../include/event/EventLoop.hpp"
 #include <unistd.h>
 
+namespace Collie {
+namespace Event {
 
-namespace Collie { namespace Event {
-
-Channel::Channel(const int fd) :
-    inEventLoop(false),
-    fd(fd),
-    events(0) {
+Channel::Channel(const int fd) : inEventLoop(false), fd(fd), events(0) {
     Log(TRACE) << "Channel " << fd << " constructing";
 
     // default error and close callback
@@ -147,5 +144,5 @@ void
 Channel::remove() {
     eventLoop->removeChannel(shared_from_this());
 }
-
-}}
+}
+}
