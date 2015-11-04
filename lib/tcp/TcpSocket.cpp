@@ -45,6 +45,10 @@ TcpSocket::listen() {
 
 void
 TcpSocket::listenV4() {
+    if( ! localAddr) {
+        Log(ERROR) << "local address is null";
+        THROW_INVALID_ARGUMENT;
+    }
     struct sockaddr_in servAddr = localAddr->getAddrV4();
 
     fd = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);

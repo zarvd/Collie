@@ -48,13 +48,13 @@ TcpServer::newConnection(const unsigned connFd, std::shared_ptr<SocketAddress> r
                                                                 this->localAddr,
                                                                 remoteAddr));
     connection->setMessageCallback(onMessageCallback);
-    clients.insert(connection);  // FIXME
+    connections.insert(connection);  // XXX
     connection->setShutdownCallback([this](std::shared_ptr<TcpConnection> conn) {
+            // remove connection
             Log(INFO) << "Connection close";
-            this->clients.erase(conn);  // remove connection
+            this->connections.erase(conn);
         });
 
-    // user callback
     if(connectedCallback) connectedCallback();
 }
 

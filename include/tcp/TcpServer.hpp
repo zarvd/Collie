@@ -39,7 +39,7 @@ public:
 private:
     void newConnection(const unsigned connFd, std::shared_ptr<SocketAddress> remoteAddr);
 
-    std::set<std::shared_ptr<TcpConnection> > clients;
+    std::set<std::shared_ptr<TcpConnection> > connections;
     const std::string host;
     const unsigned port;
     std::shared_ptr<SocketAddress> localAddr;
