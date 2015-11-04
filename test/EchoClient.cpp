@@ -9,7 +9,7 @@ using Collie::Tcp::TcpConnection;
 using namespace Collie;
 
 int
-main(int argc, char *argv[]) {
+main(int argc, char * argv[]) {
 
     auto & logger = Logger::LogHandler::getHandler();
     logger.setLogLevel(TRACE);
@@ -20,12 +20,11 @@ main(int argc, char *argv[]) {
 
     TcpClient client;
     client.setConnectCallback([](std::shared_ptr<TcpConnection> conn) {
-            conn->send("Hello, here is client");
-            const std::string content = conn->recvAll();
-            std::cout << content << std::endl;
-            conn->disconnect();
-        });
+        conn->send("Hello, here is client");
+        const std::string content = conn->recvAll();
+        std::cout << content << std::endl;
+        conn->disconnect();
+    });
     client.connect("127.0.0.1", port);
     return 0;
 }
-

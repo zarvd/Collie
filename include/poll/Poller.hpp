@@ -18,6 +18,7 @@ public:
     Poller & operator=(const Poller &) = delete;
     virtual ~Poller() = 0;
 
+    virtual void create() = 0;
     virtual void insert(const int fd, const unsigned events) = 0;
     virtual void modify(const int fd, const unsigned events) = 0;
     virtual void remove(const int fd) = 0;
@@ -35,7 +36,6 @@ public:
     const unsigned MaxEvent;
 
 protected:
-    virtual void create() = 0;
 
     int fd;
 };

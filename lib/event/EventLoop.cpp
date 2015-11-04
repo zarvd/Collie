@@ -11,6 +11,7 @@ namespace Collie { namespace Event {
 EventLoop::EventLoop() :
     poller(new Poll::EPollPoller(1024)) {
     // FIXME the number of event
+    poller->create();
 
     Log(TRACE) << "EventLoop constructing";
 }

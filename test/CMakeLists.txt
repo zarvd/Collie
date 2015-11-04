@@ -1,4 +1,6 @@
 add_executable(EchoServer EchoServer)
+add_executable(MultiThreadEchoServer MultiThreadEchoServer)
 add_executable(EchoClient EchoClient)
 target_link_libraries(EchoServer collie /usr/local/lib/liblogger.a)
+target_link_libraries(MultiThreadEchoServer collie /usr/local/lib/liblogger.a)
 target_link_libraries(EchoClient collie /usr/local/lib/liblogger.a)

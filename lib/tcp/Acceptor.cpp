@@ -5,19 +5,16 @@
 #include "../../include/event/Channel.hpp"
 #include "../../include/SocketAddress.hpp"
 
-
-namespace Collie { namespace Tcp {
+namespace Collie {
+namespace Tcp {
 
 Acceptor::Acceptor(std::shared_ptr<SocketAddress> addr,
-                   std::shared_ptr<Event::EventLoop> eventLoop) :
-    localAddr(addr),
-    eventLoop(eventLoop) {
+                   std::shared_ptr<Event::EventLoop> eventLoop)
+    : localAddr(addr), eventLoop(eventLoop) {
     Log(TRACE) << "Acceptor constructing";
 }
 
-Acceptor::~Acceptor() {
-    Log(TRACE) << "Acceptor destructing";
-}
+Acceptor::~Acceptor() { Log(TRACE) << "Acceptor destructing"; }
 
 void
 Acceptor::socket() {
@@ -31,7 +28,7 @@ Acceptor::socket() {
 
 void
 Acceptor::accept() {
-    if( ! channel) socket();
+    if(!channel) socket();
     // update channel and set acceptCallback
     eventLoop->updateChannel(channel);
     channel->enableRead();
@@ -53,5 +50,5 @@ void
 Acceptor::handleError() {
     // TODO
 }
-
-}}
+}
+}

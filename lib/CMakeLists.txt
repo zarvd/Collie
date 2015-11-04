@@ -1,6 +1,7 @@
 set(BASE_SRC
   event/EventLoop.cpp
   event/Channel.cpp
+  event/ThreadPool.cpp
   poll/Poller.cpp
   poll/EPollPoller.cpp
   )

@@ -18,6 +18,7 @@ public:
     Channel & operator=(const Channel &) = delete;
     ~Channel();
 
+    // setter
     void setReadCallback(const EventCallback & cb) { readCallback = cb; }
     void setReadCallback(const EventCallback && cb) { readCallback = std::move(cb); }
     void setWriteCallback(const EventCallback & cb) { writeCallback = cb; }
@@ -26,10 +27,11 @@ public:
     void setCloseCallback(const EventCallback && cb) { closeCallback = std::move(cb); }
     void setErrorCallback(const EventCallback & cb) { errorCallback = cb; }
     void setErrorCallback(const EventCallback && cb) { errorCallback = std::move(cb); }
+    void setEventLoop(std::shared_ptr<EventLoop>);
 
+    // getter
     int getFd() const { return fd; }
     int getEvents() const { return events; }
-    void setEventLoop(std::shared_ptr<EventLoop>);
     std::shared_ptr<EventLoop> getEventLoop() const { return eventLoop; }
 
     bool isNoneEvent() const { return events == 0; }

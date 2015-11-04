@@ -4,7 +4,6 @@
 #include <memory>
 #include <functional>
 
-
 namespace Collie {
 
 namespace Event {
@@ -20,24 +19,22 @@ class TcpSocket;
 
 class Acceptor {
 public:
-    using AcceptCallback = std::function<void(const unsigned & connFd,
-                                              std::shared_ptr<SocketAddress> remoteAddr)>;
+    using AcceptCallback = std::function<void(
+        const unsigned connFd, std::shared_ptr<SocketAddress> remoteAddr)>;
 
     Acceptor(std::shared_ptr<SocketAddress>, std::shared_ptr<Event::EventLoop>);
     Acceptor(const Acceptor &) = delete;
     Acceptor & operator=(const Acceptor &) = delete;
     ~Acceptor();
-    std::shared_ptr<Event::Channel> getChannel() const {
-        return channel;
-    }
-    void setAcceptCallback(const AcceptCallback & cb) {
-        acceptCallback = cb;
+    std::shared_ptr<Event::Channel> getChannel() const { return channel; }
+    void setAcceptCallback(const AcceptCallback & cb) { acceptCallback = cb; }
+    void setAcceptCallback(const AcceptCallback && cb) {
+        acceptCallback = std::move(cb);
     }
     void socket();
     void accept();
 
 private:
-
     void handleRead();
     void handleError();
 
@@ -47,7 +44,7 @@ private:
     std::shared_ptr<Event::Channel> channel;
     AcceptCallback acceptCallback;
 };
-
-}}
+}
+}
 
 #endif /* COLLIE_TCP_ACCEPTOR_H */

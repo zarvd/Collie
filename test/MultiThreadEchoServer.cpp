@@ -19,6 +19,7 @@ main(int argc, char * argv[]) {
     if(argc == 2) port = std::stoul(argv[1]);
 
     TcpServer server("0.0.0.0", port);
+    server.multiThread(2);
     server.setOnMessageCallback([](std::shared_ptr<TcpConnection> conn) {
         const std::string content = conn->recvAll();
 

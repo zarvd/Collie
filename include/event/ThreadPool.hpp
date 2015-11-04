@@ -4,9 +4,6 @@
 #include <functional>
 #include <thread>
 #include <mutex>
-#include <condition_variable>
-#include <ctime>
-#include <chrono>
 #include <vector>
 
 
@@ -24,7 +21,6 @@ public:
 
     void pushChannel(std::shared_ptr<Channel>);
     void shutDown();
-    void startEventLoop();
 
 private:
     void runInThread();
