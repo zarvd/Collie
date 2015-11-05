@@ -8,8 +8,7 @@
 namespace Collie {
 namespace Event {
 
-EventLoop::EventLoop()
-    : poller(new Poll::EPollPoller(1024)) {
+EventLoop::EventLoop() : poller(new Poll::EPollPoller(1024)) {
     poller->create();
 
     Log(TRACE) << "EventLoop constructing";
@@ -42,7 +41,7 @@ EventLoop::loopNonBlocking() {
 }
 
 void
-EventLoop::pollCallback(const unsigned fd, const unsigned revents) {
+EventLoop::pollCallback(const int fd, const unsigned revents) {
     // find channel
     auto it = this->channels.find(fd);
     if(it != this->channels.end()) {

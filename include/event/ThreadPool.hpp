@@ -9,11 +9,11 @@
 namespace Collie {
 namespace Event {
 
-class EventLoop;
 class Channel;
 
 class ThreadPool {
 public:
+
     explicit ThreadPool(const int threadNum);
     ThreadPool(const ThreadPool &) = delete;
     ThreadPool & operator=(const ThreadPool &) = delete;
@@ -29,7 +29,7 @@ private:
     const int threadNum;
     std::mutex channelMtx;
     std::vector<std::thread> threadPool;
-    std::vector<std::shared_ptr<Channel> > channels;
+    std::vector<std::shared_ptr<Channel>> channels;
     bool terminate;
 };
 }

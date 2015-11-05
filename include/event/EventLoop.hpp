@@ -14,6 +14,9 @@ namespace Event {
 
 class Channel;
 
+/**
+ * Thread safe is not required
+ */
 class EventLoop {
 public:
     EventLoop();
@@ -22,7 +25,7 @@ public:
     EventLoop & operator=(const EventLoop &) = delete;
     ~EventLoop();
 
-    void loop(); // main method
+    void loop(); // main method, TODO setting timeout
     void loopNonBlocking();
     void updateChannel(std::shared_ptr<Channel>); // update or insert
     void removeChannel(std::shared_ptr<Channel>);
@@ -33,7 +36,7 @@ public:
 private:
     using ChannelMap = std::map<int, std::shared_ptr<Channel>>;
 
-    void pollCallback(const unsigned fd, const unsigned revents);
+    void pollCallback(const int fd, const unsigned revents);
 
     ChannelMap channels;
 };

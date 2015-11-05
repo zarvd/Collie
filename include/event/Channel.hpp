@@ -11,6 +11,7 @@ class EventLoop;
 
 /**
  * Thread safe is not required
+ * Channel owns the file descriptor, it will close the fd when destructing.
  */
 class Channel : public std::enable_shared_from_this<Channel> {
 public:
