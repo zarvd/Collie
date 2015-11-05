@@ -11,6 +11,7 @@ class EventLoop;
 
 class Channel : public std::enable_shared_from_this<Channel> {
 public:
+    using Callback = std::function<void()>;
     using EventCallback = std::function<void()>;
 
     explicit Channel(const int fd); // channel control socket life
@@ -38,6 +39,12 @@ public:
         errorCallback = std::move(cb);
     }
     void setEventLoop(std::shared_ptr<EventLoop>);
+    void setAfterSetLoopCallback(const Callback & cb) {
+        afterSetLoopCallback = cb;
+    }
+    void setAfterSetLoopCallback(const Callback && cb) {
+        afterSetLoopCallback = std::move(cb);
+    }
     void setUpdateAfterActivate(const bool update) {
         updateAfterActivate = update;
     }
@@ -74,6 +81,7 @@ private:
     EventCallback writeCallback;
     EventCallback closeCallback;
     EventCallback errorCallback;
+    Callback afterSetLoopCallback;
 };
 }
 }

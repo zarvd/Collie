@@ -17,6 +17,7 @@ class Channel;
 class EventLoop {
 public:
     EventLoop();
+    explicit EventLoop(std::unique_ptr<Poll::Poller> poller);
     EventLoop(const EventLoop &) = delete;
     EventLoop & operator=(const EventLoop &) = delete;
     ~EventLoop();
@@ -28,6 +29,7 @@ public:
     bool hasChannel(std::shared_ptr<Channel>) const;
 
     const std::unique_ptr<Poll::Poller> poller;
+
 private:
     using ChannelMap = std::map<int, std::shared_ptr<Channel>>;
 

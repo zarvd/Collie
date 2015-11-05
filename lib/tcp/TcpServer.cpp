@@ -36,6 +36,7 @@ TcpServer::start() {
         auto channel = acceptor->getBaseChannel();
         channel->setEventLoop(eventLoop);
         channel->update();
+        eventLoop->loop();
     } else {
         threadPool.reset(new Event::ThreadPool(threadNum, acceptor->getBaseChannel()));
     }

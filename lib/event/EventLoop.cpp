@@ -8,8 +8,15 @@
 namespace Collie {
 namespace Event {
 
-EventLoop::EventLoop() : poller(new Poll::EPollPoller(1024)) {
-    // FIXME the number of event
+EventLoop::EventLoop()
+    : poller(new Poll::EPollPoller(1024)) {
+    poller->create();
+
+    Log(TRACE) << "EventLoop constructing";
+}
+
+EventLoop::EventLoop(std::unique_ptr<Poll::Poller> poller)
+    : poller(std::move(poller)) {
     poller->create();
 
     Log(TRACE) << "EventLoop constructing";

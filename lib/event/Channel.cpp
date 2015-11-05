@@ -52,51 +52,108 @@ Channel::setEventLoop(std::shared_ptr<EventLoop> eventLoop) {
     } else {
         this->eventLoop = eventLoop;
         inEventLoop = true;
+        if(afterSetLoopCallback) afterSetLoopCallback();
     }
 }
 
 bool
 Channel::isRead() const {
+    if(!inEventLoop) {
+        Log(ERROR) << "Channel is not in event loop";
+        THROW_NOTFOUND;
+    }
     return eventLoop->poller->isRead(events);
 }
 
 bool
 Channel::isWrite() const {
+    if(!inEventLoop) {
+        Log(ERROR) << "Channel is not in event loop";
+        THROW_NOTFOUND;
+    }
     return eventLoop->poller->isWrite(events);
 }
 
 void
 Channel::enableRead() {
+    if(!inEventLoop) {
+        Log(ERROR) << "Channel is not in event loop";
+        THROW_NOTFOUND;
+    }
+    if(!eventLoop->poller) {
+        Log(ERROR) << "Poller is null";
+        THROW_NOTFOUND;
+    }
     eventLoop->poller->enableRead(events);
     update();
 }
 
 void
 Channel::disableRead() {
+    if(!inEventLoop) {
+        Log(ERROR) << "Channel is not in event loop";
+        THROW_NOTFOUND;
+    }
+    if(!eventLoop->poller) {
+        Log(ERROR) << "Poller is null";
+        THROW_NOTFOUND;
+    }
     eventLoop->poller->disableRead(events);
     update();
 }
 
 void
 Channel::enableWrite() {
+    if(!inEventLoop) {
+        Log(ERROR) << "Channel is not in event loop";
+        THROW_NOTFOUND;
+    }
+    if(!eventLoop->poller) {
+        Log(ERROR) << "Poller is null";
+        THROW_NOTFOUND;
+    }
     eventLoop->poller->enableWrite(events);
     update();
 }
 
 void
 Channel::disableWrite() {
+    if(!inEventLoop) {
+        Log(ERROR) << "Channel is not in event loop";
+        THROW_NOTFOUND;
+    }
+    if(!eventLoop->poller) {
+        Log(ERROR) << "Poller is null";
+        THROW_NOTFOUND;
+    }
     eventLoop->poller->disableWrite(events);
     update();
 }
 
 void
 Channel::enableOneShot() {
+    if(!inEventLoop) {
+        Log(ERROR) << "Channel is not in event loop";
+        THROW_NOTFOUND;
+    }
+    if(!eventLoop->poller) {
+        Log(ERROR) << "Poller is null";
+        THROW_NOTFOUND;
+    }
     eventLoop->poller->enableOneShot(events);
     update();
 }
 
 void
 Channel::disableOneShot() {
+    if(!inEventLoop) {
+        Log(ERROR) << "Channel is not in event loop";
+        THROW_NOTFOUND;
+    }
+    if(!eventLoop->poller) {
+        Log(ERROR) << "Poller is null";
+        THROW_NOTFOUND;
+    }
     eventLoop->poller->disableOneShot(events);
     update();
 }
@@ -110,6 +167,10 @@ Channel::disableAll() {
 
 void
 Channel::activate(const unsigned revents) {
+    if(!eventLoop->poller) {
+        Log(ERROR) << "Poller is null";
+        THROW_NOTFOUND;
+    }
     if(eventLoop->poller->isError(revents)) {
         // error event
         Log(TRACE) << "Activate ERROR callback with events " << revents;

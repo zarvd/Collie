@@ -33,11 +33,14 @@ Acceptor::getBaseChannel() {
     // create channel
     std::shared_ptr<Event::Channel> channel(
         new Event::Channel(tcpSocket->getFd()));
-    channel->enableRead();
-    channel->setReadCallback(std::bind(&Acceptor::handleRead, this));
-    channel->enableOneShot(); // NOTE One shot, channel needs to update after
-                              // every accepting
-    channel->setUpdateAfterActivate(true);
+    channel->setAfterSetLoopCallback([channel, this]() {
+        channel->enableRead();
+        channel->setReadCallback(std::bind(&Acceptor::handleRead, this));
+        channel
+            ->enableOneShot(); // NOTE One shot, channel needs to update after
+        // every accepting
+        channel->setUpdateAfterActivate(true);
+    });
     return channel;
 }
 
