@@ -40,11 +40,12 @@ void
 ThreadPool::start(std::shared_ptr<Channel> baseChannel) {
     Log(TRACE) << "Thread pool create " << threadNum << " threads";
     for(int i = 1; i < threadNum; ++i) {
-        threadPool.push_back(std::thread(&ThreadPool::runInThread, this,
-                                         baseChannel->getCopy()));
+        threadPool.push_back(
+            std::thread(&ThreadPool::runInThread, this,
+                        baseChannel->getCopyWithoutEventLoop()));
     }
     // run in main thread
-    runInThread(baseChannel->getCopy());
+    runInThread(baseChannel->getCopyWithoutEventLoop());
 }
 
 void

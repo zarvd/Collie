@@ -9,6 +9,9 @@ namespace Event {
 
 class EventLoop;
 
+/**
+ * Thread safe is not required
+ */
 class Channel : public std::enable_shared_from_this<Channel> {
 public:
     using Callback = std::function<void(std::shared_ptr<Channel>)>;
@@ -18,8 +21,6 @@ public:
     Channel(const Channel &) = delete;
     Channel & operator=(const Channel &) = delete;
     ~Channel();
-
-    std::shared_ptr<Channel> getCopy() const;
 
     // setter
     void setReadCallback(const EventCallback & cb) { readCallback = cb; }
@@ -52,6 +53,7 @@ public:
     // getter
     int getFd() const { return fd; }
     int getEvents() const { return events; }
+    std::shared_ptr<Channel> getCopyWithoutEventLoop() const;
     std::shared_ptr<EventLoop> getEventLoop() const { return eventLoop; }
 
     // event

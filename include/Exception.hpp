@@ -8,6 +8,9 @@
 namespace Collie {
 namespace Exception {
 
+/**
+ * get system error message
+ */
 inline std::string
 getErr() {
     return std::string(strerror(errno));

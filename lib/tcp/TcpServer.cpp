@@ -80,6 +80,7 @@ TcpServer::newConnection(const unsigned connFd,
         // multi threads
         threadPool->pushChannel(channel);
     } else {
+        // FIXME remove
         // single thread
         channel->setEventLoop(this->eventLoop);
     }

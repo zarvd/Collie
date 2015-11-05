@@ -34,7 +34,7 @@ Channel::~Channel() {
 }
 
 std::shared_ptr<Channel>
-Channel::getCopy() const {
+Channel::getCopyWithoutEventLoop() const {
     std::shared_ptr<Channel> channel(new Channel(fd));
     channel->events = events;
     channel->readCallback = readCallback;
@@ -49,7 +49,7 @@ void
 Channel::setEventLoop(std::shared_ptr<EventLoop> eventLoop) {
     if(inEventLoop) {
         Log(WARN) << "Channel" << fd << " is already in eventLoop";
-        // FIXME throw exception
+        THROW_INVALID_ARGUMENT;
     } else {
         this->eventLoop = eventLoop;
         inEventLoop = true;
