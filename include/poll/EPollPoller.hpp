@@ -30,7 +30,7 @@ public:
         Write = EPOLLOUT,
         Error = EPOLLERR,
         Close = EPOLLHUP,
-        OngShot = EPOLLONESHOT,
+        OneShot = EPOLLONESHOT,
         EdgeTriggered = EPOLLET,
         Priority = EPOLLPRI
     };
@@ -46,6 +46,12 @@ public:
     }
     void disableWrite(unsigned & events) const noexcept override {
         events &= ~(unsigned)Type::Write;
+    }
+    void enableOneShot(unsigned & events) const noexcept override {
+        events |= (unsigned)Type::OneShot;
+    }
+    void disableOneShot(unsigned & events) const noexcept override {
+        events &= ~(unsigned)Type::OneShot;
     }
     bool isRead(const unsigned events) const noexcept override {
         return (unsigned)Type::Read & events;

@@ -8,35 +8,42 @@
 namespace Collie {
 namespace Tcp {
 
-Acceptor::Acceptor(std::shared_ptr<SocketAddress> addr,
-                   std::shared_ptr<Event::EventLoop> eventLoop)
-    : localAddr(addr), eventLoop(eventLoop) {
+Acceptor::Acceptor(std::shared_ptr<SocketAddress> addr) : localAddr(addr) {
     Log(TRACE) << "Acceptor constructing";
 }
 
 Acceptor::~Acceptor() { Log(TRACE) << "Acceptor destructing"; }
+
+int
+Acceptor::getSocketFd() const {
+    return tcpSocket->getFd();
+}
 
 void
 Acceptor::socket() {
     // create socket and listen
     tcpSocket.reset(new TcpSocket(localAddr));
     tcpSocket->listen();
-    // create channel
-    channel.reset(new Event::Channel(tcpSocket->getFd()));
-    channel->setEventLoop(eventLoop);
 }
 
-void
-Acceptor::accept() {
-    if(!channel) socket();
-    // update channel and set acceptCallback
-    eventLoop->updateChannel(channel);
+std::shared_ptr<Event::Channel>
+Acceptor::getBaseChannel() {
+    if(!tcpSocket) socket();
+
+    // create channel
+    std::shared_ptr<Event::Channel> channel(
+        new Event::Channel(tcpSocket->getFd()));
     channel->enableRead();
     channel->setReadCallback(std::bind(&Acceptor::handleRead, this));
+    channel->enableOneShot(); // NOTE One shot, channel needs to update after
+                              // every accepting
+    channel->setUpdateAfterActivate(true);
+    return channel;
 }
 
 void
 Acceptor::handleRead() {
+    // should be thread-safe
     std::shared_ptr<SocketAddress> remoteAddr(new SocketAddress);
     int connFd = tcpSocket->accept(remoteAddr);
     if(connFd > 0) {
@@ -49,6 +56,7 @@ Acceptor::handleRead() {
 void
 Acceptor::handleError() {
     // TODO
+    Log(TRACE) << "Acceptor handle error";
 }
 }
 }

@@ -1,12 +1,14 @@
 #include "../../include/Global.hpp"
 #include "../../include/event/Channel.hpp"
 #include "../../include/event/EventLoop.hpp"
+#include "../../include/poll/EPollPoller.hpp"
 #include <unistd.h>
 
 namespace Collie {
 namespace Event {
 
-Channel::Channel(const int fd) : inEventLoop(false), fd(fd), events(0) {
+Channel::Channel(const int fd)
+    : inEventLoop(false), fd(fd), events(0), updateAfterActivate(false) {
     Log(TRACE) << "Channel " << fd << " constructing";
 
     // default error and close callback
@@ -31,6 +33,17 @@ Channel::~Channel() {
     }
 }
 
+std::shared_ptr<Channel>
+Channel::getCopy() const {
+    std::shared_ptr<Channel> channel(new Channel(fd));
+    channel->events = events;
+    channel->readCallback = readCallback;
+    channel->writeCallback = writeCallback;
+    channel->errorCallback = errorCallback;
+    channel->closeCallback = closeCallback;
+    return channel;
+}
+
 void
 Channel::setEventLoop(std::shared_ptr<EventLoop> eventLoop) {
     if(inEventLoop) {
@@ -44,35 +57,47 @@ Channel::setEventLoop(std::shared_ptr<EventLoop> eventLoop) {
 
 bool
 Channel::isRead() const {
-    return eventLoop->isEventRead(events);
+    return eventLoop->poller->isRead(events);
 }
 
 bool
 Channel::isWrite() const {
-    return eventLoop->isEventWrite(events);
+    return eventLoop->poller->isWrite(events);
 }
 
 void
 Channel::enableRead() {
-    eventLoop->enableEventRead(events);
+    eventLoop->poller->enableRead(events);
     update();
 }
 
 void
 Channel::disableRead() {
-    eventLoop->disableEventRead(events);
+    eventLoop->poller->disableRead(events);
     update();
 }
 
 void
 Channel::enableWrite() {
-    eventLoop->enableEventWrite(events);
+    eventLoop->poller->enableWrite(events);
     update();
 }
 
 void
 Channel::disableWrite() {
-    eventLoop->disableEventWrite(events);
+    eventLoop->poller->disableWrite(events);
+    update();
+}
+
+void
+Channel::enableOneShot() {
+    eventLoop->poller->enableOneShot(events);
+    update();
+}
+
+void
+Channel::disableOneShot() {
+    eventLoop->poller->disableOneShot(events);
     update();
 }
 
@@ -84,8 +109,8 @@ Channel::disableAll() {
 }
 
 void
-Channel::activate(const unsigned revents) const {
-    if(eventLoop->isEventError(revents)) {
+Channel::activate(const unsigned revents) {
+    if(eventLoop->poller->isError(revents)) {
         // error event
         Log(TRACE) << "Activate ERROR callback with events " << revents;
         if(errorCallback) {
@@ -94,7 +119,7 @@ Channel::activate(const unsigned revents) const {
             Log(ERROR) << "errorCallback is not callable";
             THROW_NOTFOUND;
         }
-    } else if(eventLoop->isEventClose(revents)) {
+    } else if(eventLoop->poller->isClose(revents)) {
         // close event
         Log(TRACE) << "Activate CLOSE callback with events" << revents;
         if(closeCallback) {
@@ -105,7 +130,7 @@ Channel::activate(const unsigned revents) const {
         }
     } else {
         // read event
-        if(eventLoop->isEventRead(revents)) {
+        if(eventLoop->poller->isRead(revents)) {
             if(isRead()) {
                 Log(TRACE) << "Activate READ callback with events " << revents;
                 if(readCallback) {
@@ -119,7 +144,7 @@ Channel::activate(const unsigned revents) const {
             }
         }
         // write event
-        if(eventLoop->isEventWrite(revents)) {
+        if(eventLoop->poller->isWrite(revents)) {
             if(isWrite()) {
                 Log(TRACE) << "Activate WRITE callback with events" << revents;
                 if(writeCallback) {
@@ -133,6 +158,7 @@ Channel::activate(const unsigned revents) const {
             }
         }
     }
+    if(updateAfterActivate) update();
 }
 
 void

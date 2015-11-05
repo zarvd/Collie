@@ -30,6 +30,8 @@ public:
     virtual void disableRead(unsigned & events) const noexcept = 0;
     virtual void enableWrite(unsigned & events) const noexcept = 0;
     virtual void disableWrite(unsigned & events) const noexcept = 0;
+    virtual void enableOneShot(unsigned & events) const noexcept = 0;
+    virtual void disableOneShot(unsigned & events) const noexcept = 0;
     virtual bool isRead(const unsigned events) const noexcept = 0;
     virtual bool isWrite(const unsigned events) const noexcept = 0;
     virtual bool isError(const unsigned events) const noexcept = 0;

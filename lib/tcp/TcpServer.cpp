@@ -13,11 +13,11 @@ namespace Tcp {
 
 TcpServer::TcpServer(const std::string & host, const unsigned port)
     : isMultiThread(false),
+      threadNum(0),
       host(host),
       port(port),
       localAddr(SocketAddress::getSocketAddress(host, port)),
-      eventLoop(new Event::EventLoop),
-      acceptor(new Acceptor(localAddr, eventLoop)) {
+      acceptor(new Acceptor(localAddr)) {
     Log(TRACE) << "TcpServer constructing";
 }
 
@@ -31,15 +31,24 @@ TcpServer::start() {
     // setup acceptor
     acceptor->setAcceptCallback(
         std::bind(&TcpServer::newConnection, this, _1, _2));
-    acceptor->accept();
-    eventLoop->loop();
+    if(!isMultiThread) {
+        eventLoop.reset(new Event::EventLoop);
+        auto channel = acceptor->getBaseChannel();
+        channel->setEventLoop(eventLoop);
+        channel->update();
+    } else {
+        threadPool.reset(new Event::ThreadPool(threadNum, acceptor->getBaseChannel()));
+    }
 }
 
 void
 TcpServer::multiThread(const int threadNum) {
-    if(threadNum < 1) return;
-    isMultiThread = true;
-    threadPool.reset(new Event::ThreadPool(threadNum));
+    if(threadNum < 1) {
+        isMultiThread = false;
+    } else {
+        isMultiThread = true;
+        this->threadNum = threadNum;
+    }
 }
 
 void

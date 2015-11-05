@@ -6,11 +6,14 @@
 namespace Collie {
 namespace Event {
 
-ThreadPool::ThreadPool(const unsigned threadNum) : terminate(false) {
+ThreadPool::ThreadPool(const unsigned threadNum,
+                       std::shared_ptr<Channel> baseChannel)
+    : terminate(false) {
     Log(TRACE) << "ThreadPool is constructing";
     Log(TRACE) << "Thread pool create " << threadNum << " threads";
     for(unsigned i = 0; i < threadNum; ++i) {
-        threadPool.push_back(std::thread(&ThreadPool::runInThread, this));
+        threadPool.push_back(std::thread(&ThreadPool::runInThread, this,
+                                         baseChannel->getCopy()));
     }
 }
 
@@ -40,9 +43,11 @@ ThreadPool::pushChannel(std::shared_ptr<Channel> channel) {
 }
 
 void
-ThreadPool::runInThread() {
+ThreadPool::runInThread(std::shared_ptr<Channel> baseChannel) {
     // one loop per thread
     std::shared_ptr<EventLoop> eventLoop(new EventLoop);
+    baseChannel->setEventLoop(eventLoop);
+    baseChannel->update();
     std::vector<std::shared_ptr<Channel>> channelsInThisThread;
     while(true) {
         // Non blocking try lock mutex

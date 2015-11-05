@@ -18,6 +18,8 @@ public:
     Channel & operator=(const Channel &) = delete;
     ~Channel();
 
+    std::shared_ptr<Channel> getCopy() const;
+
     // setter
     void setReadCallback(const EventCallback & cb) { readCallback = cb; }
     void setReadCallback(const EventCallback && cb) {
@@ -36,12 +38,16 @@ public:
         errorCallback = std::move(cb);
     }
     void setEventLoop(std::shared_ptr<EventLoop>);
+    void setUpdateAfterActivate(const bool update) {
+        updateAfterActivate = update;
+    }
 
     // getter
     int getFd() const { return fd; }
     int getEvents() const { return events; }
     std::shared_ptr<EventLoop> getEventLoop() const { return eventLoop; }
 
+    // event
     bool isNoneEvent() const { return events == 0; }
     bool isRead() const;
     bool isWrite() const;
@@ -50,9 +56,11 @@ public:
     void disableRead();
     void enableWrite();
     void disableWrite();
+    void enableOneShot();
+    void disableOneShot();
     void disableAll();
 
-    void activate(const unsigned revents) const;
+    void activate(const unsigned revents);
     void remove();
     void update();
 
@@ -61,6 +69,7 @@ private:
     const int fd;     // file descriptor
     unsigned events;
     std::shared_ptr<EventLoop> eventLoop;
+    bool updateAfterActivate;
     EventCallback readCallback;
     EventCallback writeCallback;
     EventCallback closeCallback;

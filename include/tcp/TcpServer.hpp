@@ -56,6 +56,7 @@ private:
                                   std::shared_ptr<SocketAddress> remoteAddr);
 
     bool isMultiThread;
+    int threadNum;
     std::set<std::shared_ptr<TcpConnection>> connections;
     const std::string host;
     const unsigned port;
