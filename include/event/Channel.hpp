@@ -11,7 +11,7 @@ class EventLoop;
 
 class Channel : public std::enable_shared_from_this<Channel> {
 public:
-    using Callback = std::function<void()>;
+    using Callback = std::function<void(std::shared_ptr<Channel>)>;
     using EventCallback = std::function<void()>;
 
     explicit Channel(const int fd); // channel control socket life

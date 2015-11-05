@@ -33,7 +33,10 @@ Acceptor::getBaseChannel() {
     // create channel
     std::shared_ptr<Event::Channel> channel(
         new Event::Channel(tcpSocket->getFd()));
-    channel->setAfterSetLoopCallback([channel, this]() {
+    // set callback after setting event loop
+    channel->setAfterSetLoopCallback([this](
+        std::shared_ptr<Event::Channel> channel) {
+        Log(TRACE) << "channel setting up";
         channel->enableRead();
         channel->setReadCallback(std::bind(&Acceptor::handleRead, this));
         channel

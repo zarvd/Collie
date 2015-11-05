@@ -14,17 +14,19 @@ class Channel;
 
 class ThreadPool {
 public:
-    ThreadPool(const unsigned threadNum, std::shared_ptr<Channel> baseChannel = nullptr);
+    explicit ThreadPool(const int threadNum);
     ThreadPool(const ThreadPool &) = delete;
     ThreadPool & operator=(const ThreadPool &) = delete;
     ~ThreadPool();
 
     void pushChannel(std::shared_ptr<Channel>);
     void shutDown();
+    void start(std::shared_ptr<Channel> baseChannel = nullptr);
 
 private:
     void runInThread(std::shared_ptr<Channel> baseChannel = nullptr);
 
+    const int threadNum;
     std::mutex channelMtx;
     std::vector<std::thread> threadPool;
     std::vector<std::shared_ptr<Channel> > channels;

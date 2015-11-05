@@ -38,7 +38,8 @@ TcpServer::start() {
         channel->update();
         eventLoop->loop();
     } else {
-        threadPool.reset(new Event::ThreadPool(threadNum, acceptor->getBaseChannel()));
+        threadPool.reset(new Event::ThreadPool(threadNum));
+        threadPool->start(acceptor->getBaseChannel());
     }
 }
 
@@ -60,6 +61,21 @@ TcpServer::newConnection(const unsigned connFd,
 
     // new channel
     std::shared_ptr<Event::Channel> channel(new Event::Channel(connFd));
+    // new connection
+    // NOTE setting up channel in connection
+    channel->setAfterSetLoopCallback(
+        [this, remoteAddr](std::shared_ptr<Event::Channel> channel) {
+            std::shared_ptr<TcpConnection> connection(
+                new TcpConnection(channel, this->localAddr, remoteAddr));
+            connection->setMessageCallback(onMessageCallback);
+            this->connections.insert(connection); // XXX
+            connection->setShutdownCallback(
+                [this](std::shared_ptr<TcpConnection> conn) {
+                    // remove connection
+                    Log(INFO) << "Connection close";
+                    this->connections.erase(conn);
+                });
+        });
     if(isMultiThread) {
         // multi threads
         threadPool->pushChannel(channel);
@@ -67,19 +83,6 @@ TcpServer::newConnection(const unsigned connFd,
         // single thread
         channel->setEventLoop(this->eventLoop);
     }
-    // new connection
-    // NOTE setting up channel in connection
-    std::shared_ptr<TcpConnection> connection(
-        new TcpConnection(channel, this->localAddr, remoteAddr));
-    connection->setMessageCallback(onMessageCallback);
-    connections.insert(connection); // XXX
-    connection->setShutdownCallback(
-        [this](std::shared_ptr<TcpConnection> conn) {
-            // remove connection
-            Log(INFO) << "Connection close";
-            this->connections.erase(conn);
-        });
-
     if(connectedCallback) connectedCallback();
 }
 }

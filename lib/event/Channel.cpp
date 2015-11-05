@@ -41,6 +41,7 @@ Channel::getCopy() const {
     channel->writeCallback = writeCallback;
     channel->errorCallback = errorCallback;
     channel->closeCallback = closeCallback;
+    channel->afterSetLoopCallback = afterSetLoopCallback;
     return channel;
 }
 
@@ -52,7 +53,7 @@ Channel::setEventLoop(std::shared_ptr<EventLoop> eventLoop) {
     } else {
         this->eventLoop = eventLoop;
         inEventLoop = true;
-        if(afterSetLoopCallback) afterSetLoopCallback();
+        if(afterSetLoopCallback) afterSetLoopCallback(shared_from_this());
     }
 }
 
@@ -60,7 +61,7 @@ bool
 Channel::isRead() const {
     if(!inEventLoop) {
         Log(ERROR) << "Channel is not in event loop";
-        THROW_NOTFOUND;
+        THROW_INVALID_ARGUMENT;
     }
     return eventLoop->poller->isRead(events);
 }
@@ -69,7 +70,7 @@ bool
 Channel::isWrite() const {
     if(!inEventLoop) {
         Log(ERROR) << "Channel is not in event loop";
-        THROW_NOTFOUND;
+        THROW_INVALID_ARGUMENT;
     }
     return eventLoop->poller->isWrite(events);
 }
@@ -78,11 +79,11 @@ void
 Channel::enableRead() {
     if(!inEventLoop) {
         Log(ERROR) << "Channel is not in event loop";
-        THROW_NOTFOUND;
+        THROW_INVALID_ARGUMENT;
     }
     if(!eventLoop->poller) {
         Log(ERROR) << "Poller is null";
-        THROW_NOTFOUND;
+        THROW_INVALID_ARGUMENT;
     }
     eventLoop->poller->enableRead(events);
     update();
@@ -92,11 +93,11 @@ void
 Channel::disableRead() {
     if(!inEventLoop) {
         Log(ERROR) << "Channel is not in event loop";
-        THROW_NOTFOUND;
+        THROW_INVALID_ARGUMENT;
     }
     if(!eventLoop->poller) {
         Log(ERROR) << "Poller is null";
-        THROW_NOTFOUND;
+        THROW_INVALID_ARGUMENT;
     }
     eventLoop->poller->disableRead(events);
     update();
@@ -106,11 +107,11 @@ void
 Channel::enableWrite() {
     if(!inEventLoop) {
         Log(ERROR) << "Channel is not in event loop";
-        THROW_NOTFOUND;
+        THROW_INVALID_ARGUMENT;
     }
     if(!eventLoop->poller) {
         Log(ERROR) << "Poller is null";
-        THROW_NOTFOUND;
+        THROW_INVALID_ARGUMENT;
     }
     eventLoop->poller->enableWrite(events);
     update();
@@ -120,11 +121,11 @@ void
 Channel::disableWrite() {
     if(!inEventLoop) {
         Log(ERROR) << "Channel is not in event loop";
-        THROW_NOTFOUND;
+        THROW_INVALID_ARGUMENT;
     }
     if(!eventLoop->poller) {
         Log(ERROR) << "Poller is null";
-        THROW_NOTFOUND;
+        THROW_INVALID_ARGUMENT;
     }
     eventLoop->poller->disableWrite(events);
     update();
@@ -134,11 +135,11 @@ void
 Channel::enableOneShot() {
     if(!inEventLoop) {
         Log(ERROR) << "Channel is not in event loop";
-        THROW_NOTFOUND;
+        THROW_INVALID_ARGUMENT;
     }
     if(!eventLoop->poller) {
         Log(ERROR) << "Poller is null";
-        THROW_NOTFOUND;
+        THROW_INVALID_ARGUMENT;
     }
     eventLoop->poller->enableOneShot(events);
     update();
@@ -148,11 +149,11 @@ void
 Channel::disableOneShot() {
     if(!inEventLoop) {
         Log(ERROR) << "Channel is not in event loop";
-        THROW_NOTFOUND;
+        THROW_INVALID_ARGUMENT;
     }
     if(!eventLoop->poller) {
         Log(ERROR) << "Poller is null";
-        THROW_NOTFOUND;
+        THROW_INVALID_ARGUMENT;
     }
     eventLoop->poller->disableOneShot(events);
     update();
@@ -169,7 +170,7 @@ void
 Channel::activate(const unsigned revents) {
     if(!eventLoop->poller) {
         Log(ERROR) << "Poller is null";
-        THROW_NOTFOUND;
+        THROW_INVALID_ARGUMENT;
     }
     if(eventLoop->poller->isError(revents)) {
         // error event

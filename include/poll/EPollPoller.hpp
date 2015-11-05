@@ -69,7 +69,6 @@ public:
     // const unsigned MaxEvent;
 private:
     bool isInit;
-    int epollFd;
     std::unique_ptr<Event> revents;
 };
 }

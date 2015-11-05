@@ -6,15 +6,9 @@
 namespace Collie {
 namespace Event {
 
-ThreadPool::ThreadPool(const unsigned threadNum,
-                       std::shared_ptr<Channel> baseChannel)
-    : terminate(false) {
+ThreadPool::ThreadPool(const int threadNum)
+    : threadNum(threadNum), terminate(false) {
     Log(TRACE) << "ThreadPool is constructing";
-    Log(TRACE) << "Thread pool create " << threadNum << " threads";
-    for(unsigned i = 0; i < threadNum; ++i) {
-        threadPool.push_back(std::thread(&ThreadPool::runInThread, this,
-                                         baseChannel->getCopy()));
-    }
 }
 
 ThreadPool::~ThreadPool() {
@@ -29,7 +23,7 @@ ThreadPool::shutDown() {
         // send terminate signal to threads
         std::lock_guard<std::mutex> lock(channelMtx);
 
-        terminate = true;
+        // terminate = true;
     }
     for(auto & thread : threadPool) {
         thread.join();
@@ -40,6 +34,17 @@ void
 ThreadPool::pushChannel(std::shared_ptr<Channel> channel) {
     std::lock_guard<std::mutex> lock(channelMtx);
     channels.push_back(channel);
+}
+
+void
+ThreadPool::start(std::shared_ptr<Channel> baseChannel) {
+    Log(TRACE) << "Thread pool create " << threadNum << " threads";
+    for(int i = 1; i < threadNum; ++i) {
+        threadPool.push_back(std::thread(&ThreadPool::runInThread, this,
+                                         baseChannel->getCopy()));
+    }
+    // run in main thread
+    runInThread(baseChannel->getCopy());
 }
 
 void
@@ -55,8 +60,10 @@ ThreadPool::runInThread(std::shared_ptr<Channel> baseChannel) {
             // get new channel
 
             // terminate condition
-            if(terminate && channels.empty()) exit(0);
-
+            if(terminate && channels.empty()) {
+                Log(TRACE) << "Event loop is exiting";
+                exit(0);
+            }
             // FIXME dispatch channel more flexible
             channelsInThisThread.swap(channels);
             channelMtx.unlock();
@@ -70,8 +77,8 @@ ThreadPool::runInThread(std::shared_ptr<Channel> baseChannel) {
             // clear channels queue
             channelsInThisThread.clear();
         }
-        // eventLoop->loop();
-        eventLoop->loopNonBlocking();
+        eventLoop->loop();
+        // eventLoop->loopNonBlocking();
     }
 }
 }
