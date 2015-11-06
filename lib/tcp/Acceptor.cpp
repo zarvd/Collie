@@ -1,17 +1,26 @@
 #include "../../include/Global.hpp"
 #include "../../include/tcp/Acceptor.hpp"
 #include "../../include/tcp/TcpSocket.hpp"
+#include "../../include/event/EventLoop.hpp"
 #include "../../include/event/Channel.hpp"
+#include "../../include/event/ThreadPool.hpp"
 #include "../../include/SocketAddress.hpp"
 
 namespace Collie {
 namespace Tcp {
 
-Acceptor::Acceptor(std::shared_ptr<SocketAddress> addr) : localAddr(addr) {
+Acceptor::Acceptor(std::shared_ptr<SocketAddress> addr)
+    : threadNum(1), localAddr(addr) {
     Log(TRACE) << "Acceptor constructing";
+    threadPool.reset(new Event::ThreadPool(threadNum));
 }
 
 Acceptor::~Acceptor() { Log(TRACE) << "Acceptor destructing"; }
+
+void
+Acceptor::setMultiThread(const size_t threadNum) {
+    this->threadNum = threadNum;
+}
 
 int
 Acceptor::getSocketFd() const {
@@ -33,7 +42,7 @@ Acceptor::getBaseChannel() {
     std::shared_ptr<Event::Channel> channel(
         new Event::Channel(tcpSocket->getFd()));
     // set callback after setting event loop
-    channel->setOwnFd(false); // for multi threads it doesn't won the socket fd
+    channel->setOwnFd(false); // for multi threads it doesn't own the socket fd
     channel->setAfterSetLoopCallback([this](
         std::shared_ptr<Event::Channel> channel) {
         Log(TRACE) << "channel setting up";
