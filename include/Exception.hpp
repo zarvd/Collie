@@ -66,6 +66,22 @@ public:
     throw ::Collie::Exception::InvalidArgumentError(EXC_DETAIL);
 #define THROW_SYS throw ::Collie::Exception::SystemError(EXC_DETAIL);
 #define THROW_FATAL throw ::Collie::Exception::FatalError(EXC_DETAIL);
+
+#define THROW_NOTFOUND_(msg)                                                   \
+    Log(ERROR) << msg;                                                         \
+    throw ::Collie::Exception::NotFoundError(EXC_DETAIL + msg);
+#define THROW_OUTOFRANGE_(msg)                                                 \
+    Log(ERROR) << msg;                                                         \
+    throw ::Collie::Exception::OutOfRangeError(EXC_DETAIL + msg);
+#define THROW_INVALID_ARGUMENT_(msg)                                           \
+    Log(ERROR) << msg;                                                         \
+    throw ::Collie::Exception::InvalidArgumentError(EXC_DETAIL + msg);
+#define THROW_SYS_(msg)                                                        \
+    Log(ERROR) << msg;                                                         \
+    throw ::Collie::Exception::SystemError(EXC_DETAIL + msg);
+#define THROW_FATAL_(msg)                                                      \
+    Log(ERROR) << msg;                                                         \
+    throw ::Collie::Exception::FatalError(EXC_DETAIL + msg);
 }
 }
 
