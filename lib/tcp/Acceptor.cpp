@@ -1,6 +1,5 @@
 #include "../../include/Global.hpp"
 #include "../../include/tcp/Acceptor.hpp"
-#include "../../include/event/EventLoop.hpp"
 #include "../../include/tcp/TcpSocket.hpp"
 #include "../../include/event/Channel.hpp"
 #include "../../include/SocketAddress.hpp"
@@ -34,6 +33,7 @@ Acceptor::getBaseChannel() {
     std::shared_ptr<Event::Channel> channel(
         new Event::Channel(tcpSocket->getFd()));
     // set callback after setting event loop
+    channel->setOwnFd(false); // for multi threads it doesn't won the socket fd
     channel->setAfterSetLoopCallback([this](
         std::shared_ptr<Event::Channel> channel) {
         Log(TRACE) << "channel setting up";

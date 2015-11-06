@@ -13,7 +13,6 @@ class Channel;
 
 class ThreadPool {
 public:
-
     explicit ThreadPool(const int threadNum);
     ThreadPool(const ThreadPool &) = delete;
     ThreadPool & operator=(const ThreadPool &) = delete;

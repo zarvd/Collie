@@ -11,7 +11,8 @@ class EventLoop;
 
 /**
  * Thread safe is not required
- * Channel owns the file descriptor, it will close the fd when destructing.
+ * Channel owns the file descriptor(default), it will close the fd when
+ * destructing.
  */
 class Channel : public std::enable_shared_from_this<Channel> {
 public:
@@ -24,6 +25,7 @@ public:
     ~Channel();
 
     // setter
+    void setOwnFd(const bool own) { ownFd = own; }
     void setReadCallback(const EventCallback & cb) { readCallback = cb; }
     void setReadCallback(const EventCallback && cb) {
         readCallback = std::move(cb);
@@ -75,6 +77,7 @@ public:
     void update();
 
 private:
+    bool ownFd;
     bool inEventLoop; // whether eventLoop is setting up
     const int fd;     // file descriptor
     unsigned events;
