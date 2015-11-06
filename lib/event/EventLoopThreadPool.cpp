@@ -22,19 +22,16 @@ EventLoopThreadPool::startLoop(
 
             while(true) {
                 std::shared_ptr<Channel> channel;
-                {
-                    std::unique_lock<std::mutex> lock(this->mtx);
-                    // XXX it will block event loop
-                    condition.wait(lock, [this] {
-                        return terminate || !channels.empty();
-                    });
+                if(mtx.try_lock() && (terminate || !channels.empty())) {
                     if(terminate && channels.empty()) return; // exit
-
                     channel = channels.front();
                     channels.pop();
+                    mtx.unlock();
                 }
-                channel->setEventLoop(eventLoop);
-                channel->update();
+                if(channel) {
+                    channel->setEventLoop(eventLoop);
+                    channel->update();
+                }
                 eventLoop->loopOne();
             }
         };
