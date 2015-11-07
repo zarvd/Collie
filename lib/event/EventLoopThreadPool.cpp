@@ -38,7 +38,7 @@ EventLoopThreadPool::startLoop(
                 // Non blocking
                 if(eventLoopThread->mtx.try_lock() &&
                    (terminate || !eventLoopThread->channels.empty())) {
-                    if(terminate && channels.empty()) return; // exit
+                    if(terminate && eventLoopThread->channels.empty()) return; // exit
                     channels.swap(eventLoopThread->channels);
                     eventLoopThread->mtx.unlock();
                 }
