@@ -52,6 +52,9 @@ EventLoopThreadPool::startLoop(
             }
         };
     }
+    for(size_t i = 1; i < threadNum; ++i) {
+        workers.emplace_back(runInThread);
+    }
     runInThread();
 }
 
