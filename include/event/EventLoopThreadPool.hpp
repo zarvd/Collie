@@ -3,7 +3,6 @@
 
 #include <functional>
 #include <vector>
-#include <queue>
 #include <thread>
 #include <memory>
 #include <mutex>
@@ -14,10 +13,19 @@ namespace Collie {
 namespace Event {
 
 class Channel;
+// class EventLoop;
 
+/**
+ * One loop per thread
+ */
 class EventLoopThreadPool {
 public:
     using RunInThread = std::function<void()>;
+    struct EventLoopThread {
+        // std::shared_ptr<EventLoop> eventLoop;
+        std::vector<std::shared_ptr<Channel>> channels;
+        std::mutex mtx;
+    };
 
     explicit EventLoopThreadPool(const size_t threadNum);
     EventLoopThreadPool(const EventLoopThreadPool &) = delete;
@@ -32,14 +40,15 @@ public:
     }
     void startLoop(std::vector<std::shared_ptr<Channel>> baseChannel);
     void pushChannel(std::shared_ptr<Channel> channel);
+    std::shared_ptr<EventLoopThread> getNextLoop();
 
 private:
     const size_t threadNum;
-    std::mutex mtx;
     std::condition_variable condition;
     RunInThread runInThread;
     std::vector<std::thread> workers;
-    std::queue<std::shared_ptr<Channel>> channels;
+    std::mutex eventLoopThreadMtx;
+    std::vector<std::shared_ptr<EventLoopThread>> eventLoopThreads;
     std::atomic<bool> terminate;
 };
 }
