@@ -137,7 +137,7 @@ TcpSocket::recv(const int connFd, const int recvFlag) {
     if(connFd < 2) {
         Log(WARN) << "Illegal connection fd " << connFd;
     }
-    const unsigned msgLength = 8192; // FIXME
+    constexpr size_t msgLength = 8192; // FIXME
     char msg[msgLength];
     ::recv(connFd, msg, msgLength, recvFlag);
     Log(TRACE) << "Socket received msg";

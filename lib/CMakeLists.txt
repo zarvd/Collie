@@ -2,6 +2,7 @@ set(BASE_SRC
   event/EventLoop.cpp
   event/Channel.cpp
   event/ThreadPool.cpp
+  event/EventLoopThreadPool.cpp
   poll/Poller.cpp
   poll/EPollPoller.cpp
   )

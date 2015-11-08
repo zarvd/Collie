@@ -31,7 +31,9 @@ public:
 
     void start();
     void bind(const std::string & host, const unsigned port);
-    void setThreadNum(const int threadNum = 1) { this->threadNum = threadNum; }
+    void setThreadNum(const size_t threadNum = 1) {
+        this->threadNum = threadNum;
+    }
     // setter
     void setConnectedCallback(const ConnectedCallback & cb) {
         connectedCallback = cb;
@@ -54,7 +56,7 @@ private:
     void newConnectionMultiThread(const unsigned connFd,
                                   std::shared_ptr<SocketAddress> remoteAddr);
 
-    int threadNum;
+    size_t threadNum;
     std::unordered_set<std::shared_ptr<TcpConnection>> connections;
     std::string host;
     unsigned port;
