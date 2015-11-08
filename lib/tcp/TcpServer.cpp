@@ -11,7 +11,7 @@
 namespace Collie {
 namespace Tcp {
 
-TcpServer::TcpServer() : isMultiThread(false), threadNum(0), port(0) {
+TcpServer::TcpServer() : threadNum(1), port(0) {
     Log(TRACE) << "TcpServer constructing";
 }
 
