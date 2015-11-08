@@ -17,6 +17,14 @@ ThreadPool::~ThreadPool() {
 }
 
 void
+ThreadPool::run() {
+    // create thread
+    for(size_t i = 0; i < threadNum; ++i) {
+        workers.emplace_back(&ThreadPool::runInThread, this);
+    }
+}
+
+void
 ThreadPool::shutDown() {
     Log(TRACE) << "ThreadPool is shutting down";
     {
@@ -40,13 +48,12 @@ ThreadPool::runInThread() {
                 return this->terminate || !this->tasks.empty();
             });
 
-            if(terminate && tasks.empty()) return;  // exit
+            if(terminate && tasks.empty()) return; // exit
             task = std::move(tasks.front());
             tasks.pop();
         }
         task();
     }
 }
-
 }
 }

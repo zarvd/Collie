@@ -23,6 +23,7 @@ public:
     ThreadPool & operator=(const ThreadPool &) = delete;
     ~ThreadPool();
 
+    void run();
     void shutDown();
     bool isShutDown() const { return terminate; }
 
