@@ -8,6 +8,8 @@ namespace Event {
 EventLoopThreadPool::EventLoopThreadPool(const size_t threadNum)
     : threadNum(threadNum) {}
 
+EventLoopThreadPool::~EventLoopThreadPool() {}
+
 void
 EventLoopThreadPool::startLoop(
     std::vector<std::shared_ptr<Channel>> baseChannel) {

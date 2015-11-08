@@ -18,10 +18,11 @@ main(int argc, char * argv[]) {
     unsigned port = 8080;
     if(argc == 2) port = std::stoul(argv[1]);
 
-    TcpServer server("0.0.0.0", port);
-    server.multiThread(2);
+    TcpServer server;
+    server.bind("0.0.0.0", port);
+    server.setThreadNum(2);
     server.setOnMessageCallback([](std::shared_ptr<TcpConnection> conn) {
-        const std::string content = conn->recvAll();
+        const auto content = conn->recvAll();
 
         std::cout << content << std::endl;
         conn->send("Hi, here is server");
