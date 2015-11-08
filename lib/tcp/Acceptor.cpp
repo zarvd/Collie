@@ -42,7 +42,7 @@ Acceptor::getBaseChannel() {
     channel->setIsOwnFd(false); // for multi threads it doesn't own the socket fd
     channel->setAfterSetLoopCallback(
         [this](std::shared_ptr<Event::Channel> channel) {
-            Log(TRACE) << "channel setting up";
+            Log(TRACE) << "Acceptor channel is setting up";
             channel->enableRead();
             channel->setReadCallback(std::bind(&Acceptor::handleRead, this));
             channel->enableOneShot(); // NOTE One shot, channel needs to update

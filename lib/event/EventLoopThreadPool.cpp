@@ -1,3 +1,4 @@
+#include "../../include/Global.hpp"
 #include "../../include/event/EventLoopThreadPool.hpp"
 #include "../../include/event/Channel.hpp"
 #include "../../include/event/EventLoop.hpp"
@@ -34,10 +35,12 @@ void
 EventLoopThreadPool::pushChannel(std::shared_ptr<Channel> channel) {
     // insert to NEXT loop
     auto loop = getNextLoop();
+    Log(ERROR) << "get loop";
     {
         std::lock_guard<std::mutex> lock(loop->mtx);
         loop->channels.push_back(channel);
     }
+    Log(ERROR) << "pushed channel";
 }
 
 void
@@ -63,10 +66,12 @@ EventLoopThreadPool::runInThread() {
         std::vector<std::shared_ptr<Channel>> channels;
         // get new channel or terminate
         // Non blocking
-        if(eventLoopThread->mtx.try_lock() &&
-           (terminate || !eventLoopThread->channels.empty())) {
-            if(terminate && eventLoopThread->channels.empty()) return; // exit
-            std::swap(eventLoopThread->channels, channels);
+        if(eventLoopThread->mtx.try_lock()) {
+            if(terminate || !eventLoopThread->channels.empty()) {
+                if(terminate && eventLoopThread->channels.empty())
+                    return; // exit
+                std::swap(eventLoopThread->channels, channels);
+            }
             eventLoopThread->mtx.unlock();
         }
         // insert channel
