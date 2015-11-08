@@ -25,7 +25,7 @@ public:
     ~Channel();
 
     // setter
-    void setOwnFd(const bool own) { ownFd = own; }
+    void setIsOwnFd(const bool own) { isOwnFd = own; }
     void setReadCallback(const EventCallback & cb) { readCallback = cb; }
     void setReadCallback(const EventCallback && cb) {
         readCallback = std::move(cb);
@@ -77,7 +77,7 @@ public:
     void update();
 
 private:
-    bool ownFd;
+    bool isOwnFd;
     bool inEventLoop; // whether eventLoop is setting up
     const int fd;     // file descriptor
     unsigned events;

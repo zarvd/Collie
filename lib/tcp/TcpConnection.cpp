@@ -59,7 +59,7 @@ TcpConnection::send(const std::string & buffer) {
 
 void
 TcpConnection::handleRead() {
-    const std::string content = TcpSocket::recv(channel->getFd(), 0);
+    const auto content = TcpSocket::recv(channel->getFd(), 0);
     if(content.size() > 0) {
         inputBuffer += content;
         messageCallback(shared_from_this());

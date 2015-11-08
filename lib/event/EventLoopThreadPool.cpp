@@ -14,15 +14,14 @@ EventLoopThreadPool::startLoop(
     if(!runInThread) {
         // default
         runInThread = [this, baseChannel] {
-            std::shared_ptr<EventLoopThread> eventLoopThread(
-                new EventLoopThread);
+            auto eventLoopThread = std::make_shared<EventLoopThread>();
             {
                 std::lock_guard<std::mutex> lock(eventLoopThreadMtx);
                 eventLoopThreads.push_back(eventLoopThread);
             }
 
             // one loop per thread
-            std::shared_ptr<EventLoop> eventLoop(new EventLoop);
+            auto eventLoop = std::make_shared<EventLoop>();
 
             // insert base channels to loop
             for(auto channel : baseChannel) {
@@ -38,8 +37,9 @@ EventLoopThreadPool::startLoop(
                 // Non blocking
                 if(eventLoopThread->mtx.try_lock() &&
                    (terminate || !eventLoopThread->channels.empty())) {
-                    if(terminate && eventLoopThread->channels.empty()) return; // exit
-                    channels.swap(eventLoopThread->channels);
+                    if(terminate && eventLoopThread->channels.empty())
+                        return; // exit
+                    std::swap(eventLoopThread->channels, channels);
                     eventLoopThread->mtx.unlock();
                 }
                 // insert channel

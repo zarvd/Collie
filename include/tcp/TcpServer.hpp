@@ -3,13 +3,12 @@
 
 #include <memory>
 #include <string>
-#include <set>
+#include <unordered_set>
 
 namespace Collie {
 
 namespace Event {
-class EventLoop;
-class ThreadPool;
+class EventLoopThreadPool;
 }
 
 class SocketAddress;
@@ -25,13 +24,14 @@ public:
         std::function<void(std::shared_ptr<TcpConnection>)>;
     using ConnectedCallback = std::function<void()>;
 
-    TcpServer(const std::string & host, const unsigned port);
+    TcpServer();
     TcpServer(const TcpServer &) = delete;
     TcpServer & operator=(const TcpServer &) = delete;
     ~TcpServer();
 
     void start();
-    void multiThread(const int threadNum = 1);
+    void bind(const std::string & host, const unsigned port);
+    void setThreadNum(const int threadNum = 1) { this->threadNum = threadNum; }
     // setter
     void setConnectedCallback(const ConnectedCallback & cb) {
         connectedCallback = cb;
@@ -47,7 +47,6 @@ public:
     }
     // getter
     unsigned getPort() const { return port; }
-    std::shared_ptr<Event::EventLoop> getEventLoop() const { return eventLoop; }
 
 private:
     void newConnection(const unsigned connFd,
@@ -55,15 +54,13 @@ private:
     void newConnectionMultiThread(const unsigned connFd,
                                   std::shared_ptr<SocketAddress> remoteAddr);
 
-    bool isMultiThread;
     int threadNum;
-    std::set<std::shared_ptr<TcpConnection>> connections;
-    const std::string host;
-    const unsigned port;
+    std::unordered_set<std::shared_ptr<TcpConnection>> connections;
+    std::string host;
+    unsigned port;
     std::shared_ptr<SocketAddress> localAddr;
-    std::shared_ptr<Event::EventLoop> eventLoop;
+    std::unique_ptr<Event::EventLoopThreadPool> eventLoopThreadPool;
     std::unique_ptr<Acceptor> acceptor;
-    std::shared_ptr<Event::ThreadPool> threadPool;
     ConnectedCallback connectedCallback;
     OnMessageCallback onMessageCallback;
 };

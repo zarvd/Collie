@@ -7,13 +7,11 @@
 #include <memory>
 #include <mutex>
 #include <atomic>
-#include <condition_variable>
 
 namespace Collie {
 namespace Event {
 
 class Channel;
-// class EventLoop;
 
 /**
  * One loop per thread
@@ -44,7 +42,6 @@ public:
 
 private:
     const size_t threadNum;
-    std::condition_variable condition;
     RunInThread runInThread;
     std::vector<std::thread> workers;
     std::mutex eventLoopThreadMtx;

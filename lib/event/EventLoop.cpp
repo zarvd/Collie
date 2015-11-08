@@ -11,22 +11,29 @@ namespace Event {
 EventLoop::EventLoop() : poller(new Poll::EPollPoller(1024)) {
     poller->create();
 
-    Log(TRACE) << "EventLoop constructing";
+    Log(TRACE) << "EventLoop is constructing";
 }
 
 EventLoop::EventLoop(std::unique_ptr<Poll::Poller> poller)
     : poller(std::move(poller)) {
     poller->create();
 
-    Log(TRACE) << "EventLoop constructing";
+    Log(TRACE) << "EventLoop is constructing";
 }
 
-EventLoop::~EventLoop() { Log(TRACE) << "EventLoop destructing"; }
+EventLoop::~EventLoop() { Log(TRACE) << "EventLoop is destructing"; }
+
+void
+EventLoop::loopOne() {
+    Log(TRACE) << "EventLoop is looping one";
+    using namespace std::placeholders;
+    poller->poll(std::bind(&EventLoop::pollCallback, this, _1, _2));
+}
 
 void
 EventLoop::loop() {
     while(true) {
-        Log(TRACE) << "EventLoop looping";
+        Log(TRACE) << "EventLoop is looping";
         using namespace std::placeholders;
         poller->poll(std::bind(&EventLoop::pollCallback, this, _1, _2));
     }
@@ -46,7 +53,6 @@ EventLoop::pollCallback(const int fd, const unsigned revents) {
     auto it = this->channels.find(fd);
     if(it != this->channels.end()) {
         auto channel = it->second;
-        // activate channel according to the type of events
         channel->activate(revents);
     } else {
         Log(WARN) << "Unknown channel " << fd;

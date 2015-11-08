@@ -17,7 +17,6 @@ SocketAddress & SocketAddress::operator=(const SocketAddress & that) {
 }
 
 SocketAddress & SocketAddress::operator=(const AddrV4 & addr) {
-    // TODO
     ipVersion = IP::V4;
     addrV4 = addr;
     char ipv4[INET_ADDRSTRLEN];

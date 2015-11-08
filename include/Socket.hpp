@@ -1,9 +1,7 @@
 #ifndef COLLIE_SOCKET_H
 #define COLLIE_SOCKET_H
 
-#include <sys/socket.h>
 #include <memory>
-#include <netinet/in.h>
 
 namespace Collie {
 
@@ -29,7 +27,7 @@ public:
 
     virtual void listen() = 0;
     virtual void connect(std::shared_ptr<SocketAddress>) = 0;
-    void close();
+    virtual void close();
 
 protected:
     const Type type;

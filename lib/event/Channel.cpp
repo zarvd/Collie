@@ -8,7 +8,7 @@ namespace Collie {
 namespace Event {
 
 Channel::Channel(const int fd)
-    : ownFd(true),
+    : isOwnFd(true),
       inEventLoop(false),
       fd(fd),
       events(0),
@@ -30,7 +30,7 @@ Channel::Channel(const int fd)
 
 Channel::~Channel() {
     Log(TRACE) << "Channel " << fd << " destructing";
-    if(ownFd && ::close(fd) == -1) {
+    if(isOwnFd && ::close(fd) == -1) {
         // close socket
         Log(WARN) << "Channel " << fd << " is already closed";
         // don't throw
@@ -39,8 +39,8 @@ Channel::~Channel() {
 
 std::shared_ptr<Channel>
 Channel::getCopyWithoutEventLoop() const {
-    std::shared_ptr<Channel> channel(new Channel(fd));
-    channel->ownFd = ownFd;
+    auto channel = std::make_shared<Channel>(fd);
+    channel->isOwnFd = isOwnFd;
     channel->events = events;
     channel->readCallback = readCallback;
     channel->writeCallback = writeCallback;

@@ -12,7 +12,6 @@ class SocketAddress;
 namespace Event {
 class Channel;
 class EventLoop;
-class ThreadPool;
 }
 
 namespace Tcp {
@@ -20,9 +19,9 @@ namespace Tcp {
 class TcpSocket;
 
 /**
- * Acceptor owns all event loop
+ * Acceptor owns the socket fd
  */
-class Acceptor {
+class Acceptor final {
 public:
     using AcceptCallback = std::function<void(
         const unsigned connFd, std::shared_ptr<SocketAddress> remoteAddr)>;
@@ -55,7 +54,6 @@ private:
     std::unique_ptr<TcpSocket> tcpSocket;
     std::shared_ptr<SocketAddress> localAddr;
     std::vector<Event::EventLoop> eventLoops;
-    std::unique_ptr<Event::ThreadPool> threadPool;
     AcceptCallback acceptCallback;
 };
 }
