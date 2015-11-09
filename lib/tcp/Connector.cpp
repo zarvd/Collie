@@ -1,38 +1,29 @@
 #include "../../include/Global.hpp"
 #include "../../include/tcp/Connector.hpp"
 #include "../../include/tcp/TcpSocket.hpp"
-#include "../../include/tcp/TcpConnection.hpp"
 #include "../../include/SocketAddress.hpp"
-#include "../../include/event/EventLoop.hpp"
-#include "../../include/event/Channel.hpp"
+#include "../../include/event/ThreadPool.hpp"
 
 namespace Collie {
 namespace Tcp {
 
-Connector::Connector(std::shared_ptr<SocketAddress> addr,
-                     std::shared_ptr<Event::EventLoop> eventLoop)
-    : eventLoop(eventLoop), remoteAddr(addr) {
+Connector::Connector(std::shared_ptr<SocketAddress> addr) : remoteAddr(addr) {
     Log(TRACE) << "Connector is constructing";
 }
 
 Connector::~Connector() { Log(TRACE) << "Connector is destructing"; }
 
 void
-Connector::socket() {
-    tcpSocket.reset(new TcpSocket);
-}
+Connector::connect(const size_t threadNum, const size_t connectNum) {
+    threadPool.reset(new Event::ThreadPool(threadNum));
 
-void
-Connector::connect() {
-    if(!tcpSocket) socket();
-    tcpSocket->connect(remoteAddr);
-    std::shared_ptr<Event::Channel> channel(
-        new Event::Channel(tcpSocket->getFd()));
-    channel->setEventLoop(eventLoop);
-    std::shared_ptr<TcpConnection> conn(
-        new TcpConnection(channel, tcpSocket->getLocalAddr(), remoteAddr));
-    conn->setMessageCallback(connectCallback);
-    eventLoop->loop();
+    for(size_t i = 0; i < connectNum; ++i) {
+        threadPool->enqueue([this] {
+            auto socket = std::make_shared<TcpSocket>();
+            socket->connect(this->remoteAddr);
+            this->connectCallback(socket);
+        });
+    }
 }
 }
 }

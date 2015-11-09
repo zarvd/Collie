@@ -8,7 +8,8 @@ namespace Collie {
 
 namespace Event {
 
-class EventLoop;
+class ThreadPool;
+
 }
 
 class SocketAddress;
@@ -16,14 +17,12 @@ class SocketAddress;
 namespace Tcp {
 
 class TcpSocket;
-class TcpConnection;
 
 class Connector {
 public:
-    using ConnectCallback = std::function<void(std::shared_ptr<TcpConnection>)>;
+    using ConnectCallback = std::function<void(std::shared_ptr<TcpSocket>)>;
 
-    Connector(std::shared_ptr<SocketAddress>,
-              std::shared_ptr<Event::EventLoop>);
+    explicit Connector(std::shared_ptr<SocketAddress>);
     Connector(const Connector &) = delete;
     Connector & operator=(const Connector &) = delete;
     ~Connector();
@@ -31,13 +30,13 @@ public:
     void setConnectCallback(const ConnectCallback & cb) {
         connectCallback = cb;
     }
-
-    void socket();
-    void connect();
+    void setConnectCallback(const ConnectCallback && cb) {
+        connectCallback = std::move(cb);
+    }
+    void connect(const size_t threadNum, const size_t connectNum);
 
 private:
-    std::unique_ptr<TcpSocket> tcpSocket;
-    std::shared_ptr<Event::EventLoop> eventLoop;
+    std::unique_ptr<Event::ThreadPool> threadPool;
     std::shared_ptr<SocketAddress> remoteAddr;
     ConnectCallback connectCallback;
 };
