@@ -39,7 +39,7 @@ TcpSocket::listen() {
 void
 TcpSocket::listenV4() {
     if(!localAddr) {
-        THROW_INVALID_ARGUMENT_("local address is null");
+        THROW_("local address is null");
     }
     struct sockaddr_in servAddr = localAddr->getAddrV4();
 

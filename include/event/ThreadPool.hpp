@@ -57,7 +57,7 @@ auto ThreadPool::enqueue(Cb && cb, Args &&... args)
 
         // don't allow enqueueing after stopping the pool
         if(terminate) {
-            THROW_INVALID_ARGUMENT_("enqueue on stopped ThreadPool");
+            THROW_("enqueue on stopped ThreadPool");
         }
         tasks.emplace([task]() { (*task)(); });
     }

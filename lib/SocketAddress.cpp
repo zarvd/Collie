@@ -40,7 +40,7 @@ SocketAddress::getSocketAddress(const std::string & host,
     struct hostent * hostStruct =
         gethostbyname(host.c_str()); // FIXME: Blocking
     if(!hostStruct) {
-        THROW_INVALID_ARGUMENT_(hstrerror(h_errno));
+        THROW_(hstrerror(h_errno));
     } else {
         switch(hostStruct->h_addrtype) {
         case AF_INET:
