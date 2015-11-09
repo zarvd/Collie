@@ -34,13 +34,10 @@ EventLoopThreadPool::getNextLoop() {
 void
 EventLoopThreadPool::pushChannel(std::shared_ptr<Channel> channel) {
     // insert to NEXT loop
+    Log(TRACE) << "pushing channel";
     auto loop = getNextLoop();
-    Log(ERROR) << "get loop";
-    {
-        std::lock_guard<std::mutex> lock(loop->mtx);
-        loop->channels.push_back(channel);
-    }
-    Log(ERROR) << "pushed channel";
+    std::lock_guard<std::mutex> lock(loop->mtx);
+    loop->channels.push_back(channel);
 }
 
 void

@@ -32,7 +32,7 @@ public:
     ~Acceptor();
 
     // setter
-    void setMultiThread(const size_t threadNum);
+    void setThreadNum(const size_t threadNum);
     void setAcceptCallback(const AcceptCallback & cb) { acceptCallback = cb; }
     void setAcceptCallback(const AcceptCallback && cb) {
         acceptCallback = std::move(cb);
@@ -43,8 +43,6 @@ public:
     std::shared_ptr<Event::Channel> getBaseChannel();
 
     void socket();
-    void startLoop();
-    void pushChannel(std::shared_ptr<Event::Channel>);
 
 private:
     void handleRead();

@@ -17,9 +17,12 @@ getErr() {
 }
 
 inline std::string
-getWhere(const std::string & file, const unsigned & line,
-         const std::string & func) {
-    return file + "(" + std::to_string(line) + "): " + func;
+getDetail(const std::string & file, const unsigned & line,
+          const std::string & func, const std::string & msg = "") {
+    const std::string File = "File: " + file + "(" + std::to_string(line) + ")";
+    const std::string Function = "Function : " + func;
+    const std::string Message = "Message: " + msg;
+    return "\n" + File + "\n" + Function + "\n" + Message;
 }
 
 class Error : public std::exception {
@@ -50,7 +53,7 @@ public:
 class SystemError : public Error {
 public:
     explicit SystemError(const std::string & msg) noexcept
-        : Error(msg + getErr()) {}
+        : Error(msg + "\nSystemError:" + getErr()) {}
 };
 
 class FatalError : public Error {
@@ -59,7 +62,8 @@ public:
 };
 
 #define EXC_DETAIL                                                             \
-    ::Collie::Exception::getWhere(__FILE__, __LINE__, __PRETTY_FUNCTION__)
+    ::Collie::Exception::getDetail(__FILE__, __LINE__, __PRETTY_FUNCTION__)
+
 #define THROW_NOTFOUND throw ::Collie::Exception::NotFoundError(EXC_DETAIL);
 #define THROW_OUTOFRANGE throw ::Collie::Exception::OutOfRangeError(EXC_DETAIL);
 #define THROW_INVALID_ARGUMENT                                                 \
@@ -67,21 +71,18 @@ public:
 #define THROW_SYS throw ::Collie::Exception::SystemError(EXC_DETAIL);
 #define THROW_FATAL throw ::Collie::Exception::FatalError(EXC_DETAIL);
 
+#define EXC_DETAIL_(msg)                                                       \
+    ::Collie::Exception::getDetail(__FILE__, __LINE__, __PRETTY_FUNCTION__, msg)
 #define THROW_NOTFOUND_(msg)                                                   \
-    Log(ERROR) << msg;                                                         \
-    throw ::Collie::Exception::NotFoundError(EXC_DETAIL + msg);
+    throw ::Collie::Exception::NotFoundError(EXC_DETAIL_(msg));
 #define THROW_OUTOFRANGE_(msg)                                                 \
-    Log(ERROR) << msg;                                                         \
-    throw ::Collie::Exception::OutOfRangeError(EXC_DETAIL + msg);
+    throw ::Collie::Exception::OutOfRangeError(EXC_DETAIL_(msg));
 #define THROW_INVALID_ARGUMENT_(msg)                                           \
-    Log(ERROR) << msg;                                                         \
-    throw ::Collie::Exception::InvalidArgumentError(EXC_DETAIL + msg);
+    throw ::Collie::Exception::InvalidArgumentError(EXC_DETAIL_(msg));
 #define THROW_SYS_(msg)                                                        \
-    Log(ERROR) << msg;                                                         \
-    throw ::Collie::Exception::SystemError(EXC_DETAIL + msg);
+    throw ::Collie::Exception::SystemError(EXC_DETAIL_(msg));
 #define THROW_FATAL_(msg)                                                      \
-    Log(ERROR) << msg;                                                         \
-    throw ::Collie::Exception::FatalError(EXC_DETAIL + msg);
+    throw ::Collie::Exception::FatalError(EXC_DETAIL_(msg));
 }
 }
 

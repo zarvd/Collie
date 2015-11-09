@@ -35,7 +35,7 @@ std::shared_ptr<SocketAddress>
 SocketAddress::getSocketAddress(const std::string & host,
                                 const unsigned & port) {
 
-    std::shared_ptr<SocketAddress> addr(new SocketAddress);
+    auto addr = std::make_shared<SocketAddress>();
 
     struct hostent * hostStruct =
         gethostbyname(host.c_str()); // FIXME: Blocking
@@ -43,7 +43,6 @@ SocketAddress::getSocketAddress(const std::string & host,
         Log(WARN) << hstrerror(h_errno);
         THROW_INVALID_ARGUMENT;
     } else {
-        int ret = -1;
         switch(hostStruct->h_addrtype) {
         case AF_INET:
             // IPv4
@@ -58,9 +57,8 @@ SocketAddress::getSocketAddress(const std::string & host,
             addr->ipVersion = IP::V4;
             addr->addrV4.sin_family = AF_INET;
             addr->addrV4.sin_port = htons(port);
-            ret =
-                inet_pton(AF_INET, addr->ip.c_str(), &(addr->addrV4.sin_addr));
-            if(ret != 1) {
+            if(inet_pton(AF_INET, addr->ip.c_str(), &(addr->addrV4.sin_addr)) !=
+               1) {
                 Log(ERROR) << "inet_pton IPv4 error " << Exception::getErr();
                 THROW_INVALID_ARGUMENT;
             }
@@ -78,9 +76,8 @@ SocketAddress::getSocketAddress(const std::string & host,
             addr->ipVersion = IP::V6;
             addr->addrV6.sin6_family = AF_INET6;
             addr->addrV6.sin6_port = htons(port);
-            ret = inet_pton(AF_INET6, addr->ip.c_str(),
-                            &(addr->addrV6.sin6_addr));
-            if(ret != 1) {
+            if(inet_pton(AF_INET6, addr->ip.c_str(),
+                         &(addr->addrV6.sin6_addr)) != 1) {
                 Log(ERROR) << "inet_pton IPv6 error " << Exception::getErr();
                 THROW_INVALID_ARGUMENT;
             }

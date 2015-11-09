@@ -86,10 +86,6 @@ Channel::enableRead() {
         Log(ERROR) << "Channel is not in event loop";
         THROW_INVALID_ARGUMENT;
     }
-    if(!eventLoop->poller) {
-        Log(ERROR) << "Poller is null";
-        THROW_INVALID_ARGUMENT;
-    }
     eventLoop->poller->enableRead(events);
     update();
 }
@@ -100,10 +96,7 @@ Channel::disableRead() {
         Log(ERROR) << "Channel is not in event loop";
         THROW_INVALID_ARGUMENT;
     }
-    if(!eventLoop->poller) {
-        Log(ERROR) << "Poller is null";
-        THROW_INVALID_ARGUMENT;
-    }
+
     eventLoop->poller->disableRead(events);
     update();
 }
@@ -114,10 +107,7 @@ Channel::enableWrite() {
         Log(ERROR) << "Channel is not in event loop";
         THROW_INVALID_ARGUMENT;
     }
-    if(!eventLoop->poller) {
-        Log(ERROR) << "Poller is null";
-        THROW_INVALID_ARGUMENT;
-    }
+
     eventLoop->poller->enableWrite(events);
     update();
 }
@@ -128,10 +118,7 @@ Channel::disableWrite() {
         Log(ERROR) << "Channel is not in event loop";
         THROW_INVALID_ARGUMENT;
     }
-    if(!eventLoop->poller) {
-        Log(ERROR) << "Poller is null";
-        THROW_INVALID_ARGUMENT;
-    }
+
     eventLoop->poller->disableWrite(events);
     update();
 }
@@ -142,10 +129,7 @@ Channel::enableOneShot() {
         Log(ERROR) << "Channel is not in event loop";
         THROW_INVALID_ARGUMENT;
     }
-    if(!eventLoop->poller) {
-        Log(ERROR) << "Poller is null";
-        THROW_INVALID_ARGUMENT;
-    }
+
     eventLoop->poller->enableOneShot(events);
     update();
 }
@@ -156,10 +140,7 @@ Channel::disableOneShot() {
         Log(ERROR) << "Channel is not in event loop";
         THROW_INVALID_ARGUMENT;
     }
-    if(!eventLoop->poller) {
-        Log(ERROR) << "Poller is null";
-        THROW_INVALID_ARGUMENT;
-    }
+
     eventLoop->poller->disableOneShot(events);
     update();
 }
