@@ -77,8 +77,8 @@ EventLoop::removeChannel(std::shared_ptr<Channel> channel) {
         poller->remove(channel->getFd()); // remove channel from poller
         channels.erase(channel->getFd()); // remove from loop
     } else {
-        Log(WARN) << "EventLoop does NOT have channel " << channel->getFd();
-        THROW_NOTFOUND;
+        THROW_NOTFOUND_("EventLoop does NOT have channel " +
+                        std::to_string(channel->getFd()));
     }
 }
 

@@ -40,8 +40,7 @@ SocketAddress::getSocketAddress(const std::string & host,
     struct hostent * hostStruct =
         gethostbyname(host.c_str()); // FIXME: Blocking
     if(!hostStruct) {
-        Log(WARN) << hstrerror(h_errno);
-        THROW_INVALID_ARGUMENT;
+        THROW_INVALID_ARGUMENT_(hstrerror(h_errno));
     } else {
         switch(hostStruct->h_addrtype) {
         case AF_INET:
@@ -49,8 +48,7 @@ SocketAddress::getSocketAddress(const std::string & host,
             char ipv4[INET_ADDRSTRLEN];
             if(inet_ntop(AF_INET, *(hostStruct->h_addr_list), ipv4,
                          INET_ADDRSTRLEN) == NULL) {
-                Log(ERROR) << "inet_ntop IPv4 error " << Exception::getErr();
-                THROW_INVALID_ARGUMENT;
+                THROW_SYS;
             }
             addr->ip = ipv4;
             addr->port = port;
@@ -59,8 +57,7 @@ SocketAddress::getSocketAddress(const std::string & host,
             addr->addrV4.sin_port = htons(port);
             if(inet_pton(AF_INET, addr->ip.c_str(), &(addr->addrV4.sin_addr)) !=
                1) {
-                Log(ERROR) << "inet_pton IPv4 error " << Exception::getErr();
-                THROW_INVALID_ARGUMENT;
+                THROW_SYS;
             }
             break;
         case AF_INET6:
@@ -68,8 +65,7 @@ SocketAddress::getSocketAddress(const std::string & host,
             char ipv6[INET6_ADDRSTRLEN];
             if(inet_ntop(AF_INET6, *(hostStruct->h_addr_list), ipv6,
                          INET6_ADDRSTRLEN) == NULL) {
-                Log(ERROR) << "inet_ntop IPv6 error " << Exception::getErr();
-                THROW_INVALID_ARGUMENT;
+                THROW_SYS;
             }
             addr->ip = ipv6;
             addr->port = port;
@@ -78,8 +74,7 @@ SocketAddress::getSocketAddress(const std::string & host,
             addr->addrV6.sin6_port = htons(port);
             if(inet_pton(AF_INET6, addr->ip.c_str(),
                          &(addr->addrV6.sin6_addr)) != 1) {
-                Log(ERROR) << "inet_pton IPv6 error " << Exception::getErr();
-                THROW_INVALID_ARGUMENT;
+                THROW_SYS;
             }
             break;
         default:

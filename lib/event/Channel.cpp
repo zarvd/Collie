@@ -53,8 +53,8 @@ Channel::getCopyWithoutEventLoop() const {
 void
 Channel::setEventLoop(std::shared_ptr<EventLoop> eventLoop) {
     if(inEventLoop) {
-        Log(WARN) << "Channel" << fd << " is already in eventLoop";
-        THROW_INVALID_ARGUMENT;
+        THROW_INVALID_ARGUMENT_("Channel" + std::to_string(fd) +
+                                " is already in eventLoop");
     } else {
         this->eventLoop = eventLoop;
         inEventLoop = true;
@@ -65,8 +65,7 @@ Channel::setEventLoop(std::shared_ptr<EventLoop> eventLoop) {
 bool
 Channel::isRead() const {
     if(!inEventLoop) {
-        Log(ERROR) << "Channel is not in event loop";
-        THROW_INVALID_ARGUMENT;
+        THROW_INVALID_ARGUMENT_("Channel is not in event loop");
     }
     return eventLoop->poller->isRead(events);
 }
@@ -74,8 +73,7 @@ Channel::isRead() const {
 bool
 Channel::isWrite() const {
     if(!inEventLoop) {
-        Log(ERROR) << "Channel is not in event loop";
-        THROW_INVALID_ARGUMENT;
+        THROW_INVALID_ARGUMENT_("Channel is not in event loop");
     }
     return eventLoop->poller->isWrite(events);
 }
@@ -83,8 +81,7 @@ Channel::isWrite() const {
 void
 Channel::enableRead() {
     if(!inEventLoop) {
-        Log(ERROR) << "Channel is not in event loop";
-        THROW_INVALID_ARGUMENT;
+        THROW_INVALID_ARGUMENT_("Channel is not in event loop");
     }
     eventLoop->poller->enableRead(events);
     update();
@@ -93,8 +90,7 @@ Channel::enableRead() {
 void
 Channel::disableRead() {
     if(!inEventLoop) {
-        Log(ERROR) << "Channel is not in event loop";
-        THROW_INVALID_ARGUMENT;
+        THROW_INVALID_ARGUMENT_("Channel is not in event loop");
     }
 
     eventLoop->poller->disableRead(events);
@@ -104,8 +100,7 @@ Channel::disableRead() {
 void
 Channel::enableWrite() {
     if(!inEventLoop) {
-        Log(ERROR) << "Channel is not in event loop";
-        THROW_INVALID_ARGUMENT;
+        THROW_INVALID_ARGUMENT_("Channel is not in event loop");
     }
 
     eventLoop->poller->enableWrite(events);
@@ -115,8 +110,7 @@ Channel::enableWrite() {
 void
 Channel::disableWrite() {
     if(!inEventLoop) {
-        Log(ERROR) << "Channel is not in event loop";
-        THROW_INVALID_ARGUMENT;
+        THROW_INVALID_ARGUMENT_("Channel is not in event loop");
     }
 
     eventLoop->poller->disableWrite(events);
@@ -126,8 +120,7 @@ Channel::disableWrite() {
 void
 Channel::enableOneShot() {
     if(!inEventLoop) {
-        Log(ERROR) << "Channel is not in event loop";
-        THROW_INVALID_ARGUMENT;
+        THROW_INVALID_ARGUMENT_("Channel is not in event loop");
     }
 
     eventLoop->poller->enableOneShot(events);
@@ -137,8 +130,7 @@ Channel::enableOneShot() {
 void
 Channel::disableOneShot() {
     if(!inEventLoop) {
-        Log(ERROR) << "Channel is not in event loop";
-        THROW_INVALID_ARGUMENT;
+        THROW_INVALID_ARGUMENT_("Channel is not in event loop");
     }
 
     eventLoop->poller->disableOneShot(events);
@@ -155,8 +147,7 @@ Channel::disableAll() {
 void
 Channel::activate(const unsigned revents) {
     if(!eventLoop->poller) {
-        Log(ERROR) << "Poller is null";
-        THROW_INVALID_ARGUMENT;
+        THROW_INVALID_ARGUMENT_("Poller is null");
     }
     if(eventLoop->poller->isError(revents)) {
         // error event
@@ -164,8 +155,7 @@ Channel::activate(const unsigned revents) {
         if(errorCallback) {
             errorCallback();
         } else {
-            Log(ERROR) << "errorCallback is not callable";
-            THROW_NOTFOUND;
+            THROW_NOTFOUND_("errorCallback is not callable");
         }
     } else if(eventLoop->poller->isClose(revents)) {
         // close event
@@ -173,8 +163,7 @@ Channel::activate(const unsigned revents) {
         if(closeCallback) {
             closeCallback();
         } else {
-            Log(ERROR) << "closeCallback is not callable";
-            THROW_NOTFOUND;
+            THROW_NOTFOUND_("closeCallback is not callable");
         }
     } else {
         // read event
@@ -184,8 +173,7 @@ Channel::activate(const unsigned revents) {
                 if(readCallback) {
                     readCallback();
                 } else {
-                    Log(ERROR) << "readCallback is not callable";
-                    THROW_NOTFOUND;
+                    THROW_NOTFOUND_("readCallback is not callable");
                 }
             } else {
                 Log(WARN) << "READ callback is not available";
@@ -198,8 +186,7 @@ Channel::activate(const unsigned revents) {
                 if(writeCallback) {
                     writeCallback();
                 } else {
-                    Log(ERROR) << "writeCallback is not callable";
-                    THROW_NOTFOUND;
+                    THROW_NOTFOUND_("writeCallback is not callable");
                 }
             } else {
                 Log(WARN) << "WRITE callback is not available";

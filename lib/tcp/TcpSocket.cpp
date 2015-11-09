@@ -39,20 +39,17 @@ TcpSocket::listen() {
 void
 TcpSocket::listenV4() {
     if(!localAddr) {
-        Log(ERROR) << "local address is null";
-        THROW_INVALID_ARGUMENT;
+        THROW_INVALID_ARGUMENT_("local address is null");
     }
     struct sockaddr_in servAddr = localAddr->getAddrV4();
 
     fd = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if(fd < 0) {
-        Log(ERROR) << "socket(): " << Exception::getErr();
         THROW_SYS;
     }
 
     int ret = bind(fd, (struct sockaddr *)&servAddr, sizeof(servAddr));
     if(ret < 0) {
-        Log(ERROR) << "bind(): " << Exception::getErr();
         THROW_SYS;
     }
     Log(TRACE) << "Socket " << fd << " is binding";
@@ -60,7 +57,6 @@ TcpSocket::listenV4() {
     Log(TRACE) << "Socket is listening";
 
     if(::listen(fd, SOMAXCONN) < 0) {
-        Log(ERROR) << "listen(): " << Exception::getErr();
         THROW_SYS;
     }
 }
@@ -84,12 +80,10 @@ TcpSocket::connectV4(std::shared_ptr<SocketAddress> servAddr) {
     struct sockaddr_in serv = servAddr->getAddrV4();
     fd = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if(fd < 0) {
-        Log(ERROR) << "socket(): " << Exception::getErr();
         THROW_SYS;
     }
     int ret = ::connect(fd, (struct sockaddr *)&serv, sizeof(serv));
     if(ret == -1) {
-        Log(ERROR) << "connect(): " << Exception::getErr();
         THROW_SYS;
     }
     struct sockaddr_in local;
@@ -119,7 +113,6 @@ TcpSocket::accept(const int fd, std::shared_ptr<SocketAddress> connAddr) {
 
     Log(TRACE) << "Socket accept connection " << connFd;
     if(connFd < 0) {
-        Log(ERROR) << "accept(): " << Exception::getErr();
         THROW_SYS;
     }
     *connAddr = clientAddr;
