@@ -56,20 +56,13 @@ public:
         : Error(msg + "\nSystemError:" + getErr()) {}
 };
 
-class FatalError : public Error {
-public:
-    explicit FatalError(const std::string & msg) noexcept : Error(msg) {}
-};
-
 #define EXC_DETAIL                                                             \
     ::Collie::Exception::getDetail(__FILE__, __LINE__, __PRETTY_FUNCTION__)
-
 #define THROW_NOTFOUND throw ::Collie::Exception::NotFoundError(EXC_DETAIL);
 #define THROW_OUTOFRANGE throw ::Collie::Exception::OutOfRangeError(EXC_DETAIL);
 #define THROW_INVALID_ARGUMENT                                                 \
     throw ::Collie::Exception::InvalidArgumentError(EXC_DETAIL);
 #define THROW_SYS throw ::Collie::Exception::SystemError(EXC_DETAIL);
-#define THROW_FATAL throw ::Collie::Exception::FatalError(EXC_DETAIL);
 
 #define EXC_DETAIL_(msg)                                                       \
     ::Collie::Exception::getDetail(__FILE__, __LINE__, __PRETTY_FUNCTION__, msg)
@@ -81,8 +74,6 @@ public:
     throw ::Collie::Exception::InvalidArgumentError(EXC_DETAIL_(msg));
 #define THROW_SYS_(msg)                                                        \
     throw ::Collie::Exception::SystemError(EXC_DETAIL_(msg));
-#define THROW_FATAL_(msg)                                                      \
-    throw ::Collie::Exception::FatalError(EXC_DETAIL_(msg));
 }
 }
 
