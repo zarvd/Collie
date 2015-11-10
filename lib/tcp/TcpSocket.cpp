@@ -31,7 +31,8 @@ void
 TcpSocket::listen() {
     if(localAddr->getIPVersion() == IP::V4) {
         listenV4();
-    } else {
+    } else
+    {
         listenV6();
     }
 }
@@ -126,6 +127,11 @@ TcpSocket::recv(const int connFd) {
 }
 
 std::string
+TcpSocket::recv() {
+    return recv(fd, recvFlag);
+}
+
+std::string
 TcpSocket::recv(const int connFd, const int recvFlag) {
     if(connFd < 2) {
         Log(WARN) << "Illegal connection fd " << connFd;
@@ -135,6 +141,11 @@ TcpSocket::recv(const int connFd, const int recvFlag) {
     ::recv(connFd, msg, msgLength, recvFlag);
     Log(TRACE) << "Socket received msg";
     return msg;
+}
+
+void
+TcpSocket::send(const std::string & msg) {
+    send(fd, msg, sendFlag);
 }
 
 void

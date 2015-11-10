@@ -8,14 +8,16 @@ namespace Tcp {
 
 TcpClient::TcpClient() { Log(TRACE) << "TcpClient is constructing"; }
 
-TcpClient::~TcpClient() { Log(TRACE) << "TcpClient is destructing"; }
+TcpClient::~TcpClient() {
+    Log(TRACE) << "TcpClient is destructing";
+    if(connector) connector->disconnect();
+}
 
 void
-TcpClient::connect(const std::string & host, const unsigned & port,
+TcpClient::connect(const std::string & host, const unsigned port,
                    const size_t threadNum, const size_t connectNum) {
     if(!connectCallback) {
-        Log(ERROR) << "TcpClient connectCallback is not callable";
-        THROW;
+        THROW_("TcpClient connectCallback is not callable");
     }
 
     remoteAddr = SocketAddress::getSocketAddress(host, port);

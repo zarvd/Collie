@@ -34,6 +34,7 @@ public:
         connectCallback = std::move(cb);
     }
     void connect(const size_t threadNum, const size_t connectNum);
+    void disconnect();
 
 private:
     std::unique_ptr<Event::ThreadPool> threadPool;

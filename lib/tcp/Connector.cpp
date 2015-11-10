@@ -16,6 +16,7 @@ Connector::~Connector() { Log(TRACE) << "Connector is destructing"; }
 void
 Connector::connect(const size_t threadNum, const size_t connectNum) {
     threadPool.reset(new Event::ThreadPool(threadNum));
+    threadPool->run();
 
     for(size_t i = 0; i < connectNum; ++i) {
         threadPool->enqueue([this] {
@@ -24,6 +25,11 @@ Connector::connect(const size_t threadNum, const size_t connectNum) {
             this->connectCallback(socket);
         });
     }
+}
+
+void
+Connector::disconnect() {
+    if(threadPool) threadPool->shutDown();
 }
 }
 }

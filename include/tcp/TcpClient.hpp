@@ -29,7 +29,7 @@ public:
     void setConnectCallback(const ConnectCallback && cb) {
         connectCallback = std::move(cb);
     }
-    void connect(const std::string & host, const unsigned & port,
+    void connect(const std::string & host, const unsigned port,
                  const size_t threadNum = 1, const size_t connectNum = 1);
 
 private:
