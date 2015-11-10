@@ -6,6 +6,7 @@
 #include "../../include/event/Channel.hpp"
 #include <functional>
 #include <algorithm>
+#include <future>
 
 namespace Collie {
 namespace Tcp {
@@ -33,7 +34,7 @@ TcpConnection::~TcpConnection() { Log(TRACE) << "Tcp Connection destructing"; }
 void
 TcpConnection::disconnect() {
     connected = false;
-    if(outputBuffer.size() == 0) shutdown();
+    if(outputBuffer.empty()) shutdown();
 }
 
 void
@@ -46,7 +47,7 @@ std::string
 TcpConnection::recvAll() {
     // FIXME
     std::string buffer;
-    buffer.swap(inputBuffer);
+    std::swap(buffer, inputBuffer);
     return buffer;
 }
 
@@ -60,26 +61,25 @@ TcpConnection::send(const std::string & buffer) {
 void
 TcpConnection::handleRead() {
     const auto content = TcpSocket::recv(channel->getFd(), 0);
-    if(content.size() > 0) {
+    if(!content.empty()) {
         inputBuffer += content;
         messageCallback(shared_from_this());
-        inputBuffer.clear();
-    } else {
         channel->disableRead();
+    } else {
+        handleClose();
     }
-    if(outputBuffer.size() > 0) {
-        channel->enableWrite();
-    }
+    if(!connected && outputBuffer.empty()) shutdown();
 }
 
 void
 TcpConnection::handleWrite() {
-    if(outputBuffer.size() > 0) {
+    if(!outputBuffer.empty()) {
         // FIXME slice outputBuffer
         TcpSocket::send(channel->getFd(), outputBuffer, 0);
         outputBuffer.clear();
     }
     channel->disableWrite();
+    channel->enableRead();
     if(!connected) shutdown();
 }
 

@@ -2,6 +2,7 @@
 #include <string>
 #include "../include/tcp/TcpServer.hpp"
 #include "../include/tcp/TcpConnection.hpp"
+#include "../include/SocketAddress.hpp"
 #include "../include/Global.hpp"
 
 using Collie::Tcp::TcpServer;
@@ -22,8 +23,9 @@ main(int argc, char * argv[]) {
     server.bind("0.0.0.0", port);
     server.setOnMessageCallback([](std::shared_ptr<TcpConnection> conn) {
         const auto content = conn->recvAll();
-
-        std::cout << content << std::endl;
+        auto addr = conn->getRemoteAddr();
+        Log(INFO) << addr->getIP() << " (" << addr->getPort() << "): "
+                   << content;
         conn->send("Hi, here is server");
     });
     server.start();

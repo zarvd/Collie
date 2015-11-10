@@ -18,6 +18,9 @@ namespace Tcp {
 
 class TcpSocket;
 
+/**
+ * Based on thread pool
+ */
 class Connector {
 public:
     using ConnectCallback = std::function<void(std::shared_ptr<TcpSocket>)>;

@@ -21,8 +21,12 @@ main(int argc, char * argv[]) {
     TcpClient client;
     client.setConnectCallback([](std::shared_ptr<TcpSocket> socket) {
         socket->send("Hello, here is client");
-        const auto content = socket->recv();
-        std::cout << content << std::endl;
+        auto content = socket->recv();
+        Log(INFO) << "Received: " << content;
+        socket->send("Goodbye");
+        content = socket->recv();
+        Log(INFO) << "Received: " << content;
+
     });
     client.connect("127.0.0.1", port);
     return 0;

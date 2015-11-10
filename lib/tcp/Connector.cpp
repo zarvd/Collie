@@ -23,6 +23,7 @@ Connector::connect(const size_t threadNum, const size_t connectNum) {
             auto socket = std::make_shared<TcpSocket>();
             socket->connect(this->remoteAddr);
             this->connectCallback(socket);
+            socket->close();
         });
     }
 }

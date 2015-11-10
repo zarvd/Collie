@@ -31,8 +31,7 @@ void
 TcpSocket::listen() {
     if(localAddr->getIPVersion() == IP::V4) {
         listenV4();
-    } else
-    {
+    } else {
         listenV6();
     }
 }
@@ -138,7 +137,11 @@ TcpSocket::recv(const int connFd, const int recvFlag) {
     }
     constexpr size_t msgLength = 8192; // FIXME
     char msg[msgLength];
-    ::recv(connFd, msg, msgLength, recvFlag);
+    const auto size = ::recv(connFd, msg, msgLength, recvFlag);
+    if(size <= 0) {
+        Log(WARN) << "TcpSocket received nothing";
+        return "";
+    }
     Log(TRACE) << "Socket received msg";
     return msg;
 }
@@ -157,8 +160,12 @@ void
 TcpSocket::send(const int connFd, const std::string & msg, const int sendFlag) {
     char content[msg.length() + 1];
     std::strcpy(content, msg.c_str());
-    ::send(connFd, content, sizeof(content), sendFlag);
-    Log(TRACE) << "Socket send msg";
+    const auto size = ::send(connFd, content, sizeof(content), sendFlag);
+    if(size <= 0) {
+        Log(WARN) << "TcpSocket received nothing";
+    } else {
+        Log(TRACE) << "Socket send msg";
+    }
 }
 }
 }
