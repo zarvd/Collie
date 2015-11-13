@@ -76,9 +76,13 @@ TCPConnection::handleRead() {
 void
 TCPConnection::handleWrite() {
     if(!outputBuffer.empty()) {
-        // FIXME slice outputBuffer, detect size
         const auto size = Socket::send(channel->getFd(), outputBuffer);
-        outputBuffer.clear();
+        if(outputBuffer.length() - size == 0) {
+            outputBuffer.clear();
+        } else if(size > 0) {
+            // XXX should be sliced like this ?
+            outputBuffer = outputBuffer.substr(size);
+        }
     }
     channel->disableWrite();
     channel->enableRead();

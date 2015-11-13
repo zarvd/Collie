@@ -123,26 +123,20 @@ TCPSocket::accept(const int fd, std::shared_ptr<SocketAddress> connAddr) {
 std::string
 TCPSocket::recv(const int connFd) {
     std::string content;
-    const auto size = Socket::recv(connFd, content, recvFlag);
-    if(size <= 0) {
-        Log(DEBUG) << "TCP Socket received nothing";
-    }
+    Socket::recv(connFd, content, recvFlag);
     return content;
 }
 
 std::string
 TCPSocket::recv() {
     std::string content;
-    const auto size = Socket::recv(fd, content, recvFlag);
-    if(size <= 0) {
-        Log(DEBUG) << "TCP Socket received nothing";
-    }
+    Socket::recv(content, recvFlag);
     return content;
 }
 
 void
 TCPSocket::send(const std::string & msg) {
-    Socket::send(fd, msg, sendFlag);
+    Socket::send(msg, sendFlag);
 }
 
 void

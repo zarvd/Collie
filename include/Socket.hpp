@@ -37,7 +37,15 @@ public:
     static ssize_t recvFrom(const int socketFd, std::string & content,
                             std::shared_ptr<SocketAddress> remoteAddr,
                             const int flag = 0);
-    virtual void close();
+    ssize_t send(const std::string & content, const int flag = 0);
+    ssize_t recv(std::string & content, const int flag = 0);
+    ssize_t sendTo(const std::string & content,
+                   std::shared_ptr<SocketAddress> remoteAddr,
+                   const int flag = 0);
+    ssize_t recvFrom(std::string & content,
+                     std::shared_ptr<SocketAddress> remoteAddr,
+                     const int flag = 0);
+    void close();
 
 protected:
     const Type type;

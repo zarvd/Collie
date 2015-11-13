@@ -23,8 +23,29 @@ Socket::close() {
 }
 
 ssize_t
-Socket::send(const int socketFd, const std::string & content,
-             const int flag) {
+Socket::send(const std::string & content, const int flag) {
+    return send(fd, content, flag);
+}
+
+ssize_t
+Socket::recv(std::string & content, const int flag) {
+    return recv(fd, content, flag);
+}
+
+ssize_t
+Socket::sendTo(const std::string & content,
+               std::shared_ptr<SocketAddress> remoteAddr, const int flag) {
+    return sendTo(fd, content, remoteAddr, flag);
+}
+
+ssize_t
+Socket::recvFrom(std::string & content,
+                 std::shared_ptr<SocketAddress> remoteAddr, const int flag) {
+    return recvFrom(fd, content, remoteAddr, flag);
+}
+
+ssize_t
+Socket::send(const int socketFd, const std::string & content, const int flag) {
     char contentC[content.length() + 1];
     std::strcpy(contentC, content.c_str());
     const ssize_t size = ::send(socketFd, contentC, sizeof(content), flag);
