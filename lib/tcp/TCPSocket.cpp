@@ -122,50 +122,32 @@ TCPSocket::accept(const int fd, std::shared_ptr<SocketAddress> connAddr) {
 
 std::string
 TCPSocket::recv(const int connFd) {
-    return recv(connFd, recvFlag);
+    std::string content;
+    const auto size = Socket::recv(connFd, content, recvFlag);
+    if(size <= 0) {
+        Log(DEBUG) << "TCP Socket received nothing";
+    }
+    return content;
 }
 
 std::string
 TCPSocket::recv() {
-    return recv(fd, recvFlag);
-}
-
-std::string
-TCPSocket::recv(const int connFd, const int recvFlag) {
-    if(connFd < 2) {
-        Log(WARN) << "Illegal connection fd " << connFd;
-    }
-    constexpr size_t msgLength = 8192; // FIXME
-    char msg[msgLength];
-    const auto size = ::recv(connFd, msg, msgLength, recvFlag);
+    std::string content;
+    const auto size = Socket::recv(fd, content, recvFlag);
     if(size <= 0) {
-        Log(WARN) << "TCPSocket received nothing";
-        return "";
+        Log(DEBUG) << "TCP Socket received nothing";
     }
-    Log(TRACE) << "Socket received msg";
-    return msg;
+    return content;
 }
 
 void
 TCPSocket::send(const std::string & msg) {
-    send(fd, msg, sendFlag);
+    Socket::send(fd, msg, sendFlag);
 }
 
 void
 TCPSocket::send(const int connFd, const std::string & msg) {
-    send(connFd, msg, sendFlag);
-}
-
-void
-TCPSocket::send(const int connFd, const std::string & msg, const int sendFlag) {
-    char content[msg.length() + 1];
-    std::strcpy(content, msg.c_str());
-    const auto size = ::send(connFd, content, sizeof(content), sendFlag);
-    if(size <= 0) {
-        Log(WARN) << "TCPSocket received nothing";
-    } else {
-        Log(TRACE) << "Socket send msg";
-    }
+    Socket::send(connFd, msg, sendFlag);
 }
 }
 }

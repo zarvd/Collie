@@ -1,6 +1,6 @@
 #include "../../include/Global.hpp"
 #include "../../include/tcp/TCPConnection.hpp"
-#include "../../include/tcp/TCPSocket.hpp"
+#include "../../include/Socket.hpp"
 #include "../../include/SocketAddress.hpp"
 #include "../../include/event/EventLoop.hpp"
 #include "../../include/event/Channel.hpp"
@@ -60,8 +60,10 @@ TCPConnection::send(const std::string & buffer) {
 
 void
 TCPConnection::handleRead() {
-    const auto content = TCPSocket::recv(channel->getFd(), 0);
-    if(!content.empty()) {
+    std::string content;
+    const auto size = Socket::recv(channel->getFd(), content);
+    // const auto size = TCPSocket::recv(channel->getFd(), content, 0);
+    if(size > 0) {
         inputBuffer += content;
         messageCallback(shared_from_this());
         channel->disableRead();
@@ -74,8 +76,8 @@ TCPConnection::handleRead() {
 void
 TCPConnection::handleWrite() {
     if(!outputBuffer.empty()) {
-        // FIXME slice outputBuffer
-        TCPSocket::send(channel->getFd(), outputBuffer, 0);
+        // FIXME slice outputBuffer, detect size
+        const auto size = Socket::send(channel->getFd(), outputBuffer);
         outputBuffer.clear();
     }
     channel->disableWrite();

@@ -19,20 +19,17 @@ public:
     void setRecvFlag(const int);
 
     void listen() override;
-    void connect(std::shared_ptr<SocketAddress>) override;
+    void connect(std::shared_ptr<SocketAddress>);
 
     // accept and get addr, return connFd
     // NOTE it will block, but we don't have to worry about it because of the
     // lib is based on poller and the timer issue will be avoided in event loop
     int accept(std::shared_ptr<SocketAddress>) const;
     static int accept(const int socketFd, std::shared_ptr<SocketAddress>);
-    std::string recv(const int connFd); // server method
-    std::string recv();                 // client method
-    static std::string recv(const int connFd, const int recvFlag);
+    std::string recv(const int connFd);                   // server method
+    std::string recv();                                   // client method
     void send(const int connFd, const std::string & msg); // server method
     void send(const std::string & msg);                   // client method
-    static void send(const int connFd, const std::string & msg,
-                     const int sendFlag);
 
 private:
     void listenV4();
