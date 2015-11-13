@@ -145,35 +145,24 @@ Channel::disableAll() {
 
 void
 Channel::activate(const unsigned revents) {
-    if(!eventLoop->poller) {
-        THROW_("Poller is null");
-    }
+    REQUIRE(eventLoop && eventLoop->poller);
     if(eventLoop->poller->isError(revents)) {
         // error event
         Log(TRACE) << "Activate ERROR callback with events " << revents;
-        if(errorCallback) {
-            errorCallback();
-        } else {
-            THROW_("errorCallback is not callable");
-        }
+        REQUIRE_(errorCallback, "errorCallback is not callable");
+        errorCallback();
     } else if(eventLoop->poller->isClose(revents)) {
         // close event
         Log(TRACE) << "Activate CLOSE callback with events" << revents;
-        if(closeCallback) {
-            closeCallback();
-        } else {
-            THROW_("closeCallback is not callable");
-        }
+        REQUIRE_(closeCallback, "closeCallback is not callable");
+        closeCallback();
     } else {
         // read event
         if(eventLoop->poller->isRead(revents)) {
             if(isRead()) {
                 Log(TRACE) << "Activate READ callback with events " << revents;
-                if(readCallback) {
-                    readCallback();
-                } else {
-                    THROW_("readCallback is not callable");
-                }
+                REQUIRE_(readCallback, "readCallback is not callable");
+                readCallback();
             } else {
                 Log(WARN) << "READ callback is not available";
             }
@@ -182,11 +171,8 @@ Channel::activate(const unsigned revents) {
         if(eventLoop->poller->isWrite(revents)) {
             if(isWrite()) {
                 Log(TRACE) << "Activate WRITE callback with events" << revents;
-                if(writeCallback) {
-                    writeCallback();
-                } else {
-                    THROW_("writeCallback is not callable");
-                }
+                REQUIRE_(writeCallback, "writeCallback is not callable");
+                writeCallback();
             } else {
                 Log(WARN) << "WRITE callback is not available";
             }
@@ -202,7 +188,7 @@ Channel::update() {
 
 void
 Channel::remove() {
-    eventLoop->removeChannel(shared_from_this());
+    if(inEventLoop) eventLoop->removeChannel(shared_from_this());
 }
 }
 }

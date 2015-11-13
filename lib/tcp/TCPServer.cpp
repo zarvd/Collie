@@ -44,6 +44,8 @@ TCPServer::newConnection(const unsigned connFd,
     Log(INFO) << "TCPServer accept fd(" << connFd << ") ip("
               << remoteAddr->getIP() << ")";
 
+    // TCPSocket::setFdNonBlocking(connFd); // set fd non blocking
+
     // new channel
     std::shared_ptr<Event::Channel> channel(new Event::Channel(connFd));
     // NOTE setting up channel in connection

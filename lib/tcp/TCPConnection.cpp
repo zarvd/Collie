@@ -19,6 +19,7 @@ TCPConnection::TCPConnection(std::shared_ptr<Event::Channel> channel,
       localAddr(localAddr),
       remoteAddr(remoteAddr) {
 
+    REQUIRE(channel);
     // set channel callback and enable reading
     channel->setReadCallback(std::bind(&TCPConnection::handleRead, this));
     channel->setWriteCallback(std::bind(&TCPConnection::handleWrite, this));
@@ -26,19 +27,23 @@ TCPConnection::TCPConnection(std::shared_ptr<Event::Channel> channel,
     channel->setErrorCallback(std::bind(&TCPConnection::handleError, this));
     channel->enableRead();
     channel->enableWrite();
-    Log(TRACE) << "TCP Connection constructing";
+    Log(TRACE) << "TCP Connection is constructing";
 }
 
-TCPConnection::~TCPConnection() { Log(TRACE) << "TCP Connection destructing"; }
+TCPConnection::~TCPConnection() {
+    Log(TRACE) << "TCP Connection is destructing";
+}
 
 void
 TCPConnection::disconnect() {
+    Log(DEBUG) << "TCP Connection is trying to disconnect";
     connected = false;
     if(outputBuffer.empty()) shutdown();
 }
 
 void
 TCPConnection::shutdown() {
+    Log(TRACE) << "TCP Connection is shutting down";
     channel->remove();
     if(shutdownCallback) shutdownCallback(shared_from_this());
 }
@@ -55,33 +60,36 @@ void
 TCPConnection::send(const std::string & buffer) {
     // FIXME
     outputBuffer += buffer;
-    channel->enableWrite();
+    if(!channel->isWrite()) channel->enableWrite();
 }
 
 void
 TCPConnection::handleRead() {
     std::string content;
     const auto size = Socket::recv(channel->getFd(), content);
-    // const auto size = TCPSocket::recv(channel->getFd(), content, 0);
     if(size > 0) {
         inputBuffer += content;
         messageCallback(shared_from_this());
-        channel->disableRead();
     } else {
         handleClose();
     }
-    if(!connected && outputBuffer.empty()) shutdown();
+    channel->disableRead();
+    if(!outputBuffer.empty()) {
+        if(!channel->isWrite()) channel->enableWrite();
+    } else if(!connected) {
+        shutdown();
+    }
 }
 
 void
 TCPConnection::handleWrite() {
     if(!outputBuffer.empty()) {
         const auto size = Socket::send(channel->getFd(), outputBuffer);
-        if(outputBuffer.length() - size == 0) {
+        const int bufferSize = outputBuffer.length();
+        if(bufferSize == size - 1) {
             outputBuffer.clear();
         } else if(size > 0) {
-            // XXX should be sliced like this ?
-            outputBuffer = outputBuffer.substr(size);
+            outputBuffer = outputBuffer.substr(size - 1);
         }
     }
     channel->disableWrite();
@@ -96,7 +104,7 @@ TCPConnection::handleClose() {
 
 void
 TCPConnection::handleError() {
-    disconnect();
+    shutdown();
 }
 }
 }

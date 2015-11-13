@@ -26,25 +26,26 @@ public:
     std::shared_ptr<SocketAddress> getLocalAddr() const { return localAddr; }
 
     virtual void listen() = 0;
+    static bool setFdNonBlocking(int fd); // return true when success
     static ssize_t send(const int socketFd, const std::string & content,
-                        const int flag = 0);
+                        const int flags = 0);
     static ssize_t sendTo(const int socketFd, const std::string & content,
                           std::shared_ptr<SocketAddress> remoteAddr,
-                          const int flag = 0);
+                          const int flags = 0);
     // received content will store in std::string content
     static ssize_t recv(const int socketFd, std::string & content,
-                        const int flag = 0);
+                        const int flags = 0);
     static ssize_t recvFrom(const int socketFd, std::string & content,
                             std::shared_ptr<SocketAddress> remoteAddr,
-                            const int flag = 0);
-    ssize_t send(const std::string & content, const int flag = 0);
-    ssize_t recv(std::string & content, const int flag = 0);
+                            const int flags = 0);
+    ssize_t send(const std::string & content, const int flags = 0);
+    ssize_t recv(std::string & content, const int flags = 0);
     ssize_t sendTo(const std::string & content,
                    std::shared_ptr<SocketAddress> remoteAddr,
-                   const int flag = 0);
+                   const int flags = 0);
     ssize_t recvFrom(std::string & content,
                      std::shared_ptr<SocketAddress> remoteAddr,
-                     const int flag = 0);
+                     const int flags = 0);
     void close();
 
 protected:

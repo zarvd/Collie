@@ -2,6 +2,7 @@
 #include "../include/Socket.hpp"
 #include "../include/SocketAddress.hpp"
 #include <unistd.h>
+#include <fcntl.h>
 
 namespace Collie {
 
@@ -20,6 +21,15 @@ void
 Socket::close() {
     Log(TRACE) << "Socket closed";
     ::close(fd);
+}
+
+bool
+Socket::setFdNonBlocking(int fd) {
+    auto flags = ::fcntl(fd, F_GETFL, 0);
+    if(flags == -1) return false;
+    flags |= O_NONBLOCK;
+    if(::fcntl(fd, F_SETFL, flags) == -1) return false;
+    return true;
 }
 
 ssize_t
@@ -46,9 +56,10 @@ Socket::recvFrom(std::string & content,
 
 ssize_t
 Socket::send(const int socketFd, const std::string & content, const int flag) {
-    char contentC[content.length() + 1];
-    std::strcpy(contentC, content.c_str());
-    const ssize_t size = ::send(socketFd, contentC, sizeof(content), flag);
+    char contentChars[content.length() + 1];
+    std::strcpy(contentChars, content.c_str());
+    Log(TRACE) << "Socket is sending " << contentChars;
+    const ssize_t size = ::send(socketFd, contentChars, sizeof(contentChars), flag);
     if(size <= 0) {
         Log(DEBUG) << "Socket send nothing";
     } else {

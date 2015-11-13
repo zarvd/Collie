@@ -22,8 +22,10 @@ main(int argc, char * argv[]) {
     TCPServer server;
     server.bind("0.0.0.0", port);
     server.setOnMessageCallback([](std::shared_ptr<TCPConnection> conn) {
+        REQUIRE(conn);
         const auto content = conn->recvAll();
         auto addr = conn->getRemoteAddr();
+        REQUIRE(addr);
         Log(INFO) << addr->getIP() << " (" << addr->getPort()
                   << "): " << content;
         conn->send("Hi, here is server");
