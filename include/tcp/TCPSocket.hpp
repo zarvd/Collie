@@ -4,16 +4,16 @@
 #include "../Socket.hpp"
 
 namespace Collie {
-namespace Tcp {
+namespace TCP {
 
-class TcpSocket : public Socket {
+class TCPSocket : public Socket {
 public:
-    TcpSocket(); // client constructor
-    explicit TcpSocket(
+    TCPSocket(); // client constructor
+    explicit TCPSocket(
         std::shared_ptr<SocketAddress> servAddr); // server constructor
-    TcpSocket(const TcpSocket &) = delete;
-    TcpSocket & operator=(const TcpSocket &) = delete;
-    ~TcpSocket() override;
+    TCPSocket(const TCPSocket &) = delete;
+    TCPSocket & operator=(const TCPSocket &) = delete;
+    ~TCPSocket() override;
 
     void setSendFlag(const int);
     void setRecvFlag(const int);

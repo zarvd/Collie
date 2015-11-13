@@ -1,12 +1,12 @@
 #include "../../include/Global.hpp"
 #include "../../include/tcp/Acceptor.hpp"
-#include "../../include/tcp/TcpSocket.hpp"
+#include "../../include/tcp/TCPSocket.hpp"
 #include "../../include/event/EventLoop.hpp"
 #include "../../include/event/Channel.hpp"
 #include "../../include/SocketAddress.hpp"
 
 namespace Collie {
-namespace Tcp {
+namespace TCP {
 
 Acceptor::Acceptor(std::shared_ptr<SocketAddress> addr)
     : threadNum(1), localAddr(addr) {
@@ -28,7 +28,7 @@ Acceptor::getSocketFd() const {
 void
 Acceptor::socket() {
     // create socket and listen
-    tcpSocket.reset(new TcpSocket(localAddr));
+    tcpSocket.reset(new TCPSocket(localAddr));
     tcpSocket->listen();
 }
 

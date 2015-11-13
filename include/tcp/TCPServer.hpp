@@ -13,21 +13,21 @@ class EventLoopThreadPool;
 
 class SocketAddress;
 
-namespace Tcp {
+namespace TCP {
 
 class Acceptor;
-class TcpConnection;
+class TCPConnection;
 
-class TcpServer {
+class TCPServer {
 public:
     using OnMessageCallback =
-        std::function<void(std::shared_ptr<TcpConnection>)>;
+        std::function<void(std::shared_ptr<TCPConnection>)>;
     using ConnectedCallback = std::function<void()>;
 
-    TcpServer();
-    TcpServer(const TcpServer &) = delete;
-    TcpServer & operator=(const TcpServer &) = delete;
-    ~TcpServer();
+    TCPServer();
+    TCPServer(const TCPServer &) = delete;
+    TCPServer & operator=(const TCPServer &) = delete;
+    ~TCPServer();
 
     void start();
     void bind(const std::string & host, const unsigned port);
@@ -57,7 +57,7 @@ private:
                                   std::shared_ptr<SocketAddress> remoteAddr);
 
     size_t threadNum;
-    std::unordered_set<std::shared_ptr<TcpConnection>> connections;
+    std::unordered_set<std::shared_ptr<TCPConnection>> connections;
     std::string host;
     unsigned port;
     std::shared_ptr<SocketAddress> localAddr;

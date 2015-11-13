@@ -9,19 +9,19 @@ namespace Collie {
 
 class SocketAddress;
 
-namespace Tcp {
+namespace TCP {
 
 class Connector;
-class TcpSocket;
+class TCPSocket;
 
-class TcpClient {
+class TCPClient {
 public:
-    using ConnectCallback = std::function<void(std::shared_ptr<TcpSocket>)>;
+    using ConnectCallback = std::function<void(std::shared_ptr<TCPSocket>)>;
 
-    TcpClient();
-    TcpClient(const TcpClient &) = delete;
-    TcpClient & operator=(const TcpClient &) = delete;
-    ~TcpClient();
+    TCPClient();
+    TCPClient(const TCPClient &) = delete;
+    TCPClient & operator=(const TCPClient &) = delete;
+    ~TCPClient();
 
     void setConnectCallback(const ConnectCallback & cb) {
         connectCallback = cb;

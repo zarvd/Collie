@@ -14,16 +14,16 @@ class ThreadPool;
 
 class SocketAddress;
 
-namespace Tcp {
+namespace TCP {
 
-class TcpSocket;
+class TCPSocket;
 
 /**
  * Based on thread pool
  */
 class Connector {
 public:
-    using ConnectCallback = std::function<void(std::shared_ptr<TcpSocket>)>;
+    using ConnectCallback = std::function<void(std::shared_ptr<TCPSocket>)>;
 
     explicit Connector(std::shared_ptr<SocketAddress>);
     Connector(const Connector &) = delete;

@@ -1,6 +1,6 @@
 #include "../../include/Global.hpp"
-#include "../../include/tcp/TcpConnection.hpp"
-#include "../../include/tcp/TcpSocket.hpp"
+#include "../../include/tcp/TCPConnection.hpp"
+#include "../../include/tcp/TCPSocket.hpp"
 #include "../../include/SocketAddress.hpp"
 #include "../../include/event/EventLoop.hpp"
 #include "../../include/event/Channel.hpp"
@@ -9,9 +9,9 @@
 #include <future>
 
 namespace Collie {
-namespace Tcp {
+namespace TCP {
 
-TcpConnection::TcpConnection(std::shared_ptr<Event::Channel> channel,
+TCPConnection::TCPConnection(std::shared_ptr<Event::Channel> channel,
                              std::shared_ptr<SocketAddress> localAddr,
                              std::shared_ptr<SocketAddress> remoteAddr)
     : connected(true),
@@ -20,31 +20,31 @@ TcpConnection::TcpConnection(std::shared_ptr<Event::Channel> channel,
       remoteAddr(remoteAddr) {
 
     // set channel callback and enable reading
-    channel->setReadCallback(std::bind(&TcpConnection::handleRead, this));
-    channel->setWriteCallback(std::bind(&TcpConnection::handleWrite, this));
-    channel->setCloseCallback(std::bind(&TcpConnection::handleClose, this));
-    channel->setErrorCallback(std::bind(&TcpConnection::handleError, this));
+    channel->setReadCallback(std::bind(&TCPConnection::handleRead, this));
+    channel->setWriteCallback(std::bind(&TCPConnection::handleWrite, this));
+    channel->setCloseCallback(std::bind(&TCPConnection::handleClose, this));
+    channel->setErrorCallback(std::bind(&TCPConnection::handleError, this));
     channel->enableRead();
     channel->enableWrite();
-    Log(TRACE) << "Tcp Connection constructing";
+    Log(TRACE) << "TCP Connection constructing";
 }
 
-TcpConnection::~TcpConnection() { Log(TRACE) << "Tcp Connection destructing"; }
+TCPConnection::~TCPConnection() { Log(TRACE) << "TCP Connection destructing"; }
 
 void
-TcpConnection::disconnect() {
+TCPConnection::disconnect() {
     connected = false;
     if(outputBuffer.empty()) shutdown();
 }
 
 void
-TcpConnection::shutdown() {
+TCPConnection::shutdown() {
     channel->remove();
     if(shutdownCallback) shutdownCallback(shared_from_this());
 }
 
 std::string
-TcpConnection::recvAll() {
+TCPConnection::recvAll() {
     // FIXME
     std::string buffer;
     std::swap(buffer, inputBuffer);
@@ -52,15 +52,15 @@ TcpConnection::recvAll() {
 }
 
 void
-TcpConnection::send(const std::string & buffer) {
+TCPConnection::send(const std::string & buffer) {
     // FIXME
     outputBuffer += buffer;
     channel->enableWrite();
 }
 
 void
-TcpConnection::handleRead() {
-    const auto content = TcpSocket::recv(channel->getFd(), 0);
+TCPConnection::handleRead() {
+    const auto content = TCPSocket::recv(channel->getFd(), 0);
     if(!content.empty()) {
         inputBuffer += content;
         messageCallback(shared_from_this());
@@ -72,10 +72,10 @@ TcpConnection::handleRead() {
 }
 
 void
-TcpConnection::handleWrite() {
+TCPConnection::handleWrite() {
     if(!outputBuffer.empty()) {
         // FIXME slice outputBuffer
-        TcpSocket::send(channel->getFd(), outputBuffer, 0);
+        TCPSocket::send(channel->getFd(), outputBuffer, 0);
         outputBuffer.clear();
     }
     channel->disableWrite();
@@ -84,12 +84,12 @@ TcpConnection::handleWrite() {
 }
 
 void
-TcpConnection::handleClose() {
+TCPConnection::handleClose() {
     disconnect();
 }
 
 void
-TcpConnection::handleError() {
+TCPConnection::handleError() {
     disconnect();
 }
 }

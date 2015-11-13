@@ -14,9 +14,9 @@ class Channel;
 class EventLoop;
 }
 
-namespace Tcp {
+namespace TCP {
 
-class TcpSocket;
+class TCPSocket;
 
 /**
  * Acceptor owns the socket fd
@@ -49,7 +49,7 @@ private:
     void handleError();
 
     size_t threadNum;
-    std::unique_ptr<TcpSocket> tcpSocket;
+    std::unique_ptr<TCPSocket> tcpSocket;
     std::shared_ptr<SocketAddress> localAddr;
     std::vector<Event::EventLoop> eventLoops;
     AcceptCallback acceptCallback;

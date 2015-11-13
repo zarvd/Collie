@@ -1,11 +1,11 @@
 #include <iostream>
 #include <string>
-#include "../include/tcp/TcpClient.hpp"
-#include "../include/tcp/TcpSocket.hpp"
+#include "../include/tcp/TCPClient.hpp"
+#include "../include/tcp/TCPSocket.hpp"
 #include "../include/Global.hpp"
 
-using Collie::Tcp::TcpClient;
-using Collie::Tcp::TcpSocket;
+using Collie::TCP::TCPClient;
+using Collie::TCP::TCPSocket;
 using namespace Collie;
 
 int
@@ -18,8 +18,8 @@ main(int argc, char * argv[]) {
     unsigned port = 8080;
     if(argc == 2) port = std::stoul(argv[1]);
 
-    TcpClient client;
-    client.setConnectCallback([](std::shared_ptr<TcpSocket> socket) {
+    TCPClient client;
+    client.setConnectCallback([](std::shared_ptr<TCPSocket> socket) {
         socket->send("Hello, here is client");
         auto content = socket->recv();
         Log(INFO) << "Received: " << content;

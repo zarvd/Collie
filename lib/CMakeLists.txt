@@ -10,11 +10,11 @@ set(BASE_SRC
 set(NETWORK_SRC
   SocketAddress.cpp
   Socket.cpp
-  tcp/TcpConnection.cpp
-  tcp/TcpServer.cpp
-  tcp/TcpSocket.cpp
+  tcp/TCPConnection.cpp
+  tcp/TCPServer.cpp
+  tcp/TCPSocket.cpp
   tcp/Acceptor.cpp
-  tcp/TcpClient.cpp
+  tcp/TCPClient.cpp
   tcp/Connector.cpp
   )
 

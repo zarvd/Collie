@@ -3,45 +3,45 @@
 #include "../../include/event/Channel.hpp"
 #include "../../include/event/EventLoopThreadPool.hpp"
 #include "../../include/SocketAddress.hpp"
-#include "../../include/tcp/TcpServer.hpp"
+#include "../../include/tcp/TCPServer.hpp"
 #include "../../include/tcp/Acceptor.hpp"
-#include "../../include/tcp/TcpSocket.hpp"
-#include "../../include/tcp/TcpConnection.hpp"
+#include "../../include/tcp/TCPSocket.hpp"
+#include "../../include/tcp/TCPConnection.hpp"
 
 namespace Collie {
-namespace Tcp {
+namespace TCP {
 
-TcpServer::TcpServer() : threadNum(1), port(0) {
-    Log(TRACE) << "TcpServer constructing";
+TCPServer::TCPServer() : threadNum(1), port(0) {
+    Log(TRACE) << "TCPServer constructing";
 }
 
-TcpServer::~TcpServer() { Log(TRACE) << "TcpServer destructing"; }
+TCPServer::~TCPServer() { Log(TRACE) << "TCPServer destructing"; }
 
 void
-TcpServer::bind(const std::string & host, const unsigned port) {
+TCPServer::bind(const std::string & host, const unsigned port) {
     this->host = host;
     this->port = port;
     localAddr = SocketAddress::getSocketAddress(host, port);
 }
 
 void
-TcpServer::start() {
-    Log(INFO) << "TcpServer start";
+TCPServer::start() {
+    Log(INFO) << "TCPServer start";
 
     acceptor.reset(new Acceptor(localAddr));
     using namespace std::placeholders;
     // setup acceptor
     acceptor->setAcceptCallback(
-        std::bind(&TcpServer::newConnection, this, _1, _2));
+        std::bind(&TCPServer::newConnection, this, _1, _2));
     eventLoopThreadPool.reset(new Event::EventLoopThreadPool(threadNum));
     auto acceptChannel = acceptor->getBaseChannel();
     eventLoopThreadPool->startLoop({acceptChannel});
 }
 
 void
-TcpServer::newConnection(const unsigned connFd,
+TCPServer::newConnection(const unsigned connFd,
                          std::shared_ptr<SocketAddress> remoteAddr) {
-    Log(INFO) << "TcpServer accept fd(" << connFd << ") ip("
+    Log(INFO) << "TCPServer accept fd(" << connFd << ") ip("
               << remoteAddr->getIP() << ")";
 
     // new channel
@@ -50,14 +50,14 @@ TcpServer::newConnection(const unsigned connFd,
     channel->setAfterSetLoopCallback(
         [this, remoteAddr](std::shared_ptr<Event::Channel> channel) {
             // new connection
-            auto connection = std::make_shared<TcpConnection>(
+            auto connection = std::make_shared<TCPConnection>(
                 channel, this->localAddr, remoteAddr);
             connection->setMessageCallback(onMessageCallback);
             // store this connection in server
             this->connections.insert(connection);
 
             connection->setShutdownCallback(
-                [this](std::shared_ptr<TcpConnection> conn) {
+                [this](std::shared_ptr<TCPConnection> conn) {
                     // remove this connection from server
                     Log(INFO) << "Connection close";
                     this->connections.erase(conn);

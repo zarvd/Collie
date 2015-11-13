@@ -1,23 +1,23 @@
 #include "../../include/Global.hpp"
-#include "../../include/tcp/TcpClient.hpp"
+#include "../../include/tcp/TCPClient.hpp"
 #include "../../include/tcp/Connector.hpp"
 #include "../../include/SocketAddress.hpp"
 
 namespace Collie {
-namespace Tcp {
+namespace TCP {
 
-TcpClient::TcpClient() { Log(TRACE) << "TcpClient is constructing"; }
+TCPClient::TCPClient() { Log(TRACE) << "TCPClient is constructing"; }
 
-TcpClient::~TcpClient() {
-    Log(TRACE) << "TcpClient is destructing";
+TCPClient::~TCPClient() {
+    Log(TRACE) << "TCPClient is destructing";
     if(connector) connector->disconnect();
 }
 
 void
-TcpClient::connect(const std::string & host, const unsigned port,
+TCPClient::connect(const std::string & host, const unsigned port,
                    const size_t threadNum, const size_t connectNum) {
     if(!connectCallback) {
-        THROW_("TcpClient connectCallback is not callable");
+        THROW_("TCPClient connectCallback is not callable");
     }
 
     remoteAddr = SocketAddress::getSocketAddress(host, port);

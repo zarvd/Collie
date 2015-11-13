@@ -1,34 +1,34 @@
 #include <netinet/in.h>
-#include "../../include/tcp/TcpSocket.hpp"
+#include "../../include/tcp/TCPSocket.hpp"
 #include "../../include/SocketAddress.hpp"
 #include "../../include/Global.hpp"
 
 namespace Collie {
-namespace Tcp {
+namespace TCP {
 
-TcpSocket::TcpSocket() : Socket(), sendFlag(0), recvFlag(0) {
-    Log(TRACE) << "TcpSocket client is constructing";
+TCPSocket::TCPSocket() : Socket(), sendFlag(0), recvFlag(0) {
+    Log(TRACE) << "TCPSocket client is constructing";
 }
 
-TcpSocket::TcpSocket(std::shared_ptr<SocketAddress> addr)
+TCPSocket::TCPSocket(std::shared_ptr<SocketAddress> addr)
     : Socket(addr), sendFlag(0), recvFlag(0) {
-    Log(TRACE) << "TcpSocket server is constructing";
+    Log(TRACE) << "TCPSocket server is constructing";
 }
 
-TcpSocket::~TcpSocket() { Log(TRACE) << "TcpSocket is destructing"; }
+TCPSocket::~TCPSocket() { Log(TRACE) << "TCPSocket is destructing"; }
 
 void
-TcpSocket::setSendFlag(const int flag) {
+TCPSocket::setSendFlag(const int flag) {
     sendFlag = flag;
 }
 
 void
-TcpSocket::setRecvFlag(const int flag) {
+TCPSocket::setRecvFlag(const int flag) {
     recvFlag = flag;
 }
 
 void
-TcpSocket::listen() {
+TCPSocket::listen() {
     if(localAddr->getIPVersion() == IP::V4) {
         listenV4();
     } else {
@@ -37,7 +37,7 @@ TcpSocket::listen() {
 }
 
 void
-TcpSocket::listenV4() {
+TCPSocket::listenV4() {
     if(!localAddr) {
         THROW_("local address is null");
     }
@@ -62,12 +62,12 @@ TcpSocket::listenV4() {
 }
 
 void
-TcpSocket::listenV6() {
+TCPSocket::listenV6() {
     // TODO
 }
 
 void
-TcpSocket::connect(std::shared_ptr<SocketAddress> servAddr) {
+TCPSocket::connect(std::shared_ptr<SocketAddress> servAddr) {
     if(servAddr->getIPVersion() == IP::V4) {
         connectV4(servAddr);
     } else {
@@ -76,7 +76,7 @@ TcpSocket::connect(std::shared_ptr<SocketAddress> servAddr) {
 }
 
 void
-TcpSocket::connectV4(std::shared_ptr<SocketAddress> servAddr) {
+TCPSocket::connectV4(std::shared_ptr<SocketAddress> servAddr) {
     struct sockaddr_in serv = servAddr->getAddrV4();
     fd = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if(fd < 0) {
@@ -92,17 +92,17 @@ TcpSocket::connectV4(std::shared_ptr<SocketAddress> servAddr) {
     *localAddr = local;
 }
 
-void TcpSocket::connectV6(std::shared_ptr<SocketAddress>) {
+void TCPSocket::connectV6(std::shared_ptr<SocketAddress>) {
     // TODO
 }
 
 int
-TcpSocket::accept(std::shared_ptr<SocketAddress> connAddr) const {
-    return TcpSocket::accept(fd, connAddr);
+TCPSocket::accept(std::shared_ptr<SocketAddress> connAddr) const {
+    return TCPSocket::accept(fd, connAddr);
 }
 
 int
-TcpSocket::accept(const int fd, std::shared_ptr<SocketAddress> connAddr) {
+TCPSocket::accept(const int fd, std::shared_ptr<SocketAddress> connAddr) {
     // IPv4
     struct sockaddr_in clientAddr;
     socklen_t clientAddrLen;
@@ -121,17 +121,17 @@ TcpSocket::accept(const int fd, std::shared_ptr<SocketAddress> connAddr) {
 }
 
 std::string
-TcpSocket::recv(const int connFd) {
+TCPSocket::recv(const int connFd) {
     return recv(connFd, recvFlag);
 }
 
 std::string
-TcpSocket::recv() {
+TCPSocket::recv() {
     return recv(fd, recvFlag);
 }
 
 std::string
-TcpSocket::recv(const int connFd, const int recvFlag) {
+TCPSocket::recv(const int connFd, const int recvFlag) {
     if(connFd < 2) {
         Log(WARN) << "Illegal connection fd " << connFd;
     }
@@ -139,7 +139,7 @@ TcpSocket::recv(const int connFd, const int recvFlag) {
     char msg[msgLength];
     const auto size = ::recv(connFd, msg, msgLength, recvFlag);
     if(size <= 0) {
-        Log(WARN) << "TcpSocket received nothing";
+        Log(WARN) << "TCPSocket received nothing";
         return "";
     }
     Log(TRACE) << "Socket received msg";
@@ -147,22 +147,22 @@ TcpSocket::recv(const int connFd, const int recvFlag) {
 }
 
 void
-TcpSocket::send(const std::string & msg) {
+TCPSocket::send(const std::string & msg) {
     send(fd, msg, sendFlag);
 }
 
 void
-TcpSocket::send(const int connFd, const std::string & msg) {
+TCPSocket::send(const int connFd, const std::string & msg) {
     send(connFd, msg, sendFlag);
 }
 
 void
-TcpSocket::send(const int connFd, const std::string & msg, const int sendFlag) {
+TCPSocket::send(const int connFd, const std::string & msg, const int sendFlag) {
     char content[msg.length() + 1];
     std::strcpy(content, msg.c_str());
     const auto size = ::send(connFd, content, sizeof(content), sendFlag);
     if(size <= 0) {
-        Log(WARN) << "TcpSocket received nothing";
+        Log(WARN) << "TCPSocket received nothing";
     } else {
         Log(TRACE) << "Socket send msg";
     }

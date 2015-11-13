@@ -15,19 +15,19 @@ class Channel;
 
 class SocketAddress;
 
-namespace Tcp {
+namespace TCP {
 
-class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
+class TCPConnection : public std::enable_shared_from_this<TCPConnection> {
 public:
-    using MessageCallback = std::function<void(std::shared_ptr<TcpConnection>)>;
-    using EventCallback = std::function<void(std::shared_ptr<TcpConnection>)>;
+    using MessageCallback = std::function<void(std::shared_ptr<TCPConnection>)>;
+    using EventCallback = std::function<void(std::shared_ptr<TCPConnection>)>;
 
-    TcpConnection(std::shared_ptr<Event::Channel> channel,
+    TCPConnection(std::shared_ptr<Event::Channel> channel,
                   std::shared_ptr<SocketAddress> localAddr,
                   std::shared_ptr<SocketAddress> remoteAddr);
-    TcpConnection(const TcpConnection &) = delete;
-    TcpConnection & operator=(const TcpConnection &) = delete;
-    ~TcpConnection();
+    TCPConnection(const TCPConnection &) = delete;
+    TCPConnection & operator=(const TCPConnection &) = delete;
+    ~TCPConnection();
 
     std::shared_ptr<Event::Channel> getChannel() const { return channel; }
     std::shared_ptr<SocketAddress> getLocalAddr() const { return localAddr; }
