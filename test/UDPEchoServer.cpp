@@ -19,8 +19,9 @@ main(int argc, char * argv[]) {
     server.bind("127.0.0.1", port);
     server.setConnectCallback([&server](const std::string & content,
                                         std::shared_ptr<SocketAddress> addr) {
+        Log(INFO) << "Server received: " << content;
         const auto res = "From UDP Echo Server: " + content;
-        server.send(content, addr);
+        server.send(res, addr);
     });
     server.start();
     return 0;

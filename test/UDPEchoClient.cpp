@@ -18,8 +18,9 @@ main(int argc, char * argv[]) {
     UDPClient client;
     client.setConnectCallback([&client](const std::string & content,
                                         std::shared_ptr<SocketAddress> addr) {
+        Log(INFO) << content;
         const auto res = "From UDP Echo Client: " + content;
-        client.send(content, addr);
+        client.send(res, addr);
         return false;
     });
     client.connect("127.0.0.1", port, "Hello world");
