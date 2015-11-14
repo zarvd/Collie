@@ -96,25 +96,31 @@ void TCPSocket::connectV6(std::shared_ptr<SocketAddress>) {
     // TODO
 }
 
+// Thread safe
 int
-TCPSocket::accept(std::shared_ptr<SocketAddress> connAddr) const {
-    return TCPSocket::accept(fd, connAddr);
+TCPSocket::accept(std::shared_ptr<SocketAddress> connAddr,
+                  bool isNonBlock) const {
+    return TCPSocket::accept(fd, connAddr, isNonBlock);
 }
 
+// Thread safe
 int
-TCPSocket::accept(const int fd, std::shared_ptr<SocketAddress> connAddr) {
+TCPSocket::accept(const int fd, std::shared_ptr<SocketAddress> connAddr,
+                  bool isNonBlock) {
     // IPv4
     struct sockaddr_in clientAddr;
     socklen_t clientAddrLen;
     clientAddrLen = sizeof(clientAddr);
 
     int connFd;
-    connFd = ::accept(fd, (struct sockaddr *)&clientAddr, &clientAddrLen);
-
-    Log(TRACE) << "Socket accept connection " << connFd;
-    if(connFd < 0) {
-        THROW_SYS;
+    int flags = 0;
+    if(isNonBlock) {
+        Log(TRACE) << "Socket non blocking accept";
+        flags = SOCK_NONBLOCK;
     }
+    connFd =
+        ::accept4(fd, (struct sockaddr *)&clientAddr, &clientAddrLen, flags);
+    Log(TRACE) << "Socket accept connection " << connFd;
     *connAddr = clientAddr;
 
     return connFd;
