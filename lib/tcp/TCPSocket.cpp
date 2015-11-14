@@ -38,9 +38,8 @@ TCPSocket::listen() {
 
 void
 TCPSocket::listenV4() {
-    if(!localAddr) {
-        THROW_("local address is null");
-    }
+    REQUIRE(localAddr);
+
     struct sockaddr_in servAddr = localAddr->getAddrV4();
 
     fd = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
