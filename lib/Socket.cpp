@@ -59,7 +59,8 @@ Socket::send(const int socketFd, const std::string & content, const int flag) {
     char contentChars[content.length() + 1];
     std::strcpy(contentChars, content.c_str());
     Log(TRACE) << "Socket is sending " << contentChars;
-    const ssize_t size = ::send(socketFd, contentChars, sizeof(contentChars), flag);
+    const ssize_t size =
+        ::send(socketFd, contentChars, sizeof(contentChars), flag);
     if(size <= 0) {
         Log(DEBUG) << "Socket send nothing";
     } else {
@@ -96,7 +97,9 @@ Socket::sendTo(const int socketFd, const std::string & content,
     const ssize_t size =
         ::sendto(socketFd, contentC, sizeof(contentC), flag,
                  (struct sockaddr *)&addr, sizeof(remoteAddr->getAddrV4()));
-    if(size <= 0) {
+    if(size < 0) {
+        THROW_SYS_(std::to_string(addr.sin_family));
+    } else if(size == 0) {
         Log(DEBUG) << "Socket send nothing";
     } else {
         Log(TRACE) << "Socket send msg";
@@ -112,14 +115,15 @@ Socket::recvFrom(const int socketFd, std::string & content,
     socklen_t addrLen = sizeof(addr);
     const ssize_t size = ::recvfrom(socketFd, buffer, sizeof(buffer), flag,
                                     (struct sockaddr *)&addr, &addrLen);
-    if(size <= 0) {
+    if(size < 0) {
+        THROW_SYS;
+    } else if(size == 0) {
         Log(DEBUG) << "Socket received nothing";
         content = "";
     } else {
         Log(TRACE) << "Socket received msg";
         content = buffer;
-        remoteAddr.reset(new SocketAddress);
-        *remoteAddr = addr;
+        (*remoteAddr) = addr;
     }
     return size;
 }
