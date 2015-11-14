@@ -19,7 +19,7 @@ UDPSocket::~UDPSocket() { Log(TRACE) << "UDP Socket is destructing"; }
 
 void
 UDPSocket::listen() {
-    REQUIRE(localAddr);
+    REQUIRE(localAddr && localAddr->getIPVersion() != IP::Unknown);
     if(localAddr->getIPVersion() == IP::V4) {
         listenV4();
     } else {
@@ -31,12 +31,42 @@ void
 UDPSocket::listenV4() {
     Log(DEBUG) << "UDP Socket is listening";
     REQUIRE(type == Type::Server);
-    int fd = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    fd = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     REQUIRE(fd != -1);
     struct sockaddr_in servAddr = localAddr->getAddrV4();
 
     int ret = ::bind(fd, (struct sockaddr *)&servAddr, sizeof(servAddr));
     REQUIRE(ret != -1);
+}
+
+void
+UDPSocket::listenV6() {
+    // TODO
+    THROW_("TO BE CONTINUED");
+}
+
+void
+UDPSocket::connect(IP ipVersion) {
+    REQUIRE(ipVersion != IP::Unknown);
+    if(ipVersion == IP::V4) {
+        connectV4();
+    } else {
+        connectV6();
+    }
+}
+
+void
+UDPSocket::connectV4() {
+    Log(DEBUG) << "UDP Socket is connecting";
+    REQUIRE(type == Type::Client);
+    fd = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    REQUIRE(fd != -1);
+}
+
+void
+UDPSocket::connectV6() {
+    // TODO
+    THROW_("TO BE CONTINUED");
 }
 }
 }

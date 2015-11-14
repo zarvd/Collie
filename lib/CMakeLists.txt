@@ -16,6 +16,9 @@ set(NETWORK_SRC
   tcp/Acceptor.cpp
   tcp/TCPClient.cpp
   tcp/Connector.cpp
+  udp/UDPSocket.cpp
+  udp/UDPServer.cpp
+  udp/UDPClient.cpp
   )
 
 set(LIB_SRC ${BASE_SRC} ${NETWORK_SRC})

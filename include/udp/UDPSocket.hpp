@@ -22,7 +22,7 @@ public:
     void listenV4();
     void listenV6();
 
-    void connect(); // only socket, UDP have NO connection
+    void connect(IP); // only socket, UDP have NO connection
     void connectV4();
     void connectV6();
 };
