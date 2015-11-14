@@ -36,7 +36,7 @@ public:
     static ssize_t recv(const int socketFd, std::string & content,
                         const int flags = 0);
     static ssize_t recvFrom(const int socketFd, std::string & content,
-                            std::shared_ptr<SocketAddress> remoteAddr,
+                            const std::shared_ptr<SocketAddress> & remoteAddr,
                             const int flags = 0);
     ssize_t send(const std::string & content, const int flags = 0);
     ssize_t recv(std::string & content, const int flags = 0);
@@ -44,7 +44,7 @@ public:
                    std::shared_ptr<SocketAddress> remoteAddr,
                    const int flags = 0);
     ssize_t recvFrom(std::string & content,
-                     std::shared_ptr<SocketAddress> remoteAddr,
+                     const std::shared_ptr<SocketAddress> & remoteAddr,
                      const int flags = 0);
     void close();
 

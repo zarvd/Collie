@@ -50,7 +50,8 @@ Socket::sendTo(const std::string & content,
 
 ssize_t
 Socket::recvFrom(std::string & content,
-                 std::shared_ptr<SocketAddress> remoteAddr, const int flag) {
+                 const std::shared_ptr<SocketAddress> & remoteAddr,
+                 const int flag) {
     return recvFrom(fd, content, remoteAddr, flag);
 }
 
@@ -109,7 +110,8 @@ Socket::sendTo(const int socketFd, const std::string & content,
 
 ssize_t
 Socket::recvFrom(const int socketFd, std::string & content,
-                 std::shared_ptr<SocketAddress> remoteAddr, const int flag) {
+                 const std::shared_ptr<SocketAddress> & remoteAddr,
+                 const int flag) {
     char buffer[8192];
     struct sockaddr_in addr;
     socklen_t addrLen = sizeof(addr);
