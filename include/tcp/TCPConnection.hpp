@@ -4,6 +4,7 @@
 #include <string>
 #include <memory>
 #include <list>
+#include <unordered_set>
 
 namespace Collie {
 
@@ -58,6 +59,7 @@ private:
     void handleError();
 
     bool connected;
+    bool isShutDown;
     std::shared_ptr<Event::Channel> channel;
     std::shared_ptr<SocketAddress> localAddr;
     std::shared_ptr<SocketAddress> remoteAddr;
@@ -66,6 +68,9 @@ private:
     MessageCallback messageCallback;
     EventCallback shutdownCallback;
 };
+
+extern thread_local std::unordered_set<std::shared_ptr<TCPConnection>>
+    localThreadConnections;
 }
 }
 

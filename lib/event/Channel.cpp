@@ -52,86 +52,71 @@ Channel::getCopyWithoutEventLoop() const {
 
 void
 Channel::setEventLoop(std::shared_ptr<EventLoop> eventLoop) {
-    if(inEventLoop) {
-        THROW_("Channel" + std::to_string(fd) + " is already in eventLoop");
-    } else {
-        this->eventLoop = eventLoop;
-        inEventLoop = true;
-        if(afterSetLoopCallback) afterSetLoopCallback(shared_from_this());
-    }
+    REQUIRE_(!inEventLoop,
+             "Channel" + std::to_string(fd) + " is already in eventLoop");
+    this->eventLoop = eventLoop;
+    inEventLoop = true;
+    if(afterSetLoopCallback) afterSetLoopCallback(shared_from_this());
 }
 
 bool
 Channel::isRead() const {
-    if(!inEventLoop) {
-        THROW_("Channel is not in event loop");
-    }
+    REQUIRE_(inEventLoop, "Channel is not in event loop");
+    TRACE_LOG;
     return eventLoop->poller->isRead(events);
 }
 
 bool
 Channel::isWrite() const {
-    if(!inEventLoop) {
-        THROW_("Channel is not in event loop");
-    }
+    REQUIRE_(inEventLoop, "Channel is not in event loop");
+    TRACE_LOG;
     return eventLoop->poller->isWrite(events);
 }
 
 void
 Channel::enableRead() {
-    if(!inEventLoop) {
-        THROW_("Channel is not in event loop");
-    }
+    REQUIRE_(inEventLoop, "Channel is not in event loop");
+    TRACE_LOG;
     eventLoop->poller->enableRead(events);
     update();
 }
 
 void
 Channel::disableRead() {
-    if(!inEventLoop) {
-        THROW_("Channel is not in event loop");
-    }
-
+    REQUIRE_(inEventLoop, "Channel is not in event loop");
+    TRACE_LOG;
     eventLoop->poller->disableRead(events);
     update();
 }
 
 void
 Channel::enableWrite() {
-    if(!inEventLoop) {
-        THROW_("Channel is not in event loop");
-    }
-
+    REQUIRE_(inEventLoop, "Channel is not in event loop");
+    TRACE_LOG;
     eventLoop->poller->enableWrite(events);
     update();
 }
 
 void
 Channel::disableWrite() {
-    if(!inEventLoop) {
-        THROW_("Channel is not in event loop");
-    }
-
+    REQUIRE_(inEventLoop, "Channel is not in event loop");
+    TRACE_LOG;
     eventLoop->poller->disableWrite(events);
     update();
 }
 
 void
 Channel::enableOneShot() {
-    if(!inEventLoop) {
-        THROW_("Channel is not in event loop");
-    }
-
+    REQUIRE_(inEventLoop, "Channel is not in event loop");
+    TRACE_LOG;
     eventLoop->poller->enableOneShot(events);
     update();
 }
 
 void
 Channel::disableOneShot() {
-    if(!inEventLoop) {
-        THROW_("Channel is not in event loop");
-    }
-
+    REQUIRE_(inEventLoop, "Channel is not in event loop");
+    TRACE_LOG;
     eventLoop->poller->disableOneShot(events);
     update();
 }
@@ -139,6 +124,7 @@ Channel::disableOneShot() {
 void
 Channel::disableAll() {
     // FIXME
+    TRACE_LOG;
     events = 0;
     update();
 }
@@ -183,11 +169,13 @@ Channel::activate(const unsigned revents) {
 
 void
 Channel::update() {
+    TRACE_LOG;
     eventLoop->updateChannel(shared_from_this());
 }
 
 void
 Channel::remove() {
+    TRACE_LOG;
     if(inEventLoop) eventLoop->removeChannel(shared_from_this());
 }
 }

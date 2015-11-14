@@ -55,6 +55,8 @@ protected:
     if(!(CONDITION))                                                           \
         throw ::Collie::Exception(EXC_DETAIL_(msg) + "\nREQUIR"                \
                                                      "E");
+
+#define TRACE_LOG Log(TRACE) << "TRACE log";
 }
 
 #endif /* COLLIE_EXCEPTION_H */

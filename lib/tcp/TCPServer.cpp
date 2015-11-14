@@ -51,18 +51,20 @@ TCPServer::newConnection(const unsigned connFd,
     // NOTE setting up channel in connection
     channel->setAfterSetLoopCallback(
         [this, remoteAddr](std::shared_ptr<Event::Channel> channel) {
+            // NOTE only use this->localAddr which should be immutable
+            // TCPServer is not thread safe
             // new connection
             auto connection = std::make_shared<TCPConnection>(
                 channel, this->localAddr, remoteAddr);
             connection->setMessageCallback(onMessageCallback);
             // store this connection in server
-            this->connections.insert(connection);
+            localThreadConnections.insert(connection);
 
             connection->setShutdownCallback(
-                [this](std::shared_ptr<TCPConnection> conn) {
+                [](std::shared_ptr<TCPConnection> conn) {
                     // remove this connection from server
                     Log(INFO) << "Connection close";
-                    this->connections.erase(conn);
+                    localThreadConnections.erase(conn);
                 });
         });
     eventLoopThreadPool->pushChannel(channel);

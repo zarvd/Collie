@@ -23,9 +23,7 @@ EPollPoller::create() {
 
 void
 EPollPoller::insert(const int fd, const unsigned events) {
-    if(!isInit) {
-        THROW_("Epoller is not inited");
-    }
+    REQUIRE_(isInit, "Epoller is not inited");
     Log(TRACE) << "EPoller " << this->fd << " insert " << fd << " with events "
                << events;
     Event event;
@@ -39,9 +37,7 @@ EPollPoller::insert(const int fd, const unsigned events) {
 
 void
 EPollPoller::modify(const int fd, const unsigned events) {
-    if(!isInit) {
-        THROW_("Epoller is not inited");
-    }
+    REQUIRE_(isInit, "Epoller is not inited");
     Log(TRACE) << "EPoller " << this->fd << " modify " << fd << " with events "
                << events;
     Event event;
@@ -55,9 +51,7 @@ EPollPoller::modify(const int fd, const unsigned events) {
 
 void
 EPollPoller::remove(const int fd) {
-    if(!isInit) {
-        THROW_("Epoller is not inited");
-    }
+    REQUIRE_(isInit, "Epoller is not inited");
     Log(TRACE) << "EPoller " << this->fd << " remove " << fd;
     // Since Linux 2.6.9, event can be specified as NULL when using
     // EPOLL_CTL_DEL.
@@ -69,9 +63,7 @@ EPollPoller::remove(const int fd) {
 
 void
 EPollPoller::poll(PollCallback cb, const int timeout) {
-    if(!isInit) {
-        THROW_("Epoller is not inited");
-    }
+    REQUIRE_(isInit, "Epoller is not inited");
     Log(TRACE) << "EPoller " << this->fd << " is polling ";
     int eventNum = epoll_wait(this->fd, revents.get(), MaxEvent, timeout);
     if(eventNum == -1) {
@@ -82,11 +74,8 @@ EPollPoller::poll(PollCallback cb, const int timeout) {
 
     for(int idx = 0; idx < eventNum; ++idx) {
         const Event & curEvent = revents.get()[idx];
-        if(cb) {
-            cb(curEvent.data.fd, curEvent.events); // XXX
-        } else {
-            THROW_("PollCallback is not callable");
-        }
+        REQUIRE_(cb, "PollCallback is not callable");
+        cb(curEvent.data.fd, curEvent.events); // XXX
     }
 }
 }

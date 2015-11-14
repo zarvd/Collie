@@ -1,9 +1,9 @@
 #ifndef COLLIE_TCP_TCPSERVER_H
 #define COLLIE_TCP_TCPSERVER_H
 
+#include <thread>
 #include <memory>
 #include <string>
-#include <unordered_set>
 
 namespace Collie {
 
@@ -57,7 +57,6 @@ private:
                                   std::shared_ptr<SocketAddress> remoteAddr);
 
     size_t threadNum;
-    std::unordered_set<std::shared_ptr<TCPConnection>> connections;
     std::string host;
     unsigned port;
     std::shared_ptr<SocketAddress> localAddr;

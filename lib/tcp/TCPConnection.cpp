@@ -11,10 +11,14 @@
 namespace Collie {
 namespace TCP {
 
+thread_local std::unordered_set<std::shared_ptr<TCPConnection>>
+    localThreadConnections;
+
 TCPConnection::TCPConnection(std::shared_ptr<Event::Channel> channel,
                              std::shared_ptr<SocketAddress> localAddr,
                              std::shared_ptr<SocketAddress> remoteAddr)
     : connected(true),
+      isShutDown(false),
       channel(channel),
       localAddr(localAddr),
       remoteAddr(remoteAddr) {
@@ -43,6 +47,11 @@ TCPConnection::disconnect() {
 
 void
 TCPConnection::shutdown() {
+    if(isShutDown) {
+        Log(DEBUG) << "TCP Connection was already shut down";
+        return;
+    }
+    isShutDown = true;
     Log(TRACE) << "TCP Connection is shutting down";
     channel->remove();
     if(shutdownCallback) shutdownCallback(shared_from_this());
@@ -70,14 +79,14 @@ TCPConnection::handleRead() {
     if(size > 0) {
         inputBuffer += content;
         messageCallback(shared_from_this());
+        channel->disableRead();
+        if(!outputBuffer.empty()) {
+            if(!channel->isWrite()) channel->enableWrite();
+        } else if(!connected) {
+            shutdown();
+        }
     } else {
         handleClose();
-    }
-    channel->disableRead();
-    if(!outputBuffer.empty()) {
-        if(!channel->isWrite()) channel->enableWrite();
-    } else if(!connected) {
-        shutdown();
     }
 }
 
