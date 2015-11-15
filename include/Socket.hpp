@@ -26,7 +26,7 @@ public:
     std::shared_ptr<SocketAddress> getLocalAddr() const { return localAddr; }
 
     virtual void listen() = 0;
-    static bool setFdNonBlocking(int fd); // return true when success
+    static void setFdNonBlocking(int fd);
     static ssize_t send(const int socketFd, const std::string & content,
                         const int flags = 0);
     static ssize_t sendTo(const int socketFd, const std::string & content,

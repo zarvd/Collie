@@ -32,11 +32,11 @@ UDPSocket::listenV4() {
     Log(DEBUG) << "UDP Socket is listening";
     REQUIRE(type == Type::Server);
     fd = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    REQUIRE(fd != -1);
+    REQUIRE_SYS(fd != -1);
     struct sockaddr_in servAddr = localAddr->getAddrV4();
 
     int ret = ::bind(fd, (struct sockaddr *)&servAddr, sizeof(servAddr));
-    REQUIRE(ret != -1);
+    REQUIRE_SYS(ret != -1);
 }
 
 void
@@ -60,7 +60,7 @@ UDPSocket::connectV4() {
     Log(DEBUG) << "UDP Socket is connecting";
     REQUIRE(type == Type::Client);
     fd = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    REQUIRE(fd != -1);
+    REQUIRE_SYS(fd != -1);
 }
 
 void

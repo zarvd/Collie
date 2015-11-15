@@ -51,6 +51,9 @@ protected:
 #define REQUIRE(CONDITION)                                                     \
     if(!(CONDITION)) throw ::Collie::Exception(EXC_DETAIL + "\nREQUIRE");
 
+#define REQUIRE_SYS(CONDITION)                                                 \
+    if(!(CONDITION)) THROW_SYS;
+
 #define REQUIRE_(CONDITION, msg)                                               \
     if(!(CONDITION))                                                           \
         throw ::Collie::Exception(EXC_DETAIL_(msg) + "\nREQUIR"                \

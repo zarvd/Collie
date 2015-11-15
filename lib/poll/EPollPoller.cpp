@@ -13,11 +13,10 @@ EPollPoller::~EPollPoller() { Log(TRACE) << "EPoller destructing"; }
 
 void
 EPollPoller::create() {
-    this->fd = epoll_create1(0);
-    Log(TRACE) << "EPoller create new epoll " << this->fd;
-    if(this->fd == -1) {
-        THROW_SYS_("Epoller create failed");
-    }
+    fd = epoll_create1(0);
+    Log(TRACE) << "EPoller create new epoll " << fd;
+    REQUIRE_SYS(fd != -1);
+
     isInit = true;
 }
 
@@ -30,9 +29,7 @@ EPollPoller::insert(const int fd, const unsigned events) {
     event.data.fd = fd;
     event.events = events;
     const int ret = epoll_ctl(this->fd, EPOLL_CTL_ADD, fd, &event);
-    if(ret == -1) {
-        THROW_SYS_("Epoller " + std::to_string(this->fd) + " add ctl failed: ");
-    }
+    REQUIRE_SYS(ret != -1);
 }
 
 void
@@ -44,9 +41,7 @@ EPollPoller::modify(const int fd, const unsigned events) {
     event.data.fd = fd;
     event.events = events;
     const int ret = epoll_ctl(this->fd, EPOLL_CTL_MOD, fd, &event);
-    if(ret == -1) {
-        THROW_SYS_("Epoller " + std::to_string(this->fd) + " mod ctl failed: ");
-    }
+    REQUIRE_SYS(ret != -1);
 }
 
 void
@@ -56,9 +51,7 @@ EPollPoller::remove(const int fd) {
     // Since Linux 2.6.9, event can be specified as NULL when using
     // EPOLL_CTL_DEL.
     const int ret = epoll_ctl(this->fd, EPOLL_CTL_DEL, fd, NULL);
-    if(ret == -1) {
-        THROW_SYS_("Epoller " + std::to_string(this->fd) + " rm ctl failed: ");
-    }
+    REQUIRE_SYS(ret != -1);
 }
 
 void
@@ -66,9 +59,7 @@ EPollPoller::poll(PollCallback cb, const int timeout) {
     REQUIRE_(isInit, "Epoller is not inited");
     Log(TRACE) << "EPoller " << this->fd << " is polling ";
     int eventNum = epoll_wait(this->fd, revents.get(), MaxEvent, timeout);
-    if(eventNum == -1) {
-        THROW_SYS_("Epoller " + std::to_string(this->fd) + " wait failed: ");
-    }
+    REQUIRE_SYS(eventNum != -1);
 
     Log(TRACE) << "Epoller " << this->fd << " get " << eventNum << " events";
 

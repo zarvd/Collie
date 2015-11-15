@@ -18,10 +18,12 @@ public:
     UDPSocket & operator=(const UDPSocket &) = delete;
     ~UDPSocket() override;
 
+    // server
     void listen() override;
     void listenV4();
     void listenV6();
 
+    // client
     void connect(IP); // only socket, UDP have NO connection
     void connectV4();
     void connectV6();

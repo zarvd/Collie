@@ -23,13 +23,13 @@ Socket::close() {
     ::close(fd);
 }
 
-bool
+void
 Socket::setFdNonBlocking(int fd) {
     auto flags = ::fcntl(fd, F_GETFL, 0);
-    if(flags == -1) return false;
+    REQUIRE_SYS(flags != -1);
     flags |= O_NONBLOCK;
-    if(::fcntl(fd, F_SETFL, flags) == -1) return false;
-    return true;
+    const int ret = ::fcntl(fd, F_SETFL, flags);
+    REQUIRE_SYS(ret != -1);
 }
 
 ssize_t
@@ -62,7 +62,8 @@ Socket::send(const int socketFd, const std::string & content, const int flag) {
     Log(TRACE) << "Socket is sending " << contentChars;
     const ssize_t size =
         ::send(socketFd, contentChars, sizeof(contentChars), flag);
-    if(size <= 0) {
+    REQUIRE_SYS(size != -1);
+    if(size == 0) {
         Log(DEBUG) << "Socket send nothing";
     } else {
         Log(TRACE) << "Socket send msg";
@@ -78,7 +79,8 @@ Socket::recv(const int socketFd, std::string & content, const int flag) {
     constexpr size_t msgLength = 8192; // FIXME
     char msg[msgLength];
     const ssize_t size = ::recv(socketFd, msg, msgLength, flag);
-    if(size <= 0) {
+    REQUIRE_SYS(size != -1);
+    if(size == 0) {
         Log(DEBUG) << "Socket received nothing";
         content = "";
     } else {
@@ -98,9 +100,8 @@ Socket::sendTo(const int socketFd, const std::string & content,
     const ssize_t size =
         ::sendto(socketFd, contentC, sizeof(contentC), flag,
                  (struct sockaddr *)&addr, sizeof(remoteAddr->getAddrV4()));
-    if(size < 0) {
-        THROW_SYS_(std::to_string(addr.sin_family));
-    } else if(size == 0) {
+    REQUIRE_SYS(size != -1);
+    if(size == 0) {
         Log(DEBUG) << "Socket send nothing";
     } else {
         Log(TRACE) << "Socket send msg";
@@ -117,9 +118,8 @@ Socket::recvFrom(const int socketFd, std::string & content,
     socklen_t addrLen = sizeof(addr);
     const ssize_t size = ::recvfrom(socketFd, buffer, sizeof(buffer), flag,
                                     (struct sockaddr *)&addr, &addrLen);
-    if(size < 0) {
-        THROW_SYS;
-    } else if(size == 0) {
+    REQUIRE_SYS(size != -1);
+    if(size == 0) {
         Log(DEBUG) << "Socket received nothing";
         content = "";
     } else {
