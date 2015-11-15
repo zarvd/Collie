@@ -132,13 +132,45 @@ Socket::recvFrom(const int socketFd, std::string & content,
     return size;
 }
 
-ssize_t
+bool
 Socket::sendFile(const int socketFd, const std::string & fileName) {
     Utils::File file(fileName, Utils::File::Flags::Read);
-    off64_t offset = 0;
     if(file.isExisted() && file.isFile()) {
-        return ::sendfile64(socketFd, file.getFd(), &offset, file.getSize());
+        off64_t offset = 0;
+        size_t sentSize = 0;
+        while(sentSize < file.getSize()) {
+            const ssize_t ret =
+                ::sendfile64(socketFd, file.getFd(), &offset, file.getSize());
+            if(ret == -1) {
+                return false;
+            }
+            sentSize += static_cast<size_t>(ret);
+        }
+        return true;
+    } else {
+        return false;
     }
-    return 0;
+}
+
+bool
+Socket::recvFile(const int socketFd, const std::string & fileName,
+                 const size_t fileSize) {
+    using Utils::File;
+    File file(fileName, File::Write | File::Creat);
+    if(file.isExisted() && file.isFile()) {
+        off64_t offset = 0;
+        size_t sentSize = 0;
+        while(sentSize < fileSize) {
+            const ssize_t ret =
+                ::sendfile64(file.getFd(), socketFd, &offset, fileSize);
+            if(ret == -1) {
+                return false;
+            }
+            sentSize += static_cast<size_t>(ret);
+        }
+        return true;
+    } else {
+        return false;
+    }
 }
 }
