@@ -32,13 +32,11 @@ SocketAddress & SocketAddress::operator=(const AddrV6 &) {
 }
 
 std::shared_ptr<SocketAddress>
-SocketAddress::getSocketAddress(const std::string & host,
-                                const unsigned & port) {
+SocketAddress::getSocketAddress(const std::string & host, const unsigned port) {
 
     auto addr = std::make_shared<SocketAddress>();
 
-    struct hostent * hostStruct =
-        gethostbyname(host.c_str()); // FIXME: Blocking
+    struct hostent * hostStruct = gethostbyname(host.c_str());
     if(!hostStruct) {
         THROW_(hstrerror(h_errno));
     } else {

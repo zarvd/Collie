@@ -34,7 +34,7 @@ public:
     // then create sockaddr_in or sockaddr_in6
     // Note: it will block
     static std::shared_ptr<SocketAddress>
-    getSocketAddress(const std::string & host, const unsigned & port);
+    getSocketAddress(const std::string & host, const unsigned port);
 
 private:
     std::string ip;
