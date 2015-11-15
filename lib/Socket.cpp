@@ -1,8 +1,10 @@
 #include "../include/Global.hpp"
 #include "../include/Socket.hpp"
 #include "../include/SocketAddress.hpp"
+#include "../include/utils/file.hpp"
 #include <unistd.h>
 #include <fcntl.h>
+#include <sys/sendfile.h>
 
 namespace Collie {
 
@@ -128,5 +130,15 @@ Socket::recvFrom(const int socketFd, std::string & content,
         (*remoteAddr) = addr;
     }
     return size;
+}
+
+ssize_t
+Socket::sendFile(const int socketFd, const std::string & fileName) {
+    Utils::File file(fileName, Utils::File::Flags::Read);
+    off64_t offset = 0;
+    if(file.isExisted() && file.isFile()) {
+        return ::sendfile64(socketFd, file.getFd(), &offset, file.getSize());
+    }
+    return 0;
 }
 }

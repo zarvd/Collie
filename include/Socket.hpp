@@ -46,6 +46,8 @@ public:
     ssize_t recvFrom(std::string & content,
                      const std::shared_ptr<SocketAddress> & remoteAddr,
                      const int flags = 0);
+    ssize_t sendFile(const int socketFd, const std::string & fileName);
+    ssize_t recvFile(const int socketFd, const std::string & fileName);
     void close();
 
 protected:
