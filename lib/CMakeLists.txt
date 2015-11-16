@@ -5,6 +5,7 @@ set(BASE_SRC
   event/EventLoopThreadPool.cpp
   poll/Poller.cpp
   poll/EPollPoller.cpp
+  utils/File.cpp
   )
 
 set(NETWORK_SRC
