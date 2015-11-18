@@ -24,15 +24,15 @@ public:
     using EventCallback = std::function<void(std::shared_ptr<TCPConnection>)>;
 
     TCPConnection(std::shared_ptr<Event::Channel> channel,
-                  std::shared_ptr<SocketAddress> localAddr,
-                  std::shared_ptr<SocketAddress> remoteAddr);
+                  std::shared_ptr<const SocketAddress> localAddr,
+                  std::shared_ptr<const SocketAddress> remoteAddr);
     TCPConnection(const TCPConnection &) = delete;
     TCPConnection & operator=(const TCPConnection &) = delete;
     ~TCPConnection();
 
     std::shared_ptr<Event::Channel> getChannel() const { return channel; }
-    std::shared_ptr<SocketAddress> getLocalAddr() const { return localAddr; }
-    std::shared_ptr<SocketAddress> getRemoteAddr() const { return remoteAddr; }
+    std::shared_ptr<const SocketAddress> getLocalAddr() const { return localAddr; }
+    std::shared_ptr<const SocketAddress> getRemoteAddr() const { return remoteAddr; }
     void setMessageCallback(const MessageCallback & cb) {
         messageCallback = cb;
     }
@@ -60,9 +60,9 @@ private:
 
     bool connected;
     bool isShutDown;
-    std::shared_ptr<Event::Channel> channel;
-    std::shared_ptr<SocketAddress> localAddr;
-    std::shared_ptr<SocketAddress> remoteAddr;
+    const std::shared_ptr<Event::Channel> channel;
+    const std::shared_ptr<const SocketAddress> localAddr;
+    const std::shared_ptr<const SocketAddress> remoteAddr;
     std::string inputBuffer;
     std::string outputBuffer;
     MessageCallback messageCallback;

@@ -15,8 +15,8 @@ thread_local std::unordered_set<std::shared_ptr<TCPConnection>>
     localThreadConnections;
 
 TCPConnection::TCPConnection(std::shared_ptr<Event::Channel> channel,
-                             std::shared_ptr<SocketAddress> localAddr,
-                             std::shared_ptr<SocketAddress> remoteAddr)
+                             std::shared_ptr<const SocketAddress> localAddr,
+                             std::shared_ptr<const SocketAddress> remoteAddr)
     : connected(true),
       isShutDown(false),
       channel(channel),
@@ -75,7 +75,8 @@ TCPConnection::send(const std::string & buffer) {
 void
 TCPConnection::handleRead() {
     std::string content;
-    const auto size = Socket::recv(channel->getFd(), content);
+    // Non blocking receiving
+    const auto size = Socket::recv(channel->getFd(), content, MSG_DONTWAIT);
     if(size > 0) {
         inputBuffer += content;
         messageCallback(shared_from_this());
@@ -85,16 +86,20 @@ TCPConnection::handleRead() {
         } else if(!connected) {
             shutdown();
         }
-    } else {
+    } else if(size == 0) {
         handleClose();
+    } else {
+        handleError();
     }
 }
 
 void
 TCPConnection::handleWrite() {
+    // XXXX
     if(!outputBuffer.empty()) {
-        const auto size = Socket::send(channel->getFd(), outputBuffer);
-        const int bufferSize = outputBuffer.length();
+        const ssize_t size =
+            Socket::send(channel->getFd(), outputBuffer, MSG_DONTWAIT);
+        const ssize_t bufferSize = outputBuffer.length();
         if(bufferSize == size - 1) {
             outputBuffer.clear();
         } else if(size > 0) {

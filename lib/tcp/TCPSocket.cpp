@@ -118,9 +118,13 @@ TCPSocket::accept(const int fd, std::shared_ptr<SocketAddress> connAddr,
         flags = SOCK_NONBLOCK;
     }
     connFd =
-        ::accept4(fd, (struct sockaddr *)&clientAddr, &clientAddrLen, flags);
-    Log(TRACE) << "Socket accept connection " << connFd;
-    *connAddr = clientAddr;
+        ::accept4(fd, (struct sockaddr *)&clientAddr, &clientAddrLen, SOCK_NONBLOCK);
+    if(connFd > 2) {
+        Log(TRACE) << "Socket accept connection " << connFd;
+        *connAddr = clientAddr;
+    } else {
+        Log(DEBUG) << "Socket accept nothing";
+    }
 
     return connFd;
 }

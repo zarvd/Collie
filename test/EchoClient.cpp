@@ -28,6 +28,6 @@ main(int argc, char * argv[]) {
         Log(INFO) << "Received: " << content;
 
     });
-    client.connect("127.0.0.1", port);
+    client.connect("127.0.0.1", port, 4, 100);
     return 0;
 }
