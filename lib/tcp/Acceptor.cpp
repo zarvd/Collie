@@ -58,7 +58,7 @@ void
 Acceptor::handleRead() {
     // should be thread-safe
     auto remoteAddr = std::make_shared<SocketAddress>();
-    int connFd = tcpSocket->accept(remoteAddr);
+    int connFd = tcpSocket->acceptNonBlocking(remoteAddr);
     if(connFd > 0) {
         acceptCallback(connFd, remoteAddr);
     } else {

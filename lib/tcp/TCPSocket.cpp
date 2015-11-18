@@ -97,28 +97,49 @@ void TCPSocket::connectV6(std::shared_ptr<SocketAddress>) {
 
 // Thread safe
 int
-TCPSocket::accept(std::shared_ptr<SocketAddress> connAddr,
-                  bool isNonBlock) const {
-    return TCPSocket::accept(fd, connAddr, isNonBlock);
+TCPSocket::accept(std::shared_ptr<SocketAddress> connAddr) const {
+    return TCPSocket::accept(fd, connAddr);
+}
+
+int
+TCPSocket::acceptNonBlocking(std::shared_ptr<SocketAddress> connAddr) const {
+    return TCPSocket::acceptNonBlocking(fd, connAddr);
 }
 
 // Thread safe
 int
-TCPSocket::accept(const int fd, std::shared_ptr<SocketAddress> connAddr,
-                  bool isNonBlock) {
+TCPSocket::accept(const int fd, std::shared_ptr<SocketAddress> connAddr) {
     // IPv4
     struct sockaddr_in clientAddr;
     socklen_t clientAddrLen;
     clientAddrLen = sizeof(clientAddr);
 
     int connFd;
-    int flags = 0;
-    if(isNonBlock) {
-        Log(TRACE) << "Socket non blocking accept";
-        flags = SOCK_NONBLOCK;
+    Log(TRACE) << "Socket blocking accept";
+    connFd = ::accept(fd, (struct sockaddr *)&clientAddr, &clientAddrLen);
+    if(connFd > 2) {
+        Log(TRACE) << "Socket accept connection " << connFd;
+        *connAddr = clientAddr;
+    } else {
+        Log(DEBUG) << "Socket accept nothing";
     }
-    connFd =
-        ::accept4(fd, (struct sockaddr *)&clientAddr, &clientAddrLen, SOCK_NONBLOCK);
+
+    return connFd;
+}
+
+// Thread safe
+int
+TCPSocket::acceptNonBlocking(const int fd,
+                             std::shared_ptr<SocketAddress> connAddr) {
+    // IPv4
+    struct sockaddr_in clientAddr;
+    socklen_t clientAddrLen;
+    clientAddrLen = sizeof(clientAddr);
+
+    int connFd;
+    Log(TRACE) << "Socket non blocking accept";
+    connFd = ::accept4(fd, (struct sockaddr *)&clientAddr, &clientAddrLen,
+                       SOCK_NONBLOCK);
     if(connFd > 2) {
         Log(TRACE) << "Socket accept connection " << connFd;
         *connAddr = clientAddr;

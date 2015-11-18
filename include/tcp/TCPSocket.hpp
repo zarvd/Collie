@@ -22,9 +22,11 @@ public:
     void connect(std::shared_ptr<SocketAddress>);
 
     // accept and get addr, return connFd
-    int accept(std::shared_ptr<SocketAddress>, bool isNonBlock = true) const;
-    static int accept(const int socketFd, std::shared_ptr<SocketAddress>,
-                      bool isNonBlock = true);
+    int accept(std::shared_ptr<SocketAddress>) const;
+    int acceptNonBlocking(std::shared_ptr<SocketAddress>) const;
+    static int accept(const int socketFd, std::shared_ptr<SocketAddress>);
+    static int acceptNonBlocking(const int socketFd,
+                                 std::shared_ptr<SocketAddress>);
     std::string recv(const int connFd);                   // server method
     std::string recv();                                   // client method
     void send(const int connFd, const std::string & msg); // server method
