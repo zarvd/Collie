@@ -31,17 +31,23 @@ public:
     File & operator=(const File &) = delete;
     ~File();
 
+    bool isAbleTo(const int flags) const {
+        return (flags == 0 && this->flags == 0) ? true : (flags & this->flags);
+    }
     bool isExisted() const { return existed; }
     bool isFile() const { return S_ISREG(stat.st_mode); }
     bool isDir() const { return S_ISDIR(stat.st_mode); }
     int getFd() const { return fd; }
     size_t getSize() const { return stat.st_size; }
+    std::string getName() const { return fileName; }
     void close();
 
 private:
     int fd;
     bool existed;
     bool isClose;
+    const int flags;
+    const std::string fileName;
 
     Stat stat;
 };

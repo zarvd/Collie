@@ -8,6 +8,10 @@
 
 namespace Collie {
 
+namespace Utils {
+class File;
+}
+
 namespace Event {
 
 class EventLoop;
@@ -55,6 +59,7 @@ public:
     std::string recvAll();
     void send(const std::string &);
     void sendFile(const std::string & fileName);
+    void sendFile(const Utils::File & file);
     void recvFile(const std::string & fileName, const size_t fileSize);
 
 private:

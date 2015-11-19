@@ -1,12 +1,12 @@
 #include "../../include/Global.hpp"
-#include "../../include/utils/file.hpp"
+#include "../../include/utils/File.hpp"
 #include <unistd.h>
 
 namespace Collie {
 namespace Utils {
 
 File::File(const std::string & pathName, const int flags)
-    : fd(-1), existed(true), isClose(false) {
+    : fd(-1), existed(true), isClose(false), flags(flags), fileName(pathName) {
     if(::stat64(pathName.c_str(), &stat) == -1) {
         Log(WARN) << "Path " << pathName << " is not existed";
         existed = false;

@@ -5,6 +5,10 @@
 
 namespace Collie {
 
+namespace Utils {
+class File;
+}
+
 enum class IP;
 class SocketAddress;
 
@@ -47,9 +51,9 @@ public:
                      const std::shared_ptr<SocketAddress> & remoteAddr,
                      const int flags = 0);
     // return true when success
-    static bool sendFile(const int socketFd, const std::string & fileName);
-    static bool recvFile(const int socketFd, const std::string & fileName,
-                  const size_t fileSize);
+    static bool sendFile(const int socketFd, const Utils::File & file);
+    static bool recvFile(const int socketFd, Utils::File & file,
+                         const size_t fileSize);
     void close();
 
 protected:

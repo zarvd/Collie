@@ -4,6 +4,7 @@
 #include "../../include/SocketAddress.hpp"
 #include "../../include/event/EventLoop.hpp"
 #include "../../include/event/Channel.hpp"
+#include "../../include/utils/File.hpp"
 #include <functional>
 #include <algorithm>
 #include <future>
@@ -75,13 +76,30 @@ TCPConnection::send(const std::string & buffer) {
 void
 TCPConnection::sendFile(const std::string & fileName) {
     REQUIRE(channel);
-    Socket::sendFile(channel->getFd(), fileName);
+    Utils::File file(fileName, Utils::File::Flags::Read);
+    if(file.isExisted() && file.isFile()) {
+        Socket::sendFile(channel->getFd(), file);
+    } else {
+        // XXX
+        Log(WARN) << fileName << " not found";
+    }
+}
+
+void
+TCPConnection::sendFile(const Utils::File & file) {
+    if(file.isExisted() && file.isFile()) {
+        Socket::sendFile(channel->getFd(), file);
+    } else {
+        // XXX
+        Log(WARN) << file.getName() << " not found";
+    }
 }
 
 void
 TCPConnection::recvFile(const std::string & fileName, const size_t fileSize) {
     REQUIRE(channel);
-    Socket::recvFile(channel->getFd(), fileName, fileSize);
+    Utils::File file(fileName, Utils::File::Write | Utils::File::Creat);
+    Socket::recvFile(channel->getFd(), file, fileSize);
 }
 
 void

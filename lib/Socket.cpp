@@ -1,7 +1,7 @@
 #include "../include/Global.hpp"
 #include "../include/Socket.hpp"
 #include "../include/SocketAddress.hpp"
-#include "../include/utils/file.hpp"
+#include "../include/utils/File.hpp"
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/sendfile.h>
@@ -133,16 +133,17 @@ Socket::recvFrom(const int socketFd, std::string & content,
 }
 
 bool
-Socket::sendFile(const int socketFd, const std::string & fileName) {
-    using Utils::File;
-    File file(fileName, File::Read);
+Socket::sendFile(const int socketFd, const Utils::File & file) {
+    REQUIRE(file.isAbleTo(Utils::File::Read));
     if(file.isExisted() && file.isFile()) {
         off64_t offset = 0;
         size_t sentSize = 0;
         while(sentSize < file.getSize()) {
             const ssize_t ret =
                 ::sendfile64(socketFd, file.getFd(), &offset, file.getSize());
+            Log(DEBUG) << "sendfile64() return " << ret;
             if(ret == -1) {
+                Log(ERROR) << getError();
                 return false;
             }
             sentSize += static_cast<size_t>(ret);
@@ -154,17 +155,18 @@ Socket::sendFile(const int socketFd, const std::string & fileName) {
 }
 
 bool
-Socket::recvFile(const int socketFd, const std::string & fileName,
+Socket::recvFile(const int socketFd, Utils::File & file,
                  const size_t fileSize) {
-    using Utils::File;
-    File file(fileName, File::Write | File::Creat);
+    REQUIRE(file.isAbleTo(Utils::File::Write | Utils::File::Creat));
     if(file.isExisted() && file.isFile()) {
         off64_t offset = 0;
         size_t sentSize = 0;
         while(sentSize < fileSize) {
             const ssize_t ret =
                 ::sendfile64(file.getFd(), socketFd, &offset, fileSize);
+            Log(DEBUG) << "sendfile64() return " << ret;
             if(ret == -1) {
+                Log(ERROR) << getError();
                 return false;
             }
             sentSize += static_cast<size_t>(ret);
