@@ -76,7 +76,7 @@ TCPConnection::send(const std::string & buffer) {
 void
 TCPConnection::sendFile(const std::string & fileName) {
     REQUIRE(channel);
-    Utils::File file(fileName, Utils::File::Flags::Read);
+    Utils::File file(fileName, Utils::File::Mode::Read);
     if(file.isExisted() && file.isFile()) {
         Socket::sendFile(channel->getFd(), file);
     } else {
@@ -98,7 +98,7 @@ TCPConnection::sendFile(const Utils::File & file) {
 void
 TCPConnection::recvFile(const std::string & fileName, const size_t fileSize) {
     REQUIRE(channel);
-    Utils::File file(fileName, Utils::File::Write | Utils::File::Creat);
+    Utils::File file(fileName, Utils::File::Mode::Write);
     Socket::recvFile(channel->getFd(), file, fileSize);
 }
 

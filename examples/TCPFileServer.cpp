@@ -23,14 +23,14 @@ main(int argc, char * argv[]) {
     server.setOnMessageCallback([](std::shared_ptr<TCPConnection> conn) {
         REQUIRE(conn);
         const auto greeting = conn->recvAll();
-        File file("/home/gallon/collie/send/hello", File::Read);
+        File file("/home/gallon/collie/send/test.xls", File::Mode::Read);
         if(!file.isExisted() || !file.isFile()) {
             Log(WARN) << file.getName() << " not found";
             return;
         }
         Log(INFO) << "File size = " << file.getSize();
         Log(INFO) << "Sending file size...";
-        // conn->send(std::to_string(file.getSize()));
+        conn->send(std::to_string(file.getSize()));
         Log(INFO) << "Sending file...";
         conn->sendFile(file);
     });

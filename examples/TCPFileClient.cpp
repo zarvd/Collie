@@ -22,10 +22,10 @@ main(int argc, char * argv[]) {
     client.setConnectCallback([](std::shared_ptr<TCPSocket> socket) {
             REQUIRE(socket);
             socket->send("Hello");
-            File file("/home/gallon/collie/recv/hello", File::Write | File::Creat);
-            // const std::string fileSize = socket->recv();
-            // const auto size = std::stoul(fileSize);
-            const unsigned long size = 15;
+            File file("/home/gallon/collie/recv/test.xls", File::Mode::Write);
+            const std::string fileSize = socket->recv();
+            const auto size = std::stoul(fileSize);
+            // const unsigned long size = 15;
             Log(INFO) << "File size = " << size;
             Log(INFO) << "Receiving file...";
             socket->recvFile(socket->getFd(), file, size);

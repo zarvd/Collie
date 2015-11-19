@@ -134,7 +134,7 @@ Socket::recvFrom(const int socketFd, std::string & content,
 
 bool
 Socket::sendFile(const int socketFd, const Utils::File & file) {
-    REQUIRE(file.isAbleTo(Utils::File::Read));
+    REQUIRE(file.isExisted() && file.isRead());
     if(file.isExisted() && file.isFile()) {
         off64_t offset = 0;
         size_t sentSize = 0;
@@ -157,20 +157,14 @@ Socket::sendFile(const int socketFd, const Utils::File & file) {
 bool
 Socket::recvFile(const int socketFd, Utils::File & file,
                  const size_t fileSize) {
-    REQUIRE(file.isAbleTo(Utils::File::Write | Utils::File::Creat));
+    REQUIRE(file.isExisted() && file.isWrite());
     if(file.isExisted() && file.isFile()) {
-        off64_t offset = 0;
-        size_t sentSize = 0;
-        while(sentSize < fileSize) {
-            const ssize_t ret =
-                ::sendfile64(file.getFd(), socketFd, &offset, fileSize);
-            Log(DEBUG) << "sendfile64() return " << ret;
-            if(ret == -1) {
-                Log(ERROR) << getError();
-                return false;
-            }
-            sentSize += static_cast<size_t>(ret);
-        }
+        char buffer[fileSize];
+        int ret = ::recv(socketFd, buffer, fileSize, MSG_WAITALL);
+        // int ret = ::read(socketFd, buffer, fileSize);
+        REQUIRE_SYS(ret);
+        Log(DEBUG) << buffer;
+        ::write(file.getFd(), buffer, ::strlen(buffer));
         return true;
     } else {
         return false;

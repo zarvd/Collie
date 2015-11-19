@@ -11,10 +11,12 @@ namespace Utils {
 class File {
 public:
     using Stat = struct stat64;
-    enum Flags {
+    enum class Mode {
         Read = O_RDONLY,
         Write = O_WRONLY,
-        ReadAndWrite = O_RDWR,
+        ReadAndWrite = O_RDWR
+    };
+    enum Flags {
         Append = O_APPEND,
         Creat = O_CREAT,
         Excl = O_EXCL,
@@ -26,11 +28,17 @@ public:
         Sync = O_SYNC
     };
 
-    File(const std::string & pathName, const int flags);
+    File(const std::string & pathName, const Mode mode);
     File(const File &) = delete;
     File & operator=(const File &) = delete;
     ~File();
 
+    bool isRead() const {
+        return mode == Mode::Read || mode == Mode::ReadAndWrite;
+    }
+    bool isWrite() const {
+        return mode == Mode::Read || mode == Mode::ReadAndWrite;
+    }
     bool isAbleTo(const int flags) const {
         return (flags == 0 && this->flags == 0) ? true : (flags & this->flags);
     }
@@ -46,7 +54,8 @@ private:
     int fd;
     bool existed;
     bool isClose;
-    const int flags;
+    int flags;
+    Mode mode;
     const std::string fileName;
 
     Stat stat;
