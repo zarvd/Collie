@@ -31,8 +31,12 @@ public:
     ~TCPConnection();
 
     std::shared_ptr<Event::Channel> getChannel() const { return channel; }
-    std::shared_ptr<const SocketAddress> getLocalAddr() const { return localAddr; }
-    std::shared_ptr<const SocketAddress> getRemoteAddr() const { return remoteAddr; }
+    std::shared_ptr<const SocketAddress> getLocalAddr() const {
+        return localAddr;
+    }
+    std::shared_ptr<const SocketAddress> getRemoteAddr() const {
+        return remoteAddr;
+    }
     void setMessageCallback(const MessageCallback & cb) {
         messageCallback = cb;
     }
@@ -50,6 +54,8 @@ public:
     void disconnect();
     std::string recvAll();
     void send(const std::string &);
+    void sendFile(const std::string & fileName);
+    void recvFile(const std::string & fileName, const size_t fileSize);
 
 private:
     void shutdown();

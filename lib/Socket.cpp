@@ -134,7 +134,8 @@ Socket::recvFrom(const int socketFd, std::string & content,
 
 bool
 Socket::sendFile(const int socketFd, const std::string & fileName) {
-    Utils::File file(fileName, Utils::File::Flags::Read);
+    using Utils::File;
+    File file(fileName, File::Read);
     if(file.isExisted() && file.isFile()) {
         off64_t offset = 0;
         size_t sentSize = 0;

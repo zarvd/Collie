@@ -47,8 +47,8 @@ public:
                      const std::shared_ptr<SocketAddress> & remoteAddr,
                      const int flags = 0);
     // return true when success
-    bool sendFile(const int socketFd, const std::string & fileName);
-    bool recvFile(const int socketFd, const std::string & fileName,
+    static bool sendFile(const int socketFd, const std::string & fileName);
+    static bool recvFile(const int socketFd, const std::string & fileName,
                   const size_t fileSize);
     void close();
 

@@ -73,6 +73,18 @@ TCPConnection::send(const std::string & buffer) {
 }
 
 void
+TCPConnection::sendFile(const std::string & fileName) {
+    REQUIRE(channel);
+    Socket::sendFile(channel->getFd(), fileName);
+}
+
+void
+TCPConnection::recvFile(const std::string & fileName, const size_t fileSize) {
+    REQUIRE(channel);
+    Socket::recvFile(channel->getFd(), fileName, fileSize);
+}
+
+void
 TCPConnection::handleRead() {
     std::string content;
     // Non blocking receiving
@@ -99,12 +111,13 @@ TCPConnection::handleWrite() {
     if(!outputBuffer.empty()) {
         const ssize_t size =
             Socket::send(channel->getFd(), outputBuffer, MSG_DONTWAIT);
-        const ssize_t bufferSize = outputBuffer.length();
-        if(bufferSize == size - 1) {
-            outputBuffer.clear();
-        } else if(size > 0) {
-            outputBuffer = outputBuffer.substr(size - 1);
-        }
+        // const ssize_t bufferSize = outputBuffer.length();
+        // if(bufferSize == size - 1) {
+        //     outputBuffer.clear();
+        // } else if(size > 0) {
+        //     outputBuffer = outputBuffer.substr(size - 1);
+        // }
+        if(size > 0) outputBuffer.clear();
     }
     channel->disableWrite();
     channel->enableRead();
