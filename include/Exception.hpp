@@ -4,6 +4,7 @@
 #include <cstring>
 #include <exception>
 #include <stdexcept>
+#include <iostream>
 
 namespace Collie {
 
