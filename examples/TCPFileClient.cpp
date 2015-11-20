@@ -20,16 +20,16 @@ main(int argc, char * argv[]) {
 
     TCPClient client;
     client.setConnectCallback([](std::shared_ptr<TCPSocket> socket) {
-            REQUIRE(socket);
-            socket->send("Hello");
-            File file("/home/gallon/collie/recv/test.xls", File::Mode::Write);
-            const std::string fileSize = socket->recv();
-            const auto size = std::stoul(fileSize);
-            // const unsigned long size = 15;
-            Log(INFO) << "File size = " << size;
-            Log(INFO) << "Receiving file...";
-            socket->recvFile(socket->getFd(), file, size);
-        });
+
+        REQUIRE(socket);
+        socket->send("Hello");
+        File file("/home/gallon/collie/recv/test.xls", File::Mode::Write, File::Creat);
+        const size_t size = 110080;
+        Log(INFO) << "File size = " << size;
+        Log(INFO) << "Receiving file...";
+
+        socket->recvFile(socket->getFd(), file, size);
+    });
     client.connect("127.0.0.1", port);
 
     return 0;

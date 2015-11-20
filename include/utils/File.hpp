@@ -28,27 +28,27 @@ public:
         Sync = O_SYNC
     };
 
-    File(const std::string & pathName, const Mode mode);
+    File(const std::string & pathName, const Mode mode, int flags = 0);
     File(const File &) = delete;
     File & operator=(const File &) = delete;
     ~File();
 
-    bool isRead() const {
+    bool isRead() const noexcept {
         return mode == Mode::Read || mode == Mode::ReadAndWrite;
     }
-    bool isWrite() const {
-        return mode == Mode::Read || mode == Mode::ReadAndWrite;
+    bool isWrite() const noexcept {
+        return mode == Mode::Write || mode == Mode::ReadAndWrite;
     }
-    bool isAbleTo(const int flags) const {
+    bool isAbleTo(const int flags) const noexcept {
         return (flags == 0 && this->flags == 0) ? true : (flags & this->flags);
     }
-    bool isExisted() const { return existed; }
-    bool isFile() const { return S_ISREG(stat.st_mode); }
-    bool isDir() const { return S_ISDIR(stat.st_mode); }
-    int getFd() const { return fd; }
-    size_t getSize() const { return stat.st_size; }
-    std::string getName() const { return fileName; }
-    void close();
+    bool isExisted() const noexcept { return existed; }
+    bool isFile() const noexcept { return S_ISREG(stat.st_mode); }
+    bool isDir() const noexcept { return S_ISDIR(stat.st_mode); }
+    int getFd() const noexcept { return fd; }
+    size_t getSize() const noexcept { return stat.st_size; }
+    std::string getName() const noexcept { return fileName; }
+    void close() noexcept;
 
 private:
     int fd;

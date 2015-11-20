@@ -161,10 +161,9 @@ Socket::recvFile(const int socketFd, Utils::File & file,
     if(file.isExisted() && file.isFile()) {
         char buffer[fileSize];
         int ret = ::recv(socketFd, buffer, fileSize, MSG_WAITALL);
-        // int ret = ::read(socketFd, buffer, fileSize);
-        REQUIRE_SYS(ret);
-        Log(DEBUG) << buffer;
-        ::write(file.getFd(), buffer, ::strlen(buffer));
+        REQUIRE_SYS(ret != -1);
+        ret = ::write(file.getFd(), buffer, ret);
+        REQUIRE_SYS(ret != -1);
         return true;
     } else {
         return false;
