@@ -1,32 +1,16 @@
 #include "../include/Global.hpp"
 #include "../include/Socket.hpp"
-#include "../include/SocketAddress.hpp"
+#include "../include/InetAddress.hpp"
 #include "../include/utils/File.hpp"
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/sendfile.h>
 
 namespace Collie {
-
-Socket::Socket() : type(Type::Client), fd(-1), localAddr(new SocketAddress) {
-    Log(TRACE) << "Client socket constructing";
-}
-
-Socket::Socket(std::shared_ptr<SocketAddress> addr)
-    : type(Type::Server), fd(-1), localAddr(addr) {
-    Log(TRACE) << "Server socket constructing";
-}
-
-Socket::~Socket() { Log(TRACE) << "Socket destructing"; }
+namespace Socket {
 
 void
-Socket::close() {
-    Log(TRACE) << "Socket closed";
-    ::close(fd);
-}
-
-void
-Socket::setFdNonBlocking(int fd) {
+setNonBlocking(const int fd) {
     auto flags = ::fcntl(fd, F_GETFL, 0);
     REQUIRE_SYS(flags != -1);
     flags |= O_NONBLOCK;
@@ -35,30 +19,7 @@ Socket::setFdNonBlocking(int fd) {
 }
 
 ssize_t
-Socket::send(const std::string & content, const int flag) {
-    return send(fd, content, flag);
-}
-
-ssize_t
-Socket::recv(std::string & content, const int flag) {
-    return recv(fd, content, flag);
-}
-
-ssize_t
-Socket::sendTo(const std::string & content,
-               std::shared_ptr<SocketAddress> remoteAddr, const int flag) {
-    return sendTo(fd, content, remoteAddr, flag);
-}
-
-ssize_t
-Socket::recvFrom(std::string & content,
-                 const std::shared_ptr<SocketAddress> & remoteAddr,
-                 const int flag) {
-    return recvFrom(fd, content, remoteAddr, flag);
-}
-
-ssize_t
-Socket::send(const int socketFd, const std::string & content, const int flag) {
+send(const int socketFd, const std::string & content, const int flag) {
     char contentChars[content.length() + 1];
     std::strcpy(contentChars, content.c_str());
     Log(TRACE) << "Socket is sending " << contentChars;
@@ -74,7 +35,7 @@ Socket::send(const int socketFd, const std::string & content, const int flag) {
 }
 
 ssize_t
-Socket::recv(const int socketFd, std::string & content, const int flag) {
+recv(const int socketFd, std::string & content, const int flag) {
     if(socketFd < 2) {
         Log(WARN) << "Illegal socket fd " << socketFd;
     }
@@ -94,8 +55,8 @@ Socket::recv(const int socketFd, std::string & content, const int flag) {
 }
 
 ssize_t
-Socket::sendTo(const int socketFd, const std::string & content,
-               std::shared_ptr<SocketAddress> remoteAddr, const int flag) {
+sendTo(const int socketFd, const std::string & content,
+       std::shared_ptr<InetAddress> remoteAddr, const int flag) {
     char contentC[content.length() + 1];
     std::strcpy(contentC, content.c_str());
     struct sockaddr_in addr = remoteAddr->getAddrV4();
@@ -112,9 +73,8 @@ Socket::sendTo(const int socketFd, const std::string & content,
 }
 
 ssize_t
-Socket::recvFrom(const int socketFd, std::string & content,
-                 const std::shared_ptr<SocketAddress> & remoteAddr,
-                 const int flag) {
+recvFrom(const int socketFd, std::string & content,
+         const std::shared_ptr<InetAddress> & remoteAddr, const int flag) {
     char buffer[8192];
     struct sockaddr_in addr;
     socklen_t addrLen = sizeof(addr);
@@ -133,7 +93,7 @@ Socket::recvFrom(const int socketFd, std::string & content,
 }
 
 bool
-Socket::sendFile(const int socketFd, const Utils::File & file) {
+sendFile(const int socketFd, const Utils::File & file) {
     REQUIRE(file.isExisted() && file.isRead());
     if(file.isExisted() && file.isFile()) {
         off64_t offset = 0;
@@ -155,8 +115,7 @@ Socket::sendFile(const int socketFd, const Utils::File & file) {
 }
 
 bool
-Socket::recvFile(const int socketFd, Utils::File & file,
-                 const size_t fileSize) {
+recvFile(const int socketFd, Utils::File & file, const size_t fileSize) {
     REQUIRE(file.isExisted() && file.isWrite());
     if(file.isExisted() && file.isFile()) {
         char buffer[fileSize];
@@ -168,5 +127,6 @@ Socket::recvFile(const int socketFd, Utils::File & file,
     } else {
         return false;
     }
+}
 }
 }

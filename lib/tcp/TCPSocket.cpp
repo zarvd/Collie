@@ -1,177 +1,177 @@
 #include <netinet/in.h>
+#include <unistd.h>
 #include "../../include/tcp/TCPSocket.hpp"
-#include "../../include/SocketAddress.hpp"
+#include "../../include/Socket.hpp"
+#include "../../include/InetAddress.hpp"
 #include "../../include/Global.hpp"
 
 namespace Collie {
 namespace TCP {
 
-TCPSocket::TCPSocket() : Socket(), sendFlag(0), recvFlag(0) {
-    Log(TRACE) << "TCPSocket client is constructing";
-}
-
-TCPSocket::TCPSocket(std::shared_ptr<SocketAddress> addr)
-    : Socket(addr), sendFlag(0), recvFlag(0) {
-    Log(TRACE) << "TCPSocket server is constructing";
-}
-
-TCPSocket::~TCPSocket() { Log(TRACE) << "TCPSocket is destructing"; }
-
-void
-TCPSocket::setSendFlag(const int flag) {
-    sendFlag = flag;
-}
-
-void
-TCPSocket::setRecvFlag(const int flag) {
-    recvFlag = flag;
-}
-
-void
-TCPSocket::listen() {
-    if(localAddr->getIPVersion() == IP::V4) {
-        listenV4();
+TCPSocket::TCPSocket(SharedPtr<InetAddress> addr) noexcept : fd(-1),
+                                                             state(State::Init),
+                                                             address(addr) {
+    Log(TRACE) << "TCPSocket is constructing";
+    fd = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if(fd < 0) {
+        Log(WARN) << "TCPSocket: " << getError();
     } else {
-        listenV6();
+        state = State::Socket;
     }
 }
 
+// construct Accept connection socket
+TCPSocket::TCPSocket(const int fd, SharedPtr<InetAddress> addr) noexcept
+    : fd(fd),
+      state(State::Accept),
+      address(addr) {
+    Log(TRACE) << "TCPSocket(Accept connection) is constructing";
+}
+
+// construct illegal socket
+TCPSocket::TCPSocket() noexcept : fd(-1), state(State::IllegalAccept) {
+    Log(TRACE) << "TCPSocket(IllegalAccept) is constructing";
+}
+
+TCPSocket::~TCPSocket() noexcept { Log(TRACE) << "TCPSocket is destructing"; }
+
 void
+TCPSocket::close() noexcept {
+    Log(TRACE) << "Socket closed";
+    if(state != State::Init && state != State::Close) {
+        ::close(fd);
+    }
+}
+
+bool
+TCPSocket::bindAndListen() {
+    REQUIRE(address);
+    switch(address->getIPVersion()) {
+    case IP::V4:
+        return listenV4();
+    default:
+        return false;
+    }
+}
+
+bool
 TCPSocket::listenV4() {
-    REQUIRE(localAddr);
 
-    struct sockaddr_in servAddr = localAddr->getAddrV4();
+    if(state == State::Socket) {
+        struct sockaddr_in servAddr = address->getAddrV4();
 
-    fd = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if(fd < 0) {
-        THROW_SYS;
+        int ret = bind(fd, (struct sockaddr *)&servAddr, sizeof(servAddr));
+        if(ret < 0) {
+            Log(WARN) << "bind()" << getError();
+        } else {
+            state = State::Bind;
+        }
     }
+    if(state == State::Bind) {
+        Log(TRACE) << "Socket " << fd << " is binding";
 
-    int ret = bind(fd, (struct sockaddr *)&servAddr, sizeof(servAddr));
-    if(ret < 0) {
-        THROW_SYS;
+        Log(TRACE) << "Socket is listening";
+
+        if(::listen(fd, SOMAXCONN) < 0) {
+            Log(WARN) << getError();
+        } else {
+            state = State::Listen;
+        }
     }
-    Log(TRACE) << "Socket " << fd << " is binding";
-
-    Log(TRACE) << "Socket is listening";
-
-    if(::listen(fd, SOMAXCONN) < 0) {
-        THROW_SYS;
-    }
-}
-
-void
-TCPSocket::listenV6() {
-    // TODO
-}
-
-void
-TCPSocket::connect(std::shared_ptr<SocketAddress> servAddr) {
-    if(servAddr->getIPVersion() == IP::V4) {
-        connectV4(servAddr);
+    if(state == State::Listen) {
+        return true;
     } else {
-        connectV6(servAddr);
+        return false;
     }
 }
 
-void
-TCPSocket::connectV4(std::shared_ptr<SocketAddress> servAddr) {
+bool
+TCPSocket::connect(SharedPtr<InetAddress> servAddr) {
+    REQUIRE(servAddr);
+    switch(servAddr->getIPVersion()) {
+    case IP::V4:
+        return connectV4(servAddr);
+    default:
+        return false;
+    }
+}
+
+bool
+TCPSocket::connectV4(SharedPtr<InetAddress> servAddr) {
     struct sockaddr_in serv = servAddr->getAddrV4();
-    fd = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if(fd < 0) {
-        THROW_SYS;
-    }
-    int ret = ::connect(fd, (struct sockaddr *)&serv, sizeof(serv));
-    if(ret == -1) {
-        THROW_SYS;
-    }
-    struct sockaddr_in local;
-    int addrLen = sizeof(local);
-    ::getsockname(fd, (struct sockaddr *)&local, (socklen_t *)&addrLen);
-    *localAddr = local;
-}
+    if(state == State::Socket) {
+        int ret = ::connect(fd, (struct sockaddr *)&serv, sizeof(serv));
+        if(ret < 0) {
+            Log(WARN) << "connect()" << getError();
+        } else {
+            state = State::Connect;
 
-void TCPSocket::connectV6(std::shared_ptr<SocketAddress>) {
-    // TODO
+            // get local address
+            struct sockaddr_in local;
+            int addrLen = sizeof(local);
+            ::getsockname(fd, (struct sockaddr *)&local, (socklen_t *)&addrLen);
+            *address = local;
+            return true;
+        }
+    }
+    return false;
 }
 
 // Thread safe
-int
-TCPSocket::accept(std::shared_ptr<SocketAddress> connAddr) const {
-    return TCPSocket::accept(fd, connAddr);
-}
-
-int
-TCPSocket::acceptNonBlocking(std::shared_ptr<SocketAddress> connAddr) const {
-    return TCPSocket::acceptNonBlocking(fd, connAddr);
-}
-
-// Thread safe
-int
-TCPSocket::accept(const int fd, std::shared_ptr<SocketAddress> connAddr) {
-    // IPv4
-    struct sockaddr_in clientAddr;
-    socklen_t clientAddrLen;
-    clientAddrLen = sizeof(clientAddr);
-
-    int connFd;
-    Log(TRACE) << "Socket blocking accept";
-    connFd = ::accept(fd, (struct sockaddr *)&clientAddr, &clientAddrLen);
-    if(connFd > 2) {
-        Log(TRACE) << "Socket accept connection " << connFd;
-        *connAddr = clientAddr;
-    } else {
-        Log(DEBUG) << "Socket accept nothing";
+SharedPtr<TCPSocket>
+TCPSocket::accept(bool blocking) {
+    REQUIRE(address);
+    switch(address->getIPVersion()) {
+    case IP::V4:
+        return acceptV4(blocking);
+    default:
+        return getIllegalAcceptSocket();
     }
-
-    return connFd;
 }
 
-// Thread safe
-int
-TCPSocket::acceptNonBlocking(const int fd,
-                             std::shared_ptr<SocketAddress> connAddr) {
-    // IPv4
-    struct sockaddr_in clientAddr;
-    socklen_t clientAddrLen;
-    clientAddrLen = sizeof(clientAddr);
+SharedPtr<TCPSocket>
+TCPSocket::acceptV4(bool blocking) {
+    if(state == State::Listen) {
+        int flags = 0;
+        if(blocking) flags = SOCK_NONBLOCK;
 
-    int connFd;
-    Log(TRACE) << "Socket non blocking accept";
-    connFd = ::accept4(fd, (struct sockaddr *)&clientAddr, &clientAddrLen,
-                       SOCK_NONBLOCK);
-    if(connFd > 2) {
-        Log(TRACE) << "Socket accept connection " << connFd;
-        *connAddr = clientAddr;
-    } else {
-        Log(DEBUG) << "Socket accept nothing";
+        struct sockaddr_in clientAddr;
+        socklen_t clientAddrLen;
+        clientAddrLen = sizeof(clientAddr);
+
+        const int ret =
+            ::accept(fd, (struct sockaddr *)&clientAddr, &clientAddrLen);
+        if(ret < 0) {
+            Log(TRACE) << "accept(): " << getError();
+            return getIllegalAcceptSocket();
+        } else {
+            Log(DEBUG) << "Socket accept " << ret;
+            auto addr = MakeShared<InetAddress>(clientAddr);
+            return getAcceptSocket(ret, addr);
+        }
     }
-
-    return connFd;
+    return getIllegalAcceptSocket();
 }
 
-std::string
-TCPSocket::recv(const int connFd) {
-    std::string content;
-    Socket::recv(connFd, content, recvFlag);
-    return content;
-}
-
-std::string
+String
 TCPSocket::recv() {
-    std::string content;
-    Socket::recv(content, recvFlag);
-    return content;
+    // TODO
+    return "";
 }
 
 void
-TCPSocket::send(const std::string & msg) {
-    Socket::send(msg, sendFlag);
+TCPSocket::send(const String &) {}
+
+SharedPtr<TCPSocket>
+TCPSocket::getAcceptSocket(const int fd, SharedPtr<InetAddress> addr) {
+    REQUIRE(fd > 0);
+    return SharedPtr<TCPSocket>(new TCPSocket(fd, addr));
 }
 
-void
-TCPSocket::send(const int connFd, const std::string & msg) {
-    Socket::send(connFd, msg, sendFlag);
+SharedPtr<TCPSocket>
+TCPSocket::getIllegalAcceptSocket() {
+    static const auto illegalSocket = SharedPtr<TCPSocket>(new TCPSocket());
+    return illegalSocket;
 }
 }
 }

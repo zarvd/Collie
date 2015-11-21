@@ -1,4 +1,4 @@
-#include "../../include/SocketAddress.hpp"
+#include "../../include/InetAddress.hpp"
 #include "../../include/udp/UDPSocket.hpp"
 #include "../../include/udp/UDPClient.hpp"
 #include "../../include/Global.hpp"
@@ -13,12 +13,12 @@ void
 UDPClient::connect(const std::string & host, const unsigned port,
                    const std::string & greeting) {
     REQUIRE(connectCallback);
-    socket.reset(new UDPSocket);
-    remoteAddr = SocketAddress::getSocketAddress(host, port);
+    socket.reset(new UDPSocket(nullptr));
+    remoteAddr = InetAddress::getInetAddress(host, port);
     socket->connect(remoteAddr->getIPVersion());
-    socket->sendTo(greeting, remoteAddr);
+    // socket->sendTo(greeting, remoteAddr);
     std::string content;
-    socket->recvFrom(content, remoteAddr);
+    // socket->recvFrom(content, remoteAddr);
     while(connectCallback(content, remoteAddr)) {
         // loop until return false
     }
@@ -26,9 +26,9 @@ UDPClient::connect(const std::string & host, const unsigned port,
 
 void
 UDPClient::send(const std::string & content,
-                std::shared_ptr<SocketAddress> remoteAddr) {
+                SharedPtr<InetAddress> remoteAddr) {
     REQUIRE(socket);
-    socket->sendTo(content, remoteAddr);
+    // socket->sendTo(content, remoteAddr);
 }
 }
 }

@@ -1,7 +1,7 @@
 #include "../../include/Global.hpp"
 #include "../../include/tcp/TCPClient.hpp"
 #include "../../include/tcp/Connector.hpp"
-#include "../../include/SocketAddress.hpp"
+#include "../../include/InetAddress.hpp"
 
 namespace Collie {
 namespace TCP {
@@ -20,7 +20,7 @@ TCPClient::connect(const std::string & host, const unsigned port,
         THROW_("TCPClient connectCallback is not callable");
     }
 
-    remoteAddr = SocketAddress::getSocketAddress(host, port);
+    remoteAddr = InetAddress::getInetAddress(host, port);
     connector.reset(new Connector(remoteAddr));
     connector->setConnectCallback(connectCallback);
     connector->connect(threadNum, connectNum);

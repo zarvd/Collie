@@ -4,10 +4,11 @@
 #include <string>
 #include <memory>
 #include <functional>
+#include "../Type.hpp"
 
 namespace Collie {
 
-class SocketAddress;
+class InetAddress;
 
 namespace UDP {
 
@@ -16,8 +17,8 @@ class UDPSocket;
 class UDPClient {
 public:
     using ConnectCallback =
-        std::function<bool(const std::string & content,
-                           std::shared_ptr<SocketAddress> remoteAddr)>;
+        std::function<bool(const String & content,
+                           SharedPtr<InetAddress> remoteAddr)>;
 
     UDPClient();
     UDPClient(const UDPClient &) = delete;
@@ -30,14 +31,14 @@ public:
     void setConnectCallback(const ConnectCallback && cb) {
         connectCallback = std::move(cb);
     }
-    void connect(const std::string & host, const unsigned port,
-                 const std::string & greeting);
-    void send(const std::string & content,
-              std::shared_ptr<SocketAddress> remoteAddr);
+    void connect(const String & host, const unsigned port,
+                 const String & greeting);
+    void send(const String & content,
+              SharedPtr<InetAddress> remoteAddr);
 
 private:
-    std::unique_ptr<UDPSocket> socket;
-    std::shared_ptr<SocketAddress> remoteAddr;
+    UniquePtr<UDPSocket> socket;
+    SharedPtr<InetAddress> remoteAddr;
     ConnectCallback connectCallback;
 };
 }

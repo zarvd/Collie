@@ -26,7 +26,7 @@ public:
     ~EventLoop();
 
     void loopOne(); // main method, TODO setting timeout
-    void loop(); // main method, TODO setting timeout
+    void loop();    // main method, TODO setting timeout
     void loopNonBlocking();
     void updateChannel(std::shared_ptr<Channel>); // update or insert
     void removeChannel(std::shared_ptr<Channel>);

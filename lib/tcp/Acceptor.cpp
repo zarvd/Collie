@@ -3,43 +3,33 @@
 #include "../../include/tcp/TCPSocket.hpp"
 #include "../../include/event/EventLoop.hpp"
 #include "../../include/event/Channel.hpp"
-#include "../../include/SocketAddress.hpp"
+#include "../../include/InetAddress.hpp"
 
 namespace Collie {
 namespace TCP {
 
-Acceptor::Acceptor(std::shared_ptr<SocketAddress> addr)
-    : threadNum(1), localAddr(addr) {
+Acceptor::Acceptor(std::shared_ptr<InetAddress> addr) noexcept
+    : threadNum(1),
+      localAddr(addr),
+      tcpSocket(new TCPSocket(localAddr)) {
+    tcpSocket->bindAndListen();
     Log(TRACE) << "Acceptor constructing";
 }
 
-Acceptor::~Acceptor() { Log(TRACE) << "Acceptor destructing"; }
+Acceptor::~Acceptor() noexcept { Log(TRACE) << "Acceptor destructing"; }
 
 void
 Acceptor::setThreadNum(const size_t threadNum) {
     this->threadNum = threadNum;
 }
 
-int
-Acceptor::getSocketFd() const {
-    return tcpSocket->getFd();
-}
-
-void
-Acceptor::socket() {
-    // create socket and listen
-    tcpSocket.reset(new TCPSocket(localAddr));
-    tcpSocket->listen();
-}
-
-std::shared_ptr<Event::Channel>
+SharedPtr<Event::Channel>
 Acceptor::getBaseChannel() {
-    if(!tcpSocket) socket();
+    REQUIRE_(tcpSocket, "TCP Socket is NULL");
 
     // create channel
-    auto channel = std::make_shared<Event::Channel>(tcpSocket->getFd());
+    auto channel = MakeShared<Event::Channel>(tcpSocket);
     // for multi threads it doesn't own the socket fd
-    channel->setIsOwnFd(false);
     // set callback after setting event loop
     channel->setAfterSetLoopCallback(
         [this](std::shared_ptr<Event::Channel> channel) {
@@ -57,12 +47,11 @@ Acceptor::getBaseChannel() {
 void
 Acceptor::handleRead() {
     // should be thread-safe
-    auto remoteAddr = std::make_shared<SocketAddress>();
-    int connFd = tcpSocket->acceptNonBlocking(remoteAddr);
-    if(connFd > 0) {
-        acceptCallback(connFd, remoteAddr);
-    } else {
+    auto connSocket = tcpSocket->accept();
+    if(connSocket->getState() == TCPSocket::State::IllegalAccept) {
         handleError();
+    } else {
+        acceptCallback(connSocket);
     }
 }
 

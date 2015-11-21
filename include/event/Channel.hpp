@@ -5,27 +5,22 @@
 #include <memory>
 
 namespace Collie {
+class Descriptor;
 namespace Event {
 
 class EventLoop;
 
-/**
- * Thread safe is not required
- * Channel owns the file descriptor(default), it will close the fd when
- * destructing.
- */
 class Channel : public std::enable_shared_from_this<Channel> {
 public:
     using Callback = std::function<void(std::shared_ptr<Channel>)>;
     using EventCallback = std::function<void()>;
 
-    explicit Channel(const int fd); // channel control socket life
+    explicit Channel(std::shared_ptr<Descriptor>);
     Channel(const Channel &) = delete;
     Channel & operator=(const Channel &) = delete;
     ~Channel();
 
     // setter
-    void setIsOwnFd(const bool own) { isOwnFd = own; }
     void setReadCallback(const EventCallback & cb) { readCallback = cb; }
     void setReadCallback(const EventCallback && cb) {
         readCallback = std::move(cb);
@@ -54,7 +49,9 @@ public:
     }
 
     // getter
-    int getFd() const { return fd; }
+    std::shared_ptr<Descriptor> getDescriptor() const {
+        return descriptor;
+    }
     int getEvents() const { return events; }
     std::shared_ptr<Channel> getCopyWithoutEventLoop() const;
     std::shared_ptr<EventLoop> getEventLoop() const { return eventLoop; }
@@ -77,12 +74,12 @@ public:
     void update();
 
 private:
-    bool isOwnFd;
     bool inEventLoop; // whether eventLoop is setting up
-    const int fd;     // file descriptor
+    std::shared_ptr<Descriptor> descriptor; // file descriptor
     unsigned events;
     std::shared_ptr<EventLoop> eventLoop;
     bool updateAfterActivate;
+
     EventCallback readCallback;
     EventCallback writeCallback;
     EventCallback closeCallback;

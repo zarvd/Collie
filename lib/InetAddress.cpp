@@ -1,13 +1,13 @@
 #include <netdb.h>
 #include "../include/Global.hpp"
-#include "../include/SocketAddress.hpp"
+#include "../include/InetAddress.hpp"
 
 namespace Collie {
 
-SocketAddress::SocketAddress() : ip(), port() {}
-SocketAddress::~SocketAddress() {}
+InetAddress::InetAddress() : ip(), port() {}
+InetAddress::~InetAddress() {}
 
-SocketAddress & SocketAddress::operator=(const SocketAddress & that) {
+InetAddress & InetAddress::operator=(const InetAddress & that) {
     ip = that.ip;
     port = that.port;
     ipVersion = that.ipVersion;
@@ -16,7 +16,7 @@ SocketAddress & SocketAddress::operator=(const SocketAddress & that) {
     return *this;
 }
 
-SocketAddress & SocketAddress::operator=(const AddrV4 & addr) {
+InetAddress & InetAddress::operator=(const AddrV4 & addr) {
     ipVersion = IP::V4;
     addrV4 = addr;
     char ipv4[INET_ADDRSTRLEN];
@@ -26,15 +26,15 @@ SocketAddress & SocketAddress::operator=(const AddrV4 & addr) {
     return *this;
 }
 
-SocketAddress & SocketAddress::operator=(const AddrV6 &) {
+InetAddress & InetAddress::operator=(const AddrV6 &) {
     // TODO
     return *this;
 }
 
-std::shared_ptr<SocketAddress>
-SocketAddress::getSocketAddress(const std::string & host, const unsigned port) {
+std::shared_ptr<InetAddress>
+InetAddress::getInetAddress(const std::string & host, const unsigned port) {
 
-    auto addr = std::make_shared<SocketAddress>();
+    auto addr = std::make_shared<InetAddress>();
 
     struct hostent * hostStruct = gethostbyname(host.c_str());
     if(!hostStruct) {

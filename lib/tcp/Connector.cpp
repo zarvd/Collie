@@ -1,13 +1,13 @@
 #include "../../include/Global.hpp"
 #include "../../include/tcp/Connector.hpp"
 #include "../../include/tcp/TCPSocket.hpp"
-#include "../../include/SocketAddress.hpp"
+#include "../../include/InetAddress.hpp"
 #include "../../include/event/ThreadPool.hpp"
 
 namespace Collie {
 namespace TCP {
 
-Connector::Connector(std::shared_ptr<SocketAddress> addr) : remoteAddr(addr) {
+Connector::Connector(std::shared_ptr<InetAddress> addr) : remoteAddr(addr) {
     Log(TRACE) << "Connector is constructing";
 }
 
@@ -20,7 +20,7 @@ Connector::connect(const size_t threadNum, const size_t connectNum) {
 
     for(size_t i = 0; i < connectNum; ++i) {
         threadPool->enqueue([this] {
-            auto socket = std::make_shared<TCPSocket>();
+            auto socket = MakeShared<TCPSocket>(nullptr);
             socket->connect(this->remoteAddr);
             this->connectCallback(socket);
             socket->close();

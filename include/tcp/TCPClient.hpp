@@ -4,10 +4,11 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include "../Type.hpp"
 
 namespace Collie {
 
-class SocketAddress;
+class InetAddress;
 
 namespace TCP {
 
@@ -16,7 +17,7 @@ class TCPSocket;
 
 class TCPClient {
 public:
-    using ConnectCallback = std::function<void(std::shared_ptr<TCPSocket>)>;
+    using ConnectCallback = std::function<void(SharedPtr<TCPSocket>)>;
 
     TCPClient();
     TCPClient(const TCPClient &) = delete;
@@ -29,13 +30,13 @@ public:
     void setConnectCallback(const ConnectCallback && cb) {
         connectCallback = std::move(cb);
     }
-    void connect(const std::string & host, const unsigned port,
+    void connect(const String & host, const unsigned port,
                  const size_t threadNum = 1, const size_t connectNum = 1);
 
 private:
-    std::unique_ptr<Connector> connector;
+    UniquePtr<Connector> connector;
     ConnectCallback connectCallback;
-    std::shared_ptr<SocketAddress> remoteAddr;
+    SharedPtr<InetAddress> remoteAddr;
 };
 }
 }

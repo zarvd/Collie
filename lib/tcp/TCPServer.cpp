@@ -2,7 +2,7 @@
 #include "../../include/event/EventLoop.hpp"
 #include "../../include/event/Channel.hpp"
 #include "../../include/event/EventLoopThreadPool.hpp"
-#include "../../include/SocketAddress.hpp"
+#include "../../include/InetAddress.hpp"
 #include "../../include/tcp/TCPServer.hpp"
 #include "../../include/tcp/Acceptor.hpp"
 #include "../../include/tcp/TCPSocket.hpp"
@@ -18,10 +18,10 @@ TCPServer::TCPServer() : threadNum(1), port(0) {
 TCPServer::~TCPServer() { Log(TRACE) << "TCPServer destructing"; }
 
 void
-TCPServer::bind(const std::string & host, const unsigned port) {
+TCPServer::bind(const String & host, const unsigned port) {
     this->host = host;
     this->port = port;
-    localAddr = SocketAddress::getSocketAddress(host, port);
+    localAddr = InetAddress::getInetAddress(host, port);
 }
 
 void
@@ -31,40 +31,35 @@ TCPServer::start() {
     acceptor.reset(new Acceptor(localAddr));
     using namespace std::placeholders;
     // setup acceptor
-    acceptor->setAcceptCallback(
-        std::bind(&TCPServer::newConnection, this, _1, _2));
+    acceptor->setAcceptCallback(std::bind(&TCPServer::newConnection, this, _1));
     eventLoopThreadPool.reset(new Event::EventLoopThreadPool(threadNum));
     auto acceptChannel = acceptor->getBaseChannel();
     eventLoopThreadPool->startLoop({acceptChannel});
 }
 
 void
-TCPServer::newConnection(const unsigned connFd,
-                         std::shared_ptr<SocketAddress> remoteAddr) {
-    Log(INFO) << "TCPServer accept fd(" << connFd << ") ip("
-              << remoteAddr->getIP() << ")";
+TCPServer::newConnection(SharedPtr<TCPSocket> connSocket) {
+    Log(INFO) << "TCPServer accept fd(" << connSocket->get() << ") ip("
+              << connSocket->getAddress()->getIP() << ")";
 
     // new channel
-    std::shared_ptr<Event::Channel> channel(new Event::Channel(connFd));
+    SharedPtr<Event::Channel> channel(new Event::Channel(connSocket));
     // NOTE setting up channel in connection
-    channel->setAfterSetLoopCallback(
-        [this, remoteAddr](std::shared_ptr<Event::Channel> channel) {
-            // NOTE only use this->localAddr which should be immutable
-            // TCPServer is not thread safe
-            // new connection
-            auto connection = std::make_shared<TCPConnection>(
-                channel, this->localAddr, remoteAddr);
-            connection->setMessageCallback(onMessageCallback);
-            // store this connection in server
-            localThreadConnections.insert(connection);
+    channel->setAfterSetLoopCallback([onMessageCallback = onMessageCallback](
+        SharedPtr<Event::Channel> channel) {
 
-            connection->setShutdownCallback(
-                [](std::shared_ptr<TCPConnection> conn) {
-                    // remove this connection from server
-                    Log(INFO) << "Connection close";
-                    localThreadConnections.erase(conn);
-                });
+        // new connection
+        auto connection = MakeShared<TCPConnection>(channel);
+        connection->setMessageCallback(onMessageCallback);
+        // store this connection in server
+        localThreadConnections.insert(connection);
+
+        connection->setShutdownCallback([](SharedPtr<TCPConnection> conn) {
+            // remove this connection from server
+            Log(INFO) << "Connection close";
+            localThreadConnections.erase(conn);
         });
+    });
     eventLoopThreadPool->pushChannel(channel);
 
     if(connectedCallback) connectedCallback();

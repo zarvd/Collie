@@ -4,6 +4,7 @@
 #include "../../include/poll/PollPoller.hpp"
 #include "../../include/event/EventLoop.hpp"
 #include "../../include/event/Channel.hpp"
+#include "../../include/Descriptor.hpp"
 
 namespace Collie {
 namespace Event {
@@ -61,30 +62,30 @@ EventLoop::pollCallback(const int fd, const unsigned revents) {
 
 void
 EventLoop::updateChannel(std::shared_ptr<Channel> channel) {
-    Log(TRACE) << "EventLoop update channel " << channel->getFd();
+    const auto descriptor = channel->getDescriptor()->get();
+    Log(TRACE) << "EventLoop update channel " << descriptor;
     if(hasChannel(channel)) {
-        poller->modify(channel->getFd(), channel->getEvents());
+        poller->modify(descriptor, channel->getEvents());
     } else {
-        poller->insert(channel->getFd(), channel->getEvents());
-        channels[channel->getFd()] = channel;
+        poller->insert(descriptor, channel->getEvents());
+        channels[descriptor] = channel;
     }
 }
 
 void
 EventLoop::removeChannel(std::shared_ptr<Channel> channel) {
-    Log(TRACE) << "EventLoop remove channel " << channel->getFd();
-    if(hasChannel(channel)) {
-        poller->remove(channel->getFd()); // remove channel from poller
-        channels.erase(channel->getFd()); // remove from loop
-    } else {
-        THROW_("EventLoop does NOT have channel " +
-               std::to_string(channel->getFd()));
-    }
+    const auto descriptor = channel->getDescriptor()->get();
+    Log(TRACE) << "EventLoop remove channel " << descriptor;
+    REQUIRE_(hasChannel(channel),
+             "EventLoop does NOT have channel " + std::to_string(descriptor));
+    poller->remove(descriptor); // remove channel from poller
+    channels.erase(descriptor); // remove from loop
 }
 
 bool
 EventLoop::hasChannel(std::shared_ptr<Channel> channel) const {
-    return channels.find(channel->getFd()) != channels.end();
+    const auto descriptor = channel->getDescriptor()->get();
+    return channels.find(descriptor) != channels.end();
 }
 }
 }

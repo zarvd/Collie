@@ -1,32 +1,36 @@
 #ifndef COLLIE_UDP_UDPSOCKET_H
 #define COLLIE_UDP_UDPSOCKET_H
 
-#include "../Socket.hpp"
 #include <memory>
+#include "../Type.hpp"
 
 namespace Collie {
 
-class SocketAddress;
+enum class IP;
+class InetAddress;
 
 namespace UDP {
 
-class UDPSocket : public Socket {
+class UDPSocket {
 public:
-    UDPSocket();                                        // client
-    explicit UDPSocket(std::shared_ptr<SocketAddress>); // server
+    explicit UDPSocket(SharedPtr<InetAddress>);
     UDPSocket(const UDPSocket &) = delete;
     UDPSocket & operator=(const UDPSocket &) = delete;
-    ~UDPSocket() override;
+    ~UDPSocket();
 
     // server
-    void listen() override;
+    void listen();
     void listenV4();
     void listenV6();
 
     // client
-    void connect(IP); // only socket, UDP have NO connection
+    void connect(const IP); // only socket, UDP have NO connection
     void connectV4();
     void connectV6();
+
+private:
+    int fd;
+    SharedPtr<InetAddress> address;
 };
 }
 }

@@ -4,6 +4,7 @@
 #include <thread>
 #include <memory>
 #include <string>
+#include "../Type.hpp"
 
 namespace Collie {
 
@@ -11,17 +12,17 @@ namespace Event {
 class EventLoopThreadPool;
 }
 
-class SocketAddress;
+class InetAddress;
 
 namespace TCP {
 
 class Acceptor;
 class TCPConnection;
+class TCPSocket;
 
 class TCPServer {
 public:
-    using OnMessageCallback =
-        std::function<void(std::shared_ptr<TCPConnection>)>;
+    using OnMessageCallback = std::function<void(SharedPtr<TCPConnection>)>;
     using ConnectedCallback = std::function<void()>;
 
     TCPServer();
@@ -30,7 +31,7 @@ public:
     ~TCPServer();
 
     void start();
-    void bind(const std::string & host, const unsigned port);
+    void bind(const String & host, const unsigned port);
     void setThreadNum(const size_t threadNum = 1) {
         this->threadNum = threadNum;
     }
@@ -51,15 +52,12 @@ public:
     unsigned getPort() const { return port; }
 
 private:
-    void newConnection(const unsigned connFd,
-                       std::shared_ptr<SocketAddress> remoteAddr);
-    void newConnectionMultiThread(const unsigned connFd,
-                                  std::shared_ptr<SocketAddress> remoteAddr);
+    void newConnection(SharedPtr<TCPSocket> connSocket);
 
     size_t threadNum;
-    std::string host;
+    String host;
     unsigned port;
-    std::shared_ptr<SocketAddress> localAddr;
+    SharedPtr<InetAddress> localAddr;
     std::unique_ptr<Event::EventLoopThreadPool> eventLoopThreadPool;
     std::unique_ptr<Acceptor> acceptor;
     ConnectedCallback connectedCallback;

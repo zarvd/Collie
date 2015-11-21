@@ -1,5 +1,6 @@
 #include "../../include/Global.hpp"
 #include "../../include/event/Channel.hpp"
+#include "../../include/Descriptor.hpp"
 #include "../../include/event/EventLoop.hpp"
 #include "../../include/poll/EPollPoller.hpp"
 #include <unistd.h>
@@ -7,40 +8,35 @@
 namespace Collie {
 namespace Event {
 
-Channel::Channel(const int fd)
-    : isOwnFd(true),
-      inEventLoop(false),
-      fd(fd),
+Channel::Channel(std::shared_ptr<Descriptor> descriptor)
+    : inEventLoop(false),
+      descriptor(descriptor),
       events(0),
       updateAfterActivate(false) {
-    Log(TRACE) << "Channel " << fd << " constructing";
+    REQUIRE(descriptor);
+
+    Log(TRACE) << "Channel " << descriptor->get() << " constructing";
 
     // default error and close callback
     closeCallback = [this]() {
         // TODO remove channel
-        Log(TRACE) << "Close channel " << this->getFd();
+        Log(TRACE) << "Close channel " << this->descriptor->get();
         this->remove();
     };
     errorCallback = [this]() {
         // TODO remove channel
-        Log(TRACE) << "Channel " << this->getFd() << " meets ERROR";
+        Log(TRACE) << "Channel " << this->descriptor->get() << " meets ERROR";
         this->remove();
     };
 }
 
 Channel::~Channel() {
-    Log(TRACE) << "Channel " << fd << " destructing";
-    if(isOwnFd && ::close(fd) == -1) {
-        // close socket
-        Log(WARN) << "Channel " << fd << " is already closed";
-        // don't throw
-    }
+    Log(TRACE) << "Channel " << descriptor->get() << " destructing";
 }
 
 std::shared_ptr<Channel>
 Channel::getCopyWithoutEventLoop() const {
-    auto channel = std::make_shared<Channel>(fd);
-    channel->isOwnFd = isOwnFd;
+    auto channel = std::make_shared<Channel>(descriptor);
     channel->events = events;
     channel->readCallback = readCallback;
     channel->writeCallback = writeCallback;
@@ -52,8 +48,8 @@ Channel::getCopyWithoutEventLoop() const {
 
 void
 Channel::setEventLoop(std::shared_ptr<EventLoop> eventLoop) {
-    REQUIRE_(!inEventLoop,
-             "Channel" + std::to_string(fd) + " is already in eventLoop");
+    REQUIRE_(!inEventLoop, "Channel" + std::to_string(descriptor->get()) +
+                               " is already in eventLoop");
     this->eventLoop = eventLoop;
     inEventLoop = true;
     if(afterSetLoopCallback) afterSetLoopCallback(shared_from_this());

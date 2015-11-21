@@ -9,7 +9,7 @@ set(BASE_SRC
   )
 
 set(NETWORK_SRC
-  SocketAddress.cpp
+  InetAddress.cpp
   Socket.cpp
   tcp/TCPConnection.cpp
   tcp/TCPServer.cpp

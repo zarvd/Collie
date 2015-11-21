@@ -4,10 +4,12 @@
 #include <memory>
 #include <functional>
 #include <vector>
+#include "../Type.hpp"
 
 namespace Collie {
 
-class SocketAddress;
+class InetAddress;
+class Descriptor;
 
 namespace Event {
 class Channel;
@@ -21,37 +23,35 @@ class TCPSocket;
 /**
  * Acceptor owns the socket fd
  */
-class Acceptor final {
+class Acceptor {
 public:
-    using AcceptCallback = std::function<void(
-        const unsigned connFd, std::shared_ptr<SocketAddress> remoteAddr)>;
+    using AcceptCallback = std::function<void(SharedPtr<TCPSocket> connSocket)>;
 
-    explicit Acceptor(std::shared_ptr<SocketAddress>);
+    explicit Acceptor(SharedPtr<InetAddress>) noexcept;
     Acceptor(const Acceptor &) = delete;
     Acceptor & operator=(const Acceptor &) = delete;
-    ~Acceptor();
+    ~Acceptor() noexcept;
 
     // setter
     void setThreadNum(const size_t threadNum);
-    void setAcceptCallback(const AcceptCallback & cb) { acceptCallback = cb; }
-    void setAcceptCallback(const AcceptCallback && cb) {
+    void setAcceptCallback(const AcceptCallback & cb) noexcept {
+        acceptCallback = cb;
+    }
+    void setAcceptCallback(const AcceptCallback && cb) noexcept {
         acceptCallback = std::move(cb);
     }
 
     // getter
-    int getSocketFd() const;
-    std::shared_ptr<Event::Channel> getBaseChannel();
-
-    void socket();
+    SharedPtr<Event::Channel> getBaseChannel();
 
 private:
     void handleRead();
     void handleError();
 
     size_t threadNum;
-    std::unique_ptr<TCPSocket> tcpSocket;
-    std::shared_ptr<SocketAddress> localAddr;
-    std::vector<Event::EventLoop> eventLoops;
+    SharedPtr<InetAddress> localAddr;
+    SharedPtr<TCPSocket> tcpSocket; // listen socket
+    Vec<Event::EventLoop> eventLoops;
     AcceptCallback acceptCallback;
 };
 }

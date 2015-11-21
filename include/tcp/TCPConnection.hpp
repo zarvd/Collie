@@ -3,8 +3,8 @@
 
 #include <string>
 #include <memory>
-#include <list>
 #include <unordered_set>
+#include "../Type.hpp"
 
 namespace Collie {
 
@@ -18,29 +18,19 @@ class EventLoop;
 class Channel;
 }
 
-class SocketAddress;
-
 namespace TCP {
 
-class TCPConnection : public std::enable_shared_from_this<TCPConnection> {
+class TCPConnection : public SharedFromThis<TCPConnection> {
 public:
-    using MessageCallback = std::function<void(std::shared_ptr<TCPConnection>)>;
-    using EventCallback = std::function<void(std::shared_ptr<TCPConnection>)>;
+    using MessageCallback = std::function<void(SharedPtr<TCPConnection>)>;
+    using EventCallback = std::function<void(SharedPtr<TCPConnection>)>;
 
-    TCPConnection(std::shared_ptr<Event::Channel> channel,
-                  std::shared_ptr<const SocketAddress> localAddr,
-                  std::shared_ptr<const SocketAddress> remoteAddr);
+    TCPConnection(SharedPtr<Event::Channel> channel);
     TCPConnection(const TCPConnection &) = delete;
     TCPConnection & operator=(const TCPConnection &) = delete;
     ~TCPConnection();
 
-    std::shared_ptr<Event::Channel> getChannel() const { return channel; }
-    std::shared_ptr<const SocketAddress> getLocalAddr() const {
-        return localAddr;
-    }
-    std::shared_ptr<const SocketAddress> getRemoteAddr() const {
-        return remoteAddr;
-    }
+    SharedPtr<Event::Channel> getChannel() const { return channel; }
     void setMessageCallback(const MessageCallback & cb) {
         messageCallback = cb;
     }
@@ -56,11 +46,11 @@ public:
     }
 
     void disconnect();
-    std::string recvAll();
-    void send(const std::string &);
-    void sendFile(const std::string & fileName);
+    String recvAll();
+    void send(const String &);
+    void sendFile(const String & fileName);
     void sendFile(const Utils::File & file);
-    void recvFile(const std::string & fileName, const size_t fileSize);
+    void recvFile(const String & fileName, const size_t fileSize);
 
 private:
     void shutdown();
@@ -71,16 +61,14 @@ private:
 
     bool connected;
     bool isShutDown;
-    const std::shared_ptr<Event::Channel> channel;
-    const std::shared_ptr<const SocketAddress> localAddr;
-    const std::shared_ptr<const SocketAddress> remoteAddr;
-    std::string inputBuffer;
-    std::string outputBuffer;
+    const SharedPtr<Event::Channel> channel;
+    String inputBuffer;
+    String outputBuffer;
     MessageCallback messageCallback;
     EventCallback shutdownCallback;
 };
 
-extern thread_local std::unordered_set<std::shared_ptr<TCPConnection>>
+extern thread_local UnorderedSet<SharedPtr<TCPConnection>>
     localThreadConnections;
 }
 }

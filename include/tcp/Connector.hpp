@@ -3,6 +3,7 @@
 
 #include <functional>
 #include <memory>
+#include "../Type.hpp"
 
 namespace Collie {
 
@@ -12,7 +13,7 @@ class ThreadPool;
 
 }
 
-class SocketAddress;
+class InetAddress;
 
 namespace TCP {
 
@@ -23,9 +24,9 @@ class TCPSocket;
  */
 class Connector {
 public:
-    using ConnectCallback = std::function<void(std::shared_ptr<TCPSocket>)>;
+    using ConnectCallback = std::function<void(SharedPtr<TCPSocket>)>;
 
-    explicit Connector(std::shared_ptr<SocketAddress>);
+    explicit Connector(SharedPtr<InetAddress>);
     Connector(const Connector &) = delete;
     Connector & operator=(const Connector &) = delete;
     ~Connector();
@@ -40,8 +41,8 @@ public:
     void disconnect();
 
 private:
-    std::unique_ptr<Event::ThreadPool> threadPool;
-    std::shared_ptr<SocketAddress> remoteAddr;
+    UniquePtr<Event::ThreadPool> threadPool;
+    SharedPtr<InetAddress> remoteAddr;
     ConnectCallback connectCallback;
 };
 }

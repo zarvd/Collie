@@ -1,45 +1,70 @@
 #ifndef COLLIE_TCP_TCPSOCKET_H
 #define COLLIE_TCP_TCPSOCKET_H
 
-#include "../Socket.hpp"
+#include <memory>
+#include "../Type.hpp"
+#include "../Descriptor.hpp"
 
 namespace Collie {
+
+class InetAddress;
+
 namespace TCP {
 
-class TCPSocket : public Socket {
+class TCPSocket : public Descriptor {
 public:
-    TCPSocket(); // client constructor
-    explicit TCPSocket(
-        std::shared_ptr<SocketAddress> servAddr); // server constructor
+    enum class State {
+        Init,
+        Socket,
+        Bind,
+        Listen,
+        Accept,
+        IllegalAccept,
+        Connect,
+        Close
+    };
+    // Accept: which is the connection socket that accept() returned
+    // IllegalAccept: which is the ILLEGAL connection socket that accept()
+    // returned
+
+    explicit TCPSocket(SharedPtr<InetAddress> localAddr) noexcept;
     TCPSocket(const TCPSocket &) = delete;
     TCPSocket & operator=(const TCPSocket &) = delete;
-    ~TCPSocket() override;
+    ~TCPSocket() noexcept override;
 
-    void setSendFlag(const int);
-    void setRecvFlag(const int);
+    // Descriptor
+    int get() const override { return fd; }
+    State getState() const { return state; }
+    SharedPtr<InetAddress> getAddress() const { return address; }
 
-    void listen() override;
-    void connect(std::shared_ptr<SocketAddress>);
+    bool connect(SharedPtr<InetAddress>);
+    bool bindAndListen();
+    SharedPtr<TCPSocket> accept(bool blocking = false);
 
-    // accept and get addr, return connFd
-    int accept(std::shared_ptr<SocketAddress>) const;
-    int acceptNonBlocking(std::shared_ptr<SocketAddress>) const;
-    static int accept(const int socketFd, std::shared_ptr<SocketAddress>);
-    static int acceptNonBlocking(const int socketFd,
-                                 std::shared_ptr<SocketAddress>);
-    std::string recv(const int connFd);                   // server method
-    std::string recv();                                   // client method
-    void send(const int connFd, const std::string & msg); // server method
-    void send(const std::string & msg);                   // client method
+    // send and recv
+    String recv();
+    void send(const String & msg);
+    void close() noexcept;
 
 private:
-    void listenV4();
-    void listenV6();
-    void connectV4(std::shared_ptr<SocketAddress>);
-    void connectV6(std::shared_ptr<SocketAddress>);
+    // construct Accept connection socket
+    TCPSocket(const int fd, SharedPtr<InetAddress> addr) noexcept;
+    // construct illegal socket
+    TCPSocket() noexcept;
 
-    int sendFlag;
-    int recvFlag;
+    static SharedPtr<TCPSocket> getAcceptSocket(const int fd,
+                                                SharedPtr<InetAddress>);
+    static SharedPtr<TCPSocket> getIllegalAcceptSocket();
+    bool listenV4();
+    SharedPtr<TCPSocket> acceptV4(bool blocking);
+    bool connectV4(SharedPtr<InetAddress> servAddr);
+    // bool listenV6();
+    // int acceptV6(SharedPtr<InetAddress>, bool blocking);
+    // bool connectV6(SharedPtr<InetAddress>);
+
+    int fd;
+    State state;
+    SharedPtr<InetAddress> address;
 };
 }
 }

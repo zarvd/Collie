@@ -1,7 +1,7 @@
 #include "../../include/Global.hpp"
 #include "../../include/tcp/TCPConnection.hpp"
 #include "../../include/Socket.hpp"
-#include "../../include/SocketAddress.hpp"
+#include "../../include/InetAddress.hpp"
 #include "../../include/event/EventLoop.hpp"
 #include "../../include/event/Channel.hpp"
 #include "../../include/utils/File.hpp"
@@ -12,17 +12,11 @@
 namespace Collie {
 namespace TCP {
 
-thread_local std::unordered_set<std::shared_ptr<TCPConnection>>
+thread_local std::unordered_set<SharedPtr<TCPConnection>>
     localThreadConnections;
 
-TCPConnection::TCPConnection(std::shared_ptr<Event::Channel> channel,
-                             std::shared_ptr<const SocketAddress> localAddr,
-                             std::shared_ptr<const SocketAddress> remoteAddr)
-    : connected(true),
-      isShutDown(false),
-      channel(channel),
-      localAddr(localAddr),
-      remoteAddr(remoteAddr) {
+TCPConnection::TCPConnection(SharedPtr<Event::Channel> channel)
+    : connected(true), isShutDown(false), channel(channel) {
 
     REQUIRE(channel);
     // set channel callback and enable reading
@@ -58,27 +52,27 @@ TCPConnection::shutdown() {
     if(shutdownCallback) shutdownCallback(shared_from_this());
 }
 
-std::string
+String
 TCPConnection::recvAll() {
     // FIXME
-    std::string buffer;
+    String buffer;
     std::swap(buffer, inputBuffer);
     return buffer;
 }
 
 void
-TCPConnection::send(const std::string & buffer) {
+TCPConnection::send(const String & buffer) {
     // FIXME
     outputBuffer += buffer;
     if(!channel->isWrite()) channel->enableWrite();
 }
 
 void
-TCPConnection::sendFile(const std::string & fileName) {
+TCPConnection::sendFile(const String & fileName) {
     REQUIRE(channel);
     Utils::File file(fileName, Utils::File::Mode::Read);
     if(file.isExisted() && file.isFile()) {
-        Socket::sendFile(channel->getFd(), file);
+        Socket::sendFile(channel->getDescriptor(), file);
     } else {
         // XXX
         Log(WARN) << fileName << " not found";
@@ -88,7 +82,7 @@ TCPConnection::sendFile(const std::string & fileName) {
 void
 TCPConnection::sendFile(const Utils::File & file) {
     if(file.isExisted() && file.isFile()) {
-        Socket::sendFile(channel->getFd(), file);
+        Socket::sendFile(channel->getDescriptor(), file);
     } else {
         // XXX
         Log(WARN) << file.getName() << " not found";
@@ -96,17 +90,18 @@ TCPConnection::sendFile(const Utils::File & file) {
 }
 
 void
-TCPConnection::recvFile(const std::string & fileName, const size_t fileSize) {
+TCPConnection::recvFile(const String & fileName, const size_t fileSize) {
     REQUIRE(channel);
     Utils::File file(fileName, Utils::File::Mode::Write);
-    Socket::recvFile(channel->getFd(), file, fileSize);
+    Socket::recvFile(channel->getDescriptor(), file, fileSize);
 }
 
 void
 TCPConnection::handleRead() {
-    std::string content;
+    String content;
     // Non blocking receiving
-    const auto size = Socket::recv(channel->getFd(), content, MSG_DONTWAIT);
+    const auto size =
+        Socket::recv(channel->getDescriptor(), content, MSG_DONTWAIT);
     if(size > 0) {
         inputBuffer += content;
         messageCallback(shared_from_this());
@@ -128,7 +123,7 @@ TCPConnection::handleWrite() {
     // XXXX
     if(!outputBuffer.empty()) {
         const ssize_t size =
-            Socket::send(channel->getFd(), outputBuffer, MSG_DONTWAIT);
+            Socket::send(channel->getDescriptor(), outputBuffer, MSG_DONTWAIT);
         // const ssize_t bufferSize = outputBuffer.length();
         // if(bufferSize == size - 1) {
         //     outputBuffer.clear();

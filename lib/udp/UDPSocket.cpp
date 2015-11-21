@@ -1,26 +1,22 @@
 #include "../../include/Global.hpp"
 #include "../../include/udp/UDPSocket.hpp"
-#include "../../include/SocketAddress.hpp"
+#include "../../include/InetAddress.hpp"
 #include <sys/socket.h>
 #include <netinet/in.h>
 
 namespace Collie {
 namespace UDP {
 
-UDPSocket::UDPSocket() : Socket() {
-    Log(TRACE) << "UDP client Socket is constructing";
-}
-
-UDPSocket::UDPSocket(std::shared_ptr<SocketAddress> addr) : Socket(addr) {
-    Log(TRACE) << "UDP server Socket is constructing";
+UDPSocket::UDPSocket(SharedPtr<InetAddress> addr) : address(addr) {
+    Log(TRACE) << "UDP Socket is constructing";
 }
 
 UDPSocket::~UDPSocket() { Log(TRACE) << "UDP Socket is destructing"; }
 
 void
 UDPSocket::listen() {
-    REQUIRE(localAddr && localAddr->getIPVersion() != IP::Unknown);
-    if(localAddr->getIPVersion() == IP::V4) {
+    REQUIRE(address && address->getIPVersion() != IP::Unknown);
+    if(address->getIPVersion() == IP::V4) {
         listenV4();
     } else {
         listenV6();
@@ -30,10 +26,9 @@ UDPSocket::listen() {
 void
 UDPSocket::listenV4() {
     Log(DEBUG) << "UDP Socket is listening";
-    REQUIRE(type == Type::Server);
     fd = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     REQUIRE_SYS(fd != -1);
-    struct sockaddr_in servAddr = localAddr->getAddrV4();
+    struct sockaddr_in servAddr = address->getAddrV4();
 
     int ret = ::bind(fd, (struct sockaddr *)&servAddr, sizeof(servAddr));
     REQUIRE_SYS(ret != -1);
@@ -58,7 +53,6 @@ UDPSocket::connect(IP ipVersion) {
 void
 UDPSocket::connectV4() {
     Log(DEBUG) << "UDP Socket is connecting";
-    REQUIRE(type == Type::Client);
     fd = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     REQUIRE_SYS(fd != -1);
 }
