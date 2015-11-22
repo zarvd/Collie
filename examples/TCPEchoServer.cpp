@@ -2,7 +2,7 @@
 #include <string>
 #include "../include/tcp/TCPServer.hpp"
 #include "../include/tcp/TCPConnection.hpp"
-#include "../include/SocketAddress.hpp"
+#include "../include/InetAddress.hpp"
 #include "../include/Global.hpp"
 
 using Collie::TCP::TCPServer;

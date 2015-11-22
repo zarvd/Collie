@@ -1,6 +1,6 @@
 #include "../include/tcp/TCPClient.hpp"
 #include "../include/tcp/TCPSocket.hpp"
-#include "../include/SocketAddress.hpp"
+#include "../include/InetAddress.hpp"
 #include "../include/Global.hpp"
 #include "../include/utils/File.hpp"
 
