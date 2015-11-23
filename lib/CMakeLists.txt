@@ -1,5 +1,4 @@
 set(BASE_SRC
-  Descriptor.cpp
   event/EventLoop.cpp
   event/Channel.cpp
   event/ThreadPool.cpp
@@ -15,7 +14,7 @@ set(NETWORK_SRC
   tcp/TCPConnection.cpp
   tcp/TCPServer.cpp
   tcp/TCPSocket.cpp
-  tcp/Acceptor.cpp
+  tcp/TCPAcceptor.cpp
   tcp/TCPClient.cpp
   tcp/Connector.cpp
   udp/UDPSocket.cpp

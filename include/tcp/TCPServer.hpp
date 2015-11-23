@@ -16,7 +16,7 @@ class InetAddress;
 
 namespace TCP {
 
-class Acceptor;
+class TCPAcceptor;
 class TCPConnection;
 class TCPSocket;
 
@@ -58,8 +58,8 @@ private:
     String host;
     unsigned port;
     SharedPtr<InetAddress> localAddr;
-    std::unique_ptr<Event::EventLoopThreadPool> eventLoopThreadPool;
-    std::unique_ptr<Acceptor> acceptor;
+    UniquePtr<Event::EventLoopThreadPool> eventLoopThreadPool;
+    UniquePtr<TCPAcceptor> acceptor;
     ConnectedCallback connectedCallback;
     OnMessageCallback onMessageCallback;
 };

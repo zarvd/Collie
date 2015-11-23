@@ -5,7 +5,7 @@ namespace Collie {
 
 class Descriptor {
 public:
-    virtual ~Descriptor() = 0;
+    virtual ~Descriptor() {}
     virtual int get() const = 0;
 };
 }

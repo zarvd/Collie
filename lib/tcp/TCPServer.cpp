@@ -4,7 +4,7 @@
 #include "../../include/event/EventLoopThreadPool.hpp"
 #include "../../include/InetAddress.hpp"
 #include "../../include/tcp/TCPServer.hpp"
-#include "../../include/tcp/Acceptor.hpp"
+#include "../../include/tcp/TCPAcceptor.hpp"
 #include "../../include/tcp/TCPSocket.hpp"
 #include "../../include/tcp/TCPConnection.hpp"
 
@@ -28,7 +28,7 @@ void
 TCPServer::start() {
     Log(INFO) << "TCPServer start";
 
-    acceptor.reset(new Acceptor(localAddr));
+    acceptor.reset(new TCPAcceptor(localAddr));
     using namespace std::placeholders;
     // setup acceptor
     acceptor->setAcceptCallback(std::bind(&TCPServer::newConnection, this, _1));

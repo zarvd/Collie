@@ -1,5 +1,5 @@
-#ifndef COLLIE_TCP_ACCEPTOR_H
-#define COLLIE_TCP_ACCEPTOR_H
+#ifndef COLLIE_TCP_TCPACCEPTOR_H
+#define COLLIE_TCP_TCPACCEPTOR_H
 
 #include <memory>
 #include <functional>
@@ -20,17 +20,16 @@ namespace TCP {
 
 class TCPSocket;
 
-/**
- * Acceptor owns the socket fd
- */
-class Acceptor {
+class TCPAcceptor {
 public:
     using AcceptCallback = std::function<void(SharedPtr<TCPSocket> connSocket)>;
 
-    explicit Acceptor(SharedPtr<InetAddress>) noexcept;
-    Acceptor(const Acceptor &) = delete;
-    Acceptor & operator=(const Acceptor &) = delete;
-    ~Acceptor() noexcept;
+    explicit TCPAcceptor(SharedPtr<InetAddress>) noexcept;
+    TCPAcceptor(const TCPAcceptor &) = delete;
+    TCPAcceptor & operator=(const TCPAcceptor &) = delete;
+    ~TCPAcceptor() noexcept;
+
+    void bindAndListen() const;
 
     // setter
     void setThreadNum(const size_t threadNum);
@@ -57,4 +56,4 @@ private:
 }
 }
 
-#endif /* COLLIE_TCP_ACCEPTOR_H */
+#endif /* COLLIE_TCP_TCPACCEPTOR_H */

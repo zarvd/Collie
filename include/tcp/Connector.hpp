@@ -10,7 +10,6 @@ namespace Collie {
 namespace Event {
 
 class ThreadPool;
-
 }
 
 class InetAddress;
