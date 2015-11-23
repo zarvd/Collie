@@ -9,9 +9,13 @@ namespace Collie {
 
 class InetAddress;
 
+namespace Utils {
+class File;
+}
+
 namespace TCP {
 
-class TCPSocket : public Descriptor {
+class TCPSocket : public Descriptor, public SharedFromThis<TCPSocket> {
 public:
     enum class State {
         Init,
@@ -39,11 +43,13 @@ public:
 
     bool connect(SharedPtr<InetAddress>);
     bool bindAndListen();
-    SharedPtr<TCPSocket> accept(bool blocking = false);
+    SharedPtr<TCPSocket> accept(bool blocking = false) noexcept;
 
     // send and recv
-    String recv();
-    void send(const String & msg);
+    ssize_t recv(String & content, const int flags = 0);
+    ssize_t send(const String & content, const int flags = 0);
+    bool sendFile(const Utils::File & file);
+    bool recvFile(Utils::File & file, const size_t recvSize);
     void close() noexcept;
 
 private:
@@ -52,9 +58,9 @@ private:
     // construct illegal socket
     TCPSocket() noexcept;
 
-    static SharedPtr<TCPSocket> getAcceptSocket(const int fd,
-                                                SharedPtr<InetAddress>);
-    static SharedPtr<TCPSocket> getIllegalAcceptSocket();
+    SharedPtr<TCPSocket> getAcceptSocket(const int fd,
+                                         SharedPtr<InetAddress>) noexcept;
+    SharedPtr<TCPSocket> getIllegalAcceptSocket() noexcept;
     bool listenV4();
     SharedPtr<TCPSocket> acceptV4(bool blocking);
     bool connectV4(SharedPtr<InetAddress> servAddr);

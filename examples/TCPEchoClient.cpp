@@ -21,10 +21,11 @@ main(int argc, char * argv[]) {
     TCPClient client;
     client.setConnectCallback([](std::shared_ptr<TCPSocket> socket) {
         socket->send("Hello, here is client");
-        auto content = socket->recv();
+        std::string content;
+        socket->recv(content);
         Log(INFO) << "Received: " << content;
         socket->send("Goodbye");
-        content = socket->recv();
+        socket->recv(content);
         Log(INFO) << "Received: " << content;
 
     });

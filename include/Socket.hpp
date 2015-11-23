@@ -26,7 +26,7 @@ ssize_t recvFrom(SharedPtr<Descriptor>, String & content,
                  const SharedPtr<InetAddress> & remoteAddr,
                  const int flags = 0);
 bool sendFile(SharedPtr<Descriptor>, const Utils::File & file);
-bool recvFile(SharedPtr<Descriptor>, Utils::File & file, const size_t fileSize);
+bool recvFile(SharedPtr<Descriptor>, Utils::File & file, const size_t recvSize);
 }
 }
 

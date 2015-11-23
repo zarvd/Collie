@@ -8,6 +8,8 @@
 
 namespace Collie {
 
+class InetAddress;
+
 namespace Utils {
 class File;
 }
@@ -31,6 +33,8 @@ public:
     ~TCPConnection();
 
     SharedPtr<Event::Channel> getChannel() const { return channel; }
+    SharedPtr<InetAddress> getRemoteAddress() const;
+
     void setMessageCallback(const MessageCallback & cb) {
         messageCallback = cb;
     }
@@ -50,7 +54,8 @@ public:
     void send(const String &);
     void sendFile(const String & fileName);
     void sendFile(const Utils::File & file);
-    void recvFile(const String & fileName, const size_t fileSize);
+    void recvFile(const String & fileName, const size_t recvSize);
+    void recvFile(const Utils::File & file, const size_t recvSize);
 
 private:
     void shutdown();

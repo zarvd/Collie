@@ -1,13 +1,11 @@
 #include "../../include/Global.hpp"
-#include "../../include/tcp/TCPConnection.hpp"
 #include "../../include/Socket.hpp"
 #include "../../include/InetAddress.hpp"
 #include "../../include/event/EventLoop.hpp"
 #include "../../include/event/Channel.hpp"
+#include "../../include/tcp/TCPSocket.hpp"
+#include "../../include/tcp/TCPConnection.hpp"
 #include "../../include/utils/File.hpp"
-#include <functional>
-#include <algorithm>
-#include <future>
 
 namespace Collie {
 namespace TCP {
@@ -31,6 +29,13 @@ TCPConnection::TCPConnection(SharedPtr<Event::Channel> channel)
 
 TCPConnection::~TCPConnection() {
     Log(TRACE) << "TCP Connection is destructing";
+}
+
+SharedPtr<InetAddress>
+TCPConnection::getRemoteAddress() const {
+    auto fd = channel->getDescriptor();
+    auto socket = std::dynamic_pointer_cast<TCPSocket>(fd);
+    return socket->getAddress();
 }
 
 void

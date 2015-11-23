@@ -1,4 +1,5 @@
 set(BASE_SRC
+  Descriptor.cpp
   event/EventLoop.cpp
   event/Channel.cpp
   event/ThreadPool.cpp

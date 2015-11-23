@@ -4,6 +4,7 @@
 #include "../../include/Socket.hpp"
 #include "../../include/InetAddress.hpp"
 #include "../../include/Global.hpp"
+#include "../../include/utils/File.hpp"
 
 namespace Collie {
 namespace TCP {
@@ -119,7 +120,7 @@ TCPSocket::connectV4(SharedPtr<InetAddress> servAddr) {
 
 // Thread safe
 SharedPtr<TCPSocket>
-TCPSocket::accept(bool blocking) {
+TCPSocket::accept(bool blocking) noexcept {
     REQUIRE(address);
     switch(address->getIPVersion()) {
     case IP::V4:
@@ -153,23 +154,38 @@ TCPSocket::acceptV4(bool blocking) {
     return getIllegalAcceptSocket();
 }
 
-String
-TCPSocket::recv() {
-    // TODO
-    return "";
+ssize_t
+TCPSocket::recv(String & content, const int flags) {
+    REQUIRE(state == State::Connect || state == State::Accept);
+    return Socket::recv(shared_from_this(), content, flags);
 }
 
-void
-TCPSocket::send(const String &) {}
+ssize_t
+TCPSocket::send(const String & content, const int flags) {
+    REQUIRE(state == State::Connect || state == State::Accept);
+    return Socket::send(shared_from_this(), content, flags);
+}
+
+bool
+TCPSocket::sendFile(const Utils::File & file) {
+    REQUIRE(state == State::Connect || state == State::Accept);
+    return Socket::sendFile(shared_from_this(), file);
+}
+
+bool
+TCPSocket::recvFile(Utils::File & file, const size_t recvSize) {
+    REQUIRE(state == State::Connect || state == State::Accept);
+    return Socket::recvFile(shared_from_this(), file, recvSize);
+}
 
 SharedPtr<TCPSocket>
-TCPSocket::getAcceptSocket(const int fd, SharedPtr<InetAddress> addr) {
+TCPSocket::getAcceptSocket(const int fd, SharedPtr<InetAddress> addr) noexcept {
     REQUIRE(fd > 0);
     return SharedPtr<TCPSocket>(new TCPSocket(fd, addr));
 }
 
 SharedPtr<TCPSocket>
-TCPSocket::getIllegalAcceptSocket() {
+TCPSocket::getIllegalAcceptSocket() noexcept {
     static const auto illegalSocket = SharedPtr<TCPSocket>(new TCPSocket());
     return illegalSocket;
 }

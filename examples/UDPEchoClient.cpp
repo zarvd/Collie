@@ -1,6 +1,6 @@
 #include "../include/udp/UDPSocket.hpp"
 #include "../include/udp/UDPClient.hpp"
-#include "../include/SocketAddress.hpp"
+#include "../include/InetAddress.hpp"
 #include "../include/Global.hpp"
 
 using Collie::UDP::UDPClient;
@@ -17,7 +17,7 @@ main(int argc, char * argv[]) {
 
     UDPClient client;
     client.setConnectCallback([&client](const std::string & content,
-                                        std::shared_ptr<SocketAddress> addr) {
+                                        std::shared_ptr<InetAddress> addr) {
         Log(INFO) << content;
         const auto res = "From UDP Echo Client: " + content;
         client.send(res, addr);

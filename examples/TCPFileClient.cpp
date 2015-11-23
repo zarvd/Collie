@@ -28,7 +28,7 @@ main(int argc, char * argv[]) {
         Log(INFO) << "File size = " << size;
         Log(INFO) << "Receiving file...";
 
-        socket->recvFile(socket->getFd(), file, size);
+        socket->recvFile(file, size);
     });
     client.connect("127.0.0.1", port);
 
