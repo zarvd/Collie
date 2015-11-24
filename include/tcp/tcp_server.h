@@ -33,16 +33,16 @@ class TCPServer {
   void Bind(const std::string &host, const unsigned port);
   void set_thread_num(const size_t thread_num = 1) { thread_num_ = thread_num; }
   // setter
-  void setConnectedCallback(const ConnectedCallback &cb) {
+  void set_connected_callback(const ConnectedCallback &cb) {
     connected_callback_ = cb;
   }
-  void setConnectedCallback(const ConnectedCallback &&cb) {
+  void set_connected_callback(const ConnectedCallback &&cb) {
     connected_callback_ = std::move(cb);
   }
-  void setOnMessageCallback(const OnMessageCallback &cb) {
+  void set_on_message_callback(const OnMessageCallback &cb) {
     on_message_callback_ = cb;
   }
-  void setOnMessageCallback(const OnMessageCallback &&cb) {
+  void set_on_message_callback(const OnMessageCallback &&cb) {
     on_message_callback_ = std::move(cb);
   }
   // getter

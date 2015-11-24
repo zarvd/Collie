@@ -28,7 +28,7 @@ class ThreadPool {
   bool terminate() const { return terminate_; }
 
   template <class Cb, class... Args>
-  auto enqueue(Cb &&cb, Args &&... args)
+  auto Enqueue(Cb &&cb, Args &&... args)
       -> std::future<typename std::result_of<Cb(Args...)>::type>;
 
   const size_t kThreadNum;
@@ -45,7 +45,7 @@ class ThreadPool {
 };
 
 template <class Cb, class... Args>
-auto ThreadPool::enqueue(Cb &&cb, Args &&... args)
+auto ThreadPool::Enqueue(Cb &&cb, Args &&... args)
     -> std::future<typename std::result_of<Cb(Args...)>::type> {
   using returnType = typename std::result_of<Cb(Args...)>::type;
 
