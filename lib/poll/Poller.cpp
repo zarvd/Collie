@@ -1,7 +1,7 @@
-#include "../../include/poll/Poller.hpp"
+#include "../../include/poll/poller.h"
 
-namespace Collie {
-namespace Poll {
+namespace collie {
+namespace poll {
 
 Poller::~Poller() {}
 }
