@@ -114,7 +114,7 @@ void Channel::DisableAll() {
   Update();
 }
 
-void Channel::activate(const unsigned revents) {
+void Channel::Activate(const unsigned revents) {
   REQUIRE(eventloop_ && eventloop_->kPoller);
   if (eventloop_->kPoller->IsError(revents)) {
     // error event
