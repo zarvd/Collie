@@ -6,13 +6,13 @@ namespace collie {
 namespace poll {
 
 EPollPoller::EPollPoller(const unsigned max_event)
-    : Poller(max_event), is_init_(false), revents_(new Event[kMaxEvent]) {
+    : Poller(max_event), revents_(new Event[kMaxEvent]) {
   Log(TRACE) << "EPoller constructing";
 }
 
 EPollPoller::~EPollPoller() { Log(TRACE) << "EPoller destructing"; }
 
-void EPollPoller::Create() {
+void EPollPoller::Open() {
   fd_ = epoll_create1(0);
   Log(TRACE) << "EPoller create new epoll " << fd_;
   REQUIRE_SYS(fd_ != -1);

@@ -11,14 +11,14 @@ namespace collie {
 namespace event {
 
 EventLoop::EventLoop() : kPoller(new poll::EPollPoller(1024)) {
-  kPoller->Create();
+  kPoller->Open();
 
   Log(TRACE) << "EventLoop is constructing";
 }
 
 EventLoop::EventLoop(std::unique_ptr<poll::Poller> poller)
     : kPoller(std::move(poller)) {
-  poller->Create();
+  poller->Open();
 
   Log(TRACE) << "EventLoop is constructing";
 }
@@ -58,7 +58,7 @@ void EventLoop::PollCallback(const int fd, const unsigned revents) {
 }
 
 void EventLoop::UpdateChannel(std::shared_ptr<Channel> channel) {
-  const auto descriptor = channel->descriptor()->Get();
+  const auto descriptor = channel->descriptor()->fd();
   Log(TRACE) << "EventLoop update channel " << descriptor;
   if (HasChannel(channel)) {
     kPoller->Modify(descriptor, channel->events());
@@ -69,7 +69,7 @@ void EventLoop::UpdateChannel(std::shared_ptr<Channel> channel) {
 }
 
 void EventLoop::RemoveChannel(std::shared_ptr<Channel> channel) {
-  const auto descriptor = channel->descriptor()->Get();
+  const auto descriptor = channel->descriptor()->fd();
   Log(TRACE) << "EventLoop remove channel " << descriptor;
   REQUIRE_(HasChannel(channel),
            "EventLoop does NOT have channel " + std::to_string(descriptor));
@@ -78,7 +78,7 @@ void EventLoop::RemoveChannel(std::shared_ptr<Channel> channel) {
 }
 
 bool EventLoop::HasChannel(std::shared_ptr<Channel> channel) const {
-  const auto descriptor = channel->descriptor()->Get();
+  const auto descriptor = channel->descriptor()->fd();
   return channel_map_.find(descriptor) != channel_map_.end();
 }
 }

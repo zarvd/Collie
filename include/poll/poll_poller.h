@@ -30,7 +30,7 @@ class PollPoller : public Poller {
   virtual bool IsClose(const unsigned events) const noexcept override;
 
  private:
-  void Create() override;
+  void Open() override;
 };
 }
 }

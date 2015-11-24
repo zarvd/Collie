@@ -10,7 +10,7 @@
 namespace collie {
 
 void socket::SetNonBlocking(std::shared_ptr<Descriptor> descriptor) {
-  const auto fd = descriptor->Get();
+  const auto fd = descriptor->fd();
   auto flags = ::fcntl(fd, F_GETFL, 0);
   REQUIRE_SYS(flags != -1);
   flags |= O_NONBLOCK;
@@ -20,7 +20,7 @@ void socket::SetNonBlocking(std::shared_ptr<Descriptor> descriptor) {
 
 ssize_t socket::Send(std::shared_ptr<Descriptor> descriptor,
                      const std::string &content, const int flags) {
-  const auto fd = descriptor->Get();
+  const auto fd = descriptor->fd();
   char content_chars[content.length() + 1];
   std::strcpy(content_chars, content.c_str());
   Log(TRACE) << "Socket is sending " << content_chars;
@@ -36,7 +36,7 @@ ssize_t socket::Send(std::shared_ptr<Descriptor> descriptor,
 
 ssize_t socket::Recv(std::shared_ptr<Descriptor> descriptor,
                      std::string &content, const int flags) {
-  const auto fd = descriptor->Get();
+  const auto fd = descriptor->fd();
   if (fd < 2) {
     Log(WARN) << "Illegal socket fd " << fd;
   }
@@ -59,7 +59,7 @@ ssize_t socket::SendTo(std::shared_ptr<Descriptor> descriptor,
                        const std::string &content,
                        std::shared_ptr<InetAddress> remote_address,
                        const int flags) {
-  const auto fd = descriptor->Get();
+  const auto fd = descriptor->fd();
   char content_chars[content.length() + 1];
   std::strcpy(content_chars, content.c_str());
   struct sockaddr_in addr = remote_address->addr_v4();
@@ -79,7 +79,7 @@ ssize_t socket::RecvFrom(std::shared_ptr<Descriptor> descriptor,
                          std::string &content,
                          const std::shared_ptr<InetAddress> &remote_address,
                          const int flags) {
-  const auto fd = descriptor->Get();
+  const auto fd = descriptor->fd();
   char buffer[8192];
   struct sockaddr_in addr;
   socklen_t addr_length = sizeof(addr);
@@ -99,7 +99,7 @@ ssize_t socket::RecvFrom(std::shared_ptr<Descriptor> descriptor,
 
 bool socket::SendFile(std::shared_ptr<Descriptor> descriptor,
                       const utils::File &file) {
-  const auto fd = descriptor->Get();
+  const auto fd = descriptor->fd();
   REQUIRE(file.is_existed() && file.IsRead());
   if (file.is_existed() && file.IsFile()) {
     off64_t offset = 0;
@@ -121,7 +121,7 @@ bool socket::SendFile(std::shared_ptr<Descriptor> descriptor,
 
 bool socket::RecvFile(std::shared_ptr<Descriptor> descriptor,
                       const utils::File &file, const size_t file_size) {
-  const auto fd = descriptor->Get();
+  const auto fd = descriptor->fd();
   REQUIRE(file.is_existed() && file.IsWrite());
   if (file.is_existed() && file.IsFile()) {
     char buffer[file_size];

@@ -11,37 +11,44 @@ namespace collie {
 namespace tcp {
 
 TCPSocket::TCPSocket(std::shared_ptr<InetAddress> addr) noexcept
-    : fd_(-1),
+    : Descriptor(-1, false),
       state_(State::Init),
       address_(addr) {
   Log(TRACE) << "TCPSocket is constructing";
-  fd_ = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-  if (fd_ < 0) {
-    Log(WARN) << "TCPSocket: " << GetError();
-  } else {
-    state_ = State::Socket;
-  }
+  Open();
 }
 
 // construct Accept connection socket
 TCPSocket::TCPSocket(const int fd, std::shared_ptr<InetAddress> addr) noexcept
-    : fd_(fd),
+    : Descriptor(fd, true),
       state_(State::Accept),
       address_(addr) {
   Log(TRACE) << "TCPSocket(Accept connection) is constructing";
 }
 
 // construct illegal socket
-TCPSocket::TCPSocket() noexcept : fd_(-1), state_(State::IllegalAccept) {
+TCPSocket::TCPSocket() noexcept : Descriptor(-1, false),
+                                  state_(State::IllegalAccept) {
   Log(TRACE) << "TCPSocket(IllegalAccept) is constructing";
 }
 
 TCPSocket::~TCPSocket() noexcept { Log(TRACE) << "TCPSocket is destructing"; }
 
-void TCPSocket::Close() noexcept {
+void TCPSocket::Open() noexcept {
+  fd_ = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+  if (fd_ < 0) {
+    Log(WARN) << "TCPSocket: " << GetError();
+  } else {
+    state_ = State::Socket;
+    is_init_ = true;
+  }
+}
+
+void TCPSocket::CloseImpl() noexcept {
   Log(TRACE) << "Socket closed";
   if (state_ != State::Init && state_ != State::Close) {
     ::close(fd_);
+    state_ = State::Close;
   }
 }
 

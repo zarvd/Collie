@@ -2,6 +2,7 @@
 #define COLLIE_POLL_POLLER_H_
 
 #include <functional>
+#include "../descriptor.h"
 
 namespace collie {
 namespace poll {
@@ -9,18 +10,17 @@ namespace poll {
 /**
  * Abstract class
  */
-class Poller {
+class Poller : public Descriptor {
  public:
   using PollCallback =
-      std::function<void(const unsigned fd, const unsigned revents)>;
+      std::function<void(const int fd, const unsigned revents)>;
 
-  explicit Poller(const unsigned &maxEvent) noexcept : kMaxEvent(maxEvent),
-                                                       fd_(-1) {}
+  explicit Poller(const unsigned maxEvent) noexcept : Descriptor(-1, false),
+                                                      kMaxEvent(maxEvent) {}
   Poller(const Poller &) = delete;
   Poller &operator=(const Poller &) = delete;
   virtual ~Poller() = 0;
 
-  virtual void Create() = 0;
   virtual void Insert(const int fd, const unsigned events) = 0;
   virtual void Modify(const int fd, const unsigned events) = 0;
   virtual void Remove(const int fd) = 0;
@@ -40,7 +40,7 @@ class Poller {
   const unsigned kMaxEvent;
 
  protected:
-  int fd_;
+  void CloseImpl() noexcept override;
 };
 }
 }

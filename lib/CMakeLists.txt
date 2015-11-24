@@ -1,4 +1,5 @@
 set(BASE_SRC
+  descriptor.cc
   event/eventloop.cc
   event/channel.cc
   event/threadpool.cc

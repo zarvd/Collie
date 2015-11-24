@@ -38,7 +38,7 @@ void TCPServer::Start() {
 }
 
 void TCPServer::NewConnection(std::shared_ptr<TCPSocket> conn_socket) {
-  Log(INFO) << "TCPServer accept fd(" << conn_socket->Get() << ") ip("
+  Log(INFO) << "TCPServer accept fd(" << conn_socket->fd() << ") ip("
             << conn_socket->address()->ip() << ")";
 
   // new channel

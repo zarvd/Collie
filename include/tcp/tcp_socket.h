@@ -36,8 +36,9 @@ class TCPSocket : public Descriptor,
   TCPSocket &operator=(const TCPSocket &) = delete;
   ~TCPSocket() noexcept override;
 
+  void Open() noexcept override;
+
   // Descriptor
-  int Get() const override { return fd_; }
   State state() const { return state_; }
   std::shared_ptr<InetAddress> address() const { return address_; }
 
@@ -50,7 +51,6 @@ class TCPSocket : public Descriptor,
   ssize_t Send(const std::string &content, const int flags = 0);
   bool SendFile(const utils::File &file);
   bool RecvFile(const utils::File &file, const size_t recvSize);
-  void Close() noexcept;
 
  private:
   // construct Accept connection socket
@@ -62,6 +62,8 @@ class TCPSocket : public Descriptor,
       const int fd, std::shared_ptr<InetAddress>) noexcept;
   std::shared_ptr<TCPSocket> GetIllegalAcceptSocket() noexcept;
 
+  void CloseImpl() noexcept override;
+
   bool ListenV4();
   std::shared_ptr<TCPSocket> AcceptV4(bool blocking);
   bool ConnectV4(std::shared_ptr<InetAddress> servAddr);
@@ -69,7 +71,6 @@ class TCPSocket : public Descriptor,
   // int acceptV6(std::shared_ptr<InetAddress>, bool blocking);
   // bool connectV6(std::shared_ptr<InetAddress>);
 
-  int fd_;
   State state_;
   std::shared_ptr<InetAddress> address_;
 };

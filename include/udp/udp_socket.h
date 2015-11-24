@@ -13,26 +13,28 @@ namespace udp {
 
 class UDPSocket : public Descriptor {
  public:
-  explicit UDPSocket(std::shared_ptr<InetAddress>);
+  explicit UDPSocket(std::shared_ptr<InetAddress> local_address_);
   UDPSocket(const UDPSocket &) = delete;
   UDPSocket &operator=(const UDPSocket &) = delete;
   ~UDPSocket() override;
 
-  int Get() const override { return fd_; }
+  void Open() override;
 
   // server
   void Listen();
-  void ListenV4();
-  void ListenV6();
 
   // client
   void Connect(const IP);  // only socket, UDP have NO Connection
+
+ private:
+  void ListenV4();
+  void ListenV6();
   void ConnectV4();
   void ConnectV6();
 
- private:
-  int fd_;
-  std::shared_ptr<InetAddress> address_;
+  void CloseImpl() noexcept override;
+
+  std::shared_ptr<InetAddress> local_address_;
 };
 }
 }

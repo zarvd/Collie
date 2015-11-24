@@ -16,22 +16,22 @@ Channel::Channel(std::shared_ptr<Descriptor> descriptor)
       update_after_activate_(false) {
   REQUIRE(descriptor);
 
-  Log(TRACE) << "Channel " << descriptor->Get() << " constructing";
+  Log(TRACE) << "Channel " << descriptor_->fd() << " constructing";
 
   // default error and close callback
   close_callback_ = [this]() {
     // TODO remove channel
-    Log(TRACE) << "Close channel " << descriptor_->Get();
+    Log(TRACE) << "Close channel " << descriptor_->fd();
     Remove();
   };
   error_callback_ = [this]() {  // TODO remove channel
-    Log(TRACE) << "Channel " << descriptor_->Get() << " meets ERROR";
+    Log(TRACE) << "Channel " << descriptor_->fd() << " meets ERROR";
     Remove();
   };
 }
 
 Channel::~Channel() {
-  Log(TRACE) << "Channel " << descriptor_->Get() << " destructing";
+  Log(TRACE) << "Channel " << descriptor_->fd() << " destructing";
 }
 
 std::shared_ptr<Channel> Channel::GetCopyWithoutEventLoop() const {
@@ -46,7 +46,7 @@ std::shared_ptr<Channel> Channel::GetCopyWithoutEventLoop() const {
 }
 
 void Channel::set_eventloop(std::shared_ptr<EventLoop> eventloop) {
-  REQUIRE_(!in_eventloop_, "Channel" + std::to_string(descriptor_->Get()) +
+  REQUIRE_(!in_eventloop_, "Channel" + std::to_string(descriptor_->fd()) +
                              " is already in eventLoop");
   this->eventloop_ = eventloop;
   in_eventloop_ = true;
