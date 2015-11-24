@@ -1,66 +1,62 @@
-#include "../../include/Global.hpp"
-#include "../../include/udp/UDPSocket.hpp"
-#include "../../include/InetAddress.hpp"
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include "../../include/udp/udp_socket.h"
+#include "../../include/inet_address.h"
+#include "../../include/exception.h"
+#include "../../include/logging.h"
 
-namespace Collie {
-namespace UDP {
+namespace collie {
+namespace udp {
 
-UDPSocket::UDPSocket(SharedPtr<InetAddress> addr) : address(addr) {
-    Log(TRACE) << "UDP Socket is constructing";
+UDPSocket::UDPSocket(std::shared_ptr<InetAddress> addr)
+    : fd_(), address_(addr) {
+  Log(TRACE) << "UDP Socket is constructing";
 }
 
 UDPSocket::~UDPSocket() { Log(TRACE) << "UDP Socket is destructing"; }
 
-void
-UDPSocket::listen() {
-    REQUIRE(address && address->getIPVersion() != IP::Unknown);
-    if(address->getIPVersion() == IP::V4) {
-        listenV4();
-    } else {
-        listenV6();
-    }
+void UDPSocket::Listen() {
+  REQUIRE(address_ && address_->ip_version() != IP::UNKNOWN);
+  if (address_->ip_version() == IP::V4) {
+    ListenV4();
+  } else {
+    ListenV6();
+  }
 }
 
-void
-UDPSocket::listenV4() {
-    Log(DEBUG) << "UDP Socket is listening";
-    fd = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    REQUIRE_SYS(fd != -1);
-    struct sockaddr_in servAddr = address->getAddrV4();
+void UDPSocket::ListenV4() {
+  Log(DEBUG) << "UDP Socket is listening";
+  fd_ = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+  REQUIRE_SYS(fd_ != -1);
+  struct sockaddr_in serv_address = address_->addr_v4();
 
-    int ret = ::bind(fd, (struct sockaddr *)&servAddr, sizeof(servAddr));
-    REQUIRE_SYS(ret != -1);
+  int ret = ::bind(fd_, (struct sockaddr *)&serv_address, sizeof(serv_address));
+  REQUIRE_SYS(ret != -1);
 }
 
-void
-UDPSocket::listenV6() {
-    // TODO
-    THROW_("TO BE CONTINUED");
+void UDPSocket::ListenV6() {
+  // TODO
+  THROW_("TO BE CONTINUED");
 }
 
-void
-UDPSocket::connect(IP ipVersion) {
-    REQUIRE(ipVersion != IP::Unknown);
-    if(ipVersion == IP::V4) {
-        connectV4();
-    } else {
-        connectV6();
-    }
+void UDPSocket::Connect(IP ip_version) {
+  REQUIRE(ip_version != IP::UNKNOWN);
+  if (ip_version == IP::V4) {
+    ConnectV4();
+  } else {
+    ConnectV6();
+  }
 }
 
-void
-UDPSocket::connectV4() {
-    Log(DEBUG) << "UDP Socket is connecting";
-    fd = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    REQUIRE_SYS(fd != -1);
+void UDPSocket::ConnectV4() {
+  Log(DEBUG) << "UDP Socket is connecting";
+  fd_ = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+  REQUIRE_SYS(fd_ != -1);
 }
 
-void
-UDPSocket::connectV6() {
-    // TODO
-    THROW_("TO BE CONTINUED");
+void UDPSocket::ConnectV6() {
+  // TODO
+  THROW_("TO BE CONTINUED");
 }
 }
 }

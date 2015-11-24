@@ -1,34 +1,33 @@
-#include "../../include/InetAddress.hpp"
-#include "../../include/udp/UDPSocket.hpp"
-#include "../../include/udp/UDPClient.hpp"
-#include "../../include/Global.hpp"
+#include "../../include/inet_address.h"
+#include "../../include/udp/udp_socket.h"
+#include "../../include/udp/udp_client.h"
+#include "../../include/exception.h"
+#include "../../include/logging.h"
 
-namespace Collie {
-namespace UDP {
+namespace collie {
+namespace udp {
 
 UDPClient::UDPClient() {}
 UDPClient::~UDPClient() {}
 
-void
-UDPClient::connect(const std::string & host, const unsigned port,
-                   const std::string & greeting) {
-    REQUIRE(connectCallback);
-    socket.reset(new UDPSocket(nullptr));
-    remoteAddr = InetAddress::getInetAddress(host, port);
-    socket->connect(remoteAddr->getIPVersion());
-    // socket->sendTo(greeting, remoteAddr);
-    std::string content;
-    // socket->recvFrom(content, remoteAddr);
-    while(connectCallback(content, remoteAddr)) {
-        // loop until return false
-    }
+void UDPClient::Connect(const std::string& host, const unsigned port,
+                        const std::string& greeting) {
+  REQUIRE(connect_callback_);
+  socket_.reset(new UDPSocket(nullptr));
+  remote_address_ = InetAddress::GetInetAddress(host, port);
+  socket_->Connect(remote_address_->ip_version());
+  // socket_->sendTo(greeting, remote_address_);
+  std::string content;
+  // socket_->recvFrom(content, remote_address_);
+  while (connect_callback_(content, remote_address_)) {
+    // loop until return false
+  }
 }
 
-void
-UDPClient::send(const std::string & content,
-                SharedPtr<InetAddress> remoteAddr) {
-    REQUIRE(socket);
-    // socket->sendTo(content, remoteAddr);
+void UDPClient::Send(const std::string& content,
+                     std::shared_ptr<InetAddress> remote_address_) {
+  REQUIRE(socket_);
+  // socket_->sendTo(content, remote_address_);
 }
 }
 }
