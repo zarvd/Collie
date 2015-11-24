@@ -1,5 +1,3 @@
-#include <iostream>
-#include <string>
 #include "../include/tcp/tcp_client.h"
 #include "../include/tcp/tcp_socket.h"
 #include "../include/exception.h"
@@ -13,6 +11,7 @@ int main(int argc, char* argv[]) {
   auto& logging = logger::LogHandler::GetHandler();
   logging.set_log_level(TRACE);
   logging.Init();
+
   unsigned port = 8080;
   if (argc == 2) port = std::stoul(argv[1]);
 

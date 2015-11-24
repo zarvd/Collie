@@ -1,5 +1,5 @@
-#ifndef COLLIE_POLL_POLLPOLLER_H
-#define COLLIE_POLL_POLLPOLLER_H
+#ifndef COLLIE_POLL_POLLPOLLER_H_
+#define COLLIE_POLL_POLLPOLLER_H_
 
 #include <memory>
 #include "poller.h"
@@ -35,4 +35,4 @@ class PollPoller : public Poller {
 }
 }
 
-#endif /* COLLIE_POLL_POLLPOLLER_H */
+#endif /* COLLIE_POLL_POLLPOLLER_H_ */
