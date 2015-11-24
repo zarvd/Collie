@@ -14,8 +14,13 @@ namespace tcp {
 thread_local std::unordered_set<std::shared_ptr<TCPConnection>>
     g_local_thread_connections;
 
-TCPConnection::TCPConnection(std::shared_ptr<event::Channel> channel)
-    : connected_(true), terminate_(false), channel_(channel) {
+TCPConnection::TCPConnection(std::shared_ptr<event::Channel> channel,
+                             std::shared_ptr<InetAddress> local_address)
+    : connected_(true),
+      terminate_(false),
+      channel_(channel),
+      local_address_(local_address) {
+  Log(TRACE) << "TCP Connection is constructing";
   REQUIRE(channel);
   // set channel callback and enable reading
   channel->set_read_callback(std::bind(&TCPConnection::HandleRead, this));
@@ -24,17 +29,13 @@ TCPConnection::TCPConnection(std::shared_ptr<event::Channel> channel)
   channel->set_error_callback(std::bind(&TCPConnection::HandleError, this));
   channel->EnableRead();
   channel->EnableWrite();
-  Log(TRACE) << "TCP Connection is constructing";
+  auto fd = channel_->descriptor();
+  auto socket = std::static_pointer_cast<TCPSocket>(fd);
+  remote_address_ = socket->address();
 }
 
 TCPConnection::~TCPConnection() {
   Log(TRACE) << "TCP Connection is destructing";
-}
-
-std::shared_ptr<InetAddress> TCPConnection::GetRemoteAddress() const {
-  auto fd = channel_->descriptor();
-  auto socket = std::dynamic_pointer_cast<TCPSocket>(fd);
-  return socket->address();
 }
 
 void TCPConnection::Disconnect() {

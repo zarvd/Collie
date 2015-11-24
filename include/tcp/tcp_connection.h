@@ -26,13 +26,17 @@ class TCPConnection : public std::enable_shared_from_this<TCPConnection> {
   using MessageCallback = std::function<void(std::shared_ptr<TCPConnection>)>;
   using EventCallback = std::function<void(std::shared_ptr<TCPConnection>)>;
 
-  TCPConnection(std::shared_ptr<event::Channel> channel);
+  explicit TCPConnection(std::shared_ptr<event::Channel> channel,
+                         std::shared_ptr<InetAddress> local_address = nullptr);
   TCPConnection(const TCPConnection &) = delete;
   TCPConnection &operator=(const TCPConnection &) = delete;
   ~TCPConnection();
 
   std::shared_ptr<event::Channel> channel() const { return channel_; }
-  std::shared_ptr<InetAddress> GetRemoteAddress() const;
+  std::shared_ptr<InetAddress> local_address() const { return local_address_; }
+  std::shared_ptr<InetAddress> remote_address() const {
+    return remote_address_;
+  }
 
   void set_message_callback(const MessageCallback &cb) {
     message_callback_ = cb;
@@ -66,6 +70,8 @@ class TCPConnection : public std::enable_shared_from_this<TCPConnection> {
   bool connected_;
   bool terminate_;
   const std::shared_ptr<event::Channel> channel_;
+  std::shared_ptr<InetAddress> local_address_;
+  std::shared_ptr<InetAddress> remote_address_;
   std::string inputBuffer_;
   std::string outputBuffer_;
   MessageCallback message_callback_;

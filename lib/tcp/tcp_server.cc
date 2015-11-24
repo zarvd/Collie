@@ -44,12 +44,13 @@ void TCPServer::NewConnection(std::shared_ptr<TCPSocket> conn_socket) {
   // new channel
   std::shared_ptr<event::Channel> channel(new event::Channel(conn_socket));
   // NOTE setting up channel in connection
-  channel->set_after_set_loop_callback([on_message_callback =
-                                            on_message_callback_](
-      std::shared_ptr<event::Channel> channel) {
+  channel->set_after_set_loop_callback([
+    on_message_callback = on_message_callback_,
+    local_address = local_address_
+  ](std::shared_ptr<event::Channel> channel) {
 
     // new connection
-    auto connection = std::make_shared<TCPConnection>(channel);
+    auto connection = std::make_shared<TCPConnection>(channel, local_address);
     connection->set_message_callback(on_message_callback);
     // store this connection in server
     g_local_thread_connections.insert(connection);
