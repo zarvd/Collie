@@ -4,10 +4,22 @@
 namespace collie {
 
 /**
- * Descriptor RAII interface
+ * Descriptor interface
  *
- * when is_init_ == true, the destructor will automatically call
- * this->Close(fd_), which actually call CloseImpl according to is_close_
+ * Pure virtual method:
+ * ~Descriptor() noexcept
+ * Create()
+ * Close()
+ *
+ * is_init_ is a flag for calling Create() successfully
+ * is_close_ is a flag for calling Close() successfully
+ *
+ * NOTE: For RAII, Derived class's destructor should contains Close() method:
+ * Derived::~Derived() {
+ * ...
+ * Close();
+ * ...
+ * }
  */
 class Descriptor {
  public:
@@ -18,25 +30,17 @@ class Descriptor {
   Descriptor &operator=(const Descriptor &) = delete;
   virtual ~Descriptor() noexcept = 0;
 
-  virtual void Open() = 0;
-  void Close() noexcept {
-    if (!is_close_ && is_init_) {
-      CloseImpl();
-      is_close_ = true;
-    }
-  }
+  virtual void Create() = 0;
+  virtual void Close() = 0;
 
+  // getter
   virtual int fd() const { return fd_; }
   virtual bool is_init() const { return is_init_; }
-  bool is_close() const { return is_close_; }
+  virtual bool is_close() const { return is_close_; }
 
  protected:
-  virtual void CloseImpl() noexcept = 0;
-
   int fd_;
   bool is_init_;
-
- private:
   bool is_close_;
 };
 }

@@ -3,18 +3,17 @@
 
 #include <functional>
 #include <memory>
+#include "eventloop.h"
 
 namespace collie {
 class Descriptor;
 
 namespace event {
 
-class EventLoop;
-
 class Channel : public std::enable_shared_from_this<Channel> {
  public:
   using Callback = std::function<void(std::shared_ptr<Channel>)>;
-  using EventCallback = std::function<void()>;
+  using EventCallback = std::function<void(std::shared_ptr<Channel>)>;
 
   explicit Channel(std::shared_ptr<Descriptor>);
   Channel(const Channel &) = delete;
@@ -38,22 +37,21 @@ class Channel : public std::enable_shared_from_this<Channel> {
   void set_error_callback(const EventCallback &&cb) {
     error_callback_ = std::move(cb);
   }
-  void set_eventloop(std::shared_ptr<EventLoop>);
-  void set_after_set_loop_callback(const Callback &cb) {
-    after_set_loop_callback_ = cb;
-  }
-  void set_after_set_loop_callback(const Callback &&cb) {
-    after_set_loop_callback_ = std::move(cb);
+  void set_insert_callback(const Callback &cb) { insert_callback_ = cb; }
+  void set_insert_callback(const Callback &&cb) {
+    insert_callback_ = std::move(cb);
   }
   void set_update_after_activate(const bool update) {
     update_after_activate_ = update;
   }
 
+  std::shared_ptr<Channel> GetCopyWithoutEventLoop() const;
+
   // getter
   std::shared_ptr<Descriptor> descriptor() const { return descriptor_; }
   int events() const { return events_; }
-  std::shared_ptr<Channel> GetCopyWithoutEventLoop() const;
   std::shared_ptr<EventLoop> eventloop() const { return eventloop_; }
+  bool in_eventloop() const { return in_eventloop_; }
 
   // event
   bool IsNoneEvent() const { return events_ == 0; }
@@ -72,6 +70,9 @@ class Channel : public std::enable_shared_from_this<Channel> {
   void Remove();
   void Update();
 
+  friend void EventLoop::UpdateChannel(std::shared_ptr<Channel>);
+  friend void EventLoop::RemoveChannel(std::shared_ptr<Channel>);
+
  private:
   bool in_eventloop_;                       // whether eventLoop is setting up
   std::shared_ptr<Descriptor> descriptor_;  // file descriptor
@@ -83,7 +84,7 @@ class Channel : public std::enable_shared_from_this<Channel> {
   EventCallback write_callback_;
   EventCallback close_callback_;
   EventCallback error_callback_;
-  Callback after_set_loop_callback_;
+  Callback insert_callback_;
 };
 }
 }

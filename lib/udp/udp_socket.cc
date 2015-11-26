@@ -12,12 +12,20 @@ namespace udp {
 UDPSocket::UDPSocket(std::shared_ptr<InetAddress> local_addr)
     : Descriptor(-1, false), local_address_(local_addr) {
   Log(TRACE) << "UDP Socket is constructing";
+  CreateImpl();
 }
 
-UDPSocket::~UDPSocket() { Log(TRACE) << "UDP Socket is destructing"; }
+UDPSocket::~UDPSocket() {
+  Log(TRACE) << "UDP Socket is destructing";
+  CloseImpl();
+}
 
-void UDPSocket::Open() {
-  if(is_init_) return;
+void UDPSocket::Create() { CreateImpl(); }
+
+void UDPSocket::Close() { CloseImpl(); }
+
+void UDPSocket::CreateImpl() noexcept {
+  if (is_init_) return;
   fd_ = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
   if (fd_ < 0) {
     Log(WARN) << "UDPSocket: " << GetError();
@@ -27,7 +35,10 @@ void UDPSocket::Open() {
 }
 
 void UDPSocket::CloseImpl() noexcept {
-  ::close(fd_);
+  if (is_init_ && !is_close_) {
+    ::close(fd_);
+    is_close_ = true;
+  }
 }
 
 void UDPSocket::Listen() {
@@ -64,7 +75,7 @@ void UDPSocket::Connect(IP ip_version) {
 
 void UDPSocket::ConnectV4() {
   Log(DEBUG) << "UDP Socket is connecting";
-  if (!is_init_) Open();
+  if (!is_init_) Create();
   REQUIRE_SYS(fd_ != -1);
 }
 

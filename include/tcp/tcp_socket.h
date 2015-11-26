@@ -36,7 +36,8 @@ class TCPSocket : public Descriptor,
   TCPSocket &operator=(const TCPSocket &) = delete;
   ~TCPSocket() noexcept override;
 
-  void Open() noexcept override;
+  void Create() noexcept override;
+  void Close() noexcept override;
 
   // Descriptor
   State state() const { return state_; }
@@ -62,7 +63,8 @@ class TCPSocket : public Descriptor,
       const int fd, std::shared_ptr<InetAddress>) noexcept;
   std::shared_ptr<TCPSocket> GetIllegalAcceptSocket() noexcept;
 
-  void CloseImpl() noexcept override;
+  void CreateImpl() noexcept;
+  void CloseImpl() noexcept;
 
   bool ListenV4();
   std::shared_ptr<TCPSocket> AcceptV4(bool blocking);

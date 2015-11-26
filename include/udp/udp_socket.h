@@ -18,7 +18,8 @@ class UDPSocket : public Descriptor {
   UDPSocket &operator=(const UDPSocket &) = delete;
   ~UDPSocket() override;
 
-  void Open() override;
+  void Create() override;
+  void Close() override;
 
   // server
   void Listen();
@@ -32,7 +33,8 @@ class UDPSocket : public Descriptor {
   void ConnectV4();
   void ConnectV6();
 
-  void CloseImpl() noexcept override;
+  void CreateImpl() noexcept;
+  void CloseImpl() noexcept;
 
   std::shared_ptr<InetAddress> local_address_;
 };

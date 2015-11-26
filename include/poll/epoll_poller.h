@@ -19,7 +19,8 @@ class EPollPoller : public Poller {
   EPollPoller &operator=(const EPollPoller &) = delete;
   ~EPollPoller() override;
 
-  void Open() override;
+  void Create() override;
+  void Close() override;
   void Insert(const int fd, const unsigned events) override;
   void Modify(const int fd, const unsigned events) override;
   void Remove(const int fd) override;
@@ -68,6 +69,9 @@ class EPollPoller : public Poller {
 
   // const unsigned MaxEvent;
  private:
+  void CreateImpl() noexcept;
+  void CloseImpl() noexcept;
+
   std::unique_ptr<Event> revents_;
 };
 }

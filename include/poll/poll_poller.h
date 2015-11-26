@@ -28,9 +28,6 @@ class PollPoller : public Poller {
   virtual bool IsWrite(const unsigned events) const noexcept override;
   virtual bool IsError(const unsigned events) const noexcept override;
   virtual bool IsClose(const unsigned events) const noexcept override;
-
- private:
-  void Open() override;
 };
 }
 }

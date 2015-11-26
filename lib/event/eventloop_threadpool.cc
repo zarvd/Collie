@@ -7,14 +7,18 @@
 namespace collie {
 namespace event {
 
-EventLoopThreadPool::EventLoopThreadPool(const size_t thread_num)
-    : kThreadNum(thread_num) {}
+EventLoopThreadPool::EventLoopThreadPool(const size_t thread_num) noexcept
+    : kThreadNum(thread_num) {
+  Log(TRACE) << "Event loop with thread pool is constructing";
+}
 
-EventLoopThreadPool::~EventLoopThreadPool() {}
+EventLoopThreadPool::~EventLoopThreadPool() noexcept {
+  Log(TRACE) << "Event loop with thread pool is destructing";
+}
 
 void EventLoopThreadPool::StartLoop(
-    std::vector<std::shared_ptr<Channel>> baseChannel) {
-  base_channel_ = baseChannel;
+    std::vector<std::shared_ptr<Channel>> base_channels) noexcept {
+  base_channels_ = base_channels;
   for (size_t i = 1; i < kThreadNum; ++i) {
     workers_.emplace_back(&EventLoopThreadPool::RunInThread, this);
   }
@@ -50,10 +54,9 @@ void EventLoopThreadPool::RunInThread() {
   auto eventloop = std::make_shared<EventLoop>();
 
   // insert base channels to loop
-  for (auto channel : base_channel_) {
+  for (auto channel : base_channels_) {
     auto new_channel = channel->GetCopyWithoutEventLoop();
-    new_channel->set_eventloop(eventloop);
-    new_channel->Update();
+    eventloop->UpdateChannel(new_channel);
   }
 
   // loop
@@ -70,8 +73,7 @@ void EventLoopThreadPool::RunInThread() {
     }
     // insert channel
     for (auto channel : channels) {
-      channel->set_eventloop(eventloop);
-      channel->Update();
+      eventloop->UpdateChannel(channel);
     }
     // block
     eventloop->LoopOne();

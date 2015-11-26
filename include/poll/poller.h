@@ -38,9 +38,6 @@ class Poller : public Descriptor {
   virtual bool IsClose(const unsigned events) const noexcept = 0;
 
   const unsigned kMaxEvent;
-
- protected:
-  void CloseImpl() noexcept override;
 };
 }
 }

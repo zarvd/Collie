@@ -19,14 +19,14 @@ Channel::Channel(std::shared_ptr<Descriptor> descriptor)
   Log(TRACE) << "Channel " << descriptor_->fd() << " constructing";
 
   // default error and close callback
-  close_callback_ = [this]() {
+  close_callback_ = [](auto channel) {
     // TODO remove channel
-    Log(TRACE) << "Close channel " << descriptor_->fd();
-    Remove();
+    Log(TRACE) << "Closing channel " << channel->descriptor_->fd();
+    channel->Remove();
   };
-  error_callback_ = [this]() {  // TODO remove channel
-    Log(TRACE) << "Channel " << descriptor_->fd() << " meets ERROR";
-    Remove();
+  error_callback_ = [](auto channel) {  // TODO remove channel
+    Log(TRACE) << "Channel " << channel->descriptor_->fd() << " meets ERROR";
+    channel->Remove();
   };
 }
 
@@ -35,22 +35,15 @@ Channel::~Channel() {
 }
 
 std::shared_ptr<Channel> Channel::GetCopyWithoutEventLoop() const {
+  Log(TRACE) << "Get copy channel without eventloop";
   auto channel = std::make_shared<Channel>(descriptor_);
   channel->events_ = events_;
   channel->read_callback_ = read_callback_;
   channel->write_callback_ = write_callback_;
   channel->error_callback_ = error_callback_;
   channel->close_callback_ = close_callback_;
-  channel->after_set_loop_callback_ = after_set_loop_callback_;
+  channel->insert_callback_ = insert_callback_;
   return channel;
-}
-
-void Channel::set_eventloop(std::shared_ptr<EventLoop> eventloop) {
-  REQUIRE_(!in_eventloop_, "Channel" + std::to_string(descriptor_->fd()) +
-                             " is already in eventLoop");
-  this->eventloop_ = eventloop;
-  in_eventloop_ = true;
-  if (after_set_loop_callback_) after_set_loop_callback_(shared_from_this());
 }
 
 bool Channel::IsRead() const {
@@ -115,24 +108,24 @@ void Channel::DisableAll() {
 }
 
 void Channel::Activate(const unsigned revents) {
-  REQUIRE(eventloop_ && eventloop_->kPoller);
+  REQUIRE(in_eventloop_ && eventloop_->kPoller);
   if (eventloop_->kPoller->IsError(revents)) {
     // error event
     Log(TRACE) << "Activate ERROR callback with events " << revents;
     REQUIRE_(error_callback_, "errorCallback is not callable");
-    error_callback_();
+    error_callback_(shared_from_this());
   } else if (eventloop_->kPoller->IsClose(revents)) {
     // close event
     Log(TRACE) << "Activate CLOSE callback with events" << revents;
     REQUIRE_(close_callback_, "closeCallback is not callable");
-    close_callback_();
+    close_callback_(shared_from_this());
   } else {
     // read event
     if (eventloop_->kPoller->IsRead(revents)) {
       if (IsRead()) {
         Log(TRACE) << "Activate READ callback with events " << revents;
         REQUIRE_(read_callback_, "readCallback is not callable");
-        read_callback_();
+        read_callback_(shared_from_this());
       } else {
         Log(WARN) << "READ callback is not available";
       }
@@ -142,23 +135,26 @@ void Channel::Activate(const unsigned revents) {
       if (IsWrite()) {
         Log(TRACE) << "Activate WRITE callback with events" << revents;
         REQUIRE_(write_callback_, "writeCallback is not callable");
-        write_callback_();
+        write_callback_(shared_from_this());
       } else {
         Log(WARN) << "WRITE callback is not available";
       }
     }
+    if (update_after_activate_) Update();
   }
-  if (update_after_activate_) Update();
 }
 
 void Channel::Update() {
   TRACE_LOG;
+  REQUIRE(in_eventloop_);
   eventloop_->UpdateChannel(shared_from_this());
 }
 
 void Channel::Remove() {
   TRACE_LOG;
-  if (in_eventloop_) eventloop_->RemoveChannel(shared_from_this());
+  REQUIRE(in_eventloop_);
+  eventloop_->RemoveChannel(shared_from_this());
+  in_eventloop_ = false;
 }
 }
 }

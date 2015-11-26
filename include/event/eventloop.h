@@ -17,7 +17,7 @@ class Channel;
 /**
  * Thread safe is not required
  */
-class EventLoop {
+class EventLoop : public std::enable_shared_from_this<EventLoop> {
  public:
   EventLoop();
   explicit EventLoop(std::unique_ptr<poll::Poller> poller);

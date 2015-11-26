@@ -5,10 +5,5 @@ namespace collie {
 namespace poll {
 
 Poller::~Poller() {}
-
-void Poller::CloseImpl() noexcept {
-  // TODO error handling
-  ::close(fd_);
-}
 }
 }

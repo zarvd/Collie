@@ -23,12 +23,12 @@ class EventLoopThreadPool {
     std::mutex mtx;
   };
 
-  explicit EventLoopThreadPool(const size_t thread_num);
+  explicit EventLoopThreadPool(const size_t thread_num) noexcept;
   EventLoopThreadPool(const EventLoopThreadPool &) = delete;
   EventLoopThreadPool &operator=(const EventLoopThreadPool &) = delete;
-  ~EventLoopThreadPool();
+  ~EventLoopThreadPool() noexcept;
 
-  void StartLoop(std::vector<std::shared_ptr<Channel>> base_channel);
+  void StartLoop(std::vector<std::shared_ptr<Channel>> base_channels) noexcept;
   void PushChannel(std::shared_ptr<Channel> channel);
   std::shared_ptr<EventLoopThread> GetNextLoop();
 
@@ -39,7 +39,7 @@ class EventLoopThreadPool {
 
   std::vector<std::thread> workers_;
   std::mutex eventloop_thread_mtx_;
-  std::vector<std::shared_ptr<Channel>> base_channel_;
+  std::vector<std::shared_ptr<Channel>> base_channels_;
   std::vector<std::shared_ptr<EventLoopThread>> eventloop_threads_;
   std::atomic<bool> terminate_;
 };

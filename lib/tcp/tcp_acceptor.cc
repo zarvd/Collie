@@ -31,18 +31,16 @@ std::shared_ptr<event::Channel> TCPAcceptor::GetBaseChannel() {
 
   // create channel
   auto channel = std::make_shared<event::Channel>(tcp_socket_);
-  // for multi threads it doesn't own the socket fd
   // set callback after setting event loop
-  channel->set_after_set_loop_callback(
-      [this](std::shared_ptr<event::Channel> channel) {
-        Log(TRACE) << "TCPAcceptor channel is setting up";
-        channel->EnableRead();
-        channel->set_read_callback(std::bind(&TCPAcceptor::HandleRead, this));
-        channel->set_error_callback(std::bind(&TCPAcceptor::HandleError, this));
-        channel->EnableOneShot();  // NOTE One shot, channel needs to update
-                                   // after every accepting
-        channel->set_update_after_activate(true);
-      });
+  channel->set_insert_callback([this](std::shared_ptr<event::Channel> channel) {
+    Log(TRACE) << "TCPAcceptor channel is setting up";
+    channel->EnableRead();
+    channel->set_read_callback(std::bind(&TCPAcceptor::HandleRead, this));
+    channel->set_error_callback(std::bind(&TCPAcceptor::HandleError, this));
+    channel->EnableOneShot();  // NOTE One shot, channel needs to update
+                               // after every accepting
+    channel->set_update_after_activate(true);
+  });
   return channel;
 }
 

@@ -28,6 +28,7 @@ void TCPServer::Start() {
   Log(INFO) << "TCPServer start";
 
   acceptor_.reset(new TCPAcceptor(local_address_));
+  acceptor_->BindAndListen();
   using namespace std::placeholders;
   // setup acceptor
   acceptor_->set_accept_callback(
@@ -44,7 +45,7 @@ void TCPServer::NewConnection(std::shared_ptr<TCPSocket> conn_socket) {
   // new channel
   std::shared_ptr<event::Channel> channel(new event::Channel(conn_socket));
   // NOTE setting up channel in connection
-  channel->set_after_set_loop_callback([
+  channel->set_insert_callback([
     on_message_callback = on_message_callback_,
     local_address = local_address_
   ](std::shared_ptr<event::Channel> channel) {

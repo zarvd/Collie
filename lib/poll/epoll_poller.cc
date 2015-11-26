@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include "../../include/poll/epoll_poller.h"
 #include "../../include/exception.h"
 #include "../../include/logging.h"
@@ -8,16 +9,32 @@ namespace poll {
 EPollPoller::EPollPoller(const unsigned max_event)
     : Poller(max_event), revents_(new Event[kMaxEvent]) {
   Log(TRACE) << "EPoller constructing";
+  CreateImpl();
 }
 
-EPollPoller::~EPollPoller() { Log(TRACE) << "EPoller destructing"; }
+EPollPoller::~EPollPoller() {
+  Log(TRACE) << "EPoller destructing";
+  CloseImpl();
+}
 
-void EPollPoller::Open() {
+void EPollPoller::Create() { CreateImpl(); }
+
+void EPollPoller::Close() { CloseImpl(); }
+
+void EPollPoller::CreateImpl() noexcept {
+  if (is_init_) return;
   fd_ = epoll_create1(0);
   Log(TRACE) << "EPoller create new epoll " << fd_;
   REQUIRE_SYS(fd_ != -1);
 
   is_init_ = true;
+}
+
+void EPollPoller::CloseImpl() noexcept {
+  if (is_init_ && !is_close_) {
+    ::close(fd_);
+    is_close_ = true;
+  }
 }
 
 void EPollPoller::Insert(const int fd, const unsigned events) {
@@ -60,9 +77,9 @@ void EPollPoller::Poll(PollCallback cb, const int timeout) {
   Log(TRACE) << "Epoller " << fd_ << " get " << event_num << " events";
 
   for (int idx = 0; idx < event_num; ++idx) {
-    const Event& curEvent = revents_.get()[idx];
+    const Event& cur_event = revents_.get()[idx];
     REQUIRE_(cb, "PollCallback is not callable");
-    cb(curEvent.data.fd, curEvent.events);  // XXX
+    cb(cur_event.data.fd, cur_event.events);  // XXX
   }
 }
 }

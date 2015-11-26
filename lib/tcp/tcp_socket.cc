@@ -15,7 +15,7 @@ TCPSocket::TCPSocket(std::shared_ptr<InetAddress> addr) noexcept
       state_(State::Init),
       address_(addr) {
   Log(TRACE) << "TCPSocket is constructing";
-  Open();
+  CreateImpl();
 }
 
 // construct Accept connection socket
@@ -32,15 +32,24 @@ TCPSocket::TCPSocket() noexcept : Descriptor(-1, false),
   Log(TRACE) << "TCPSocket(IllegalAccept) is constructing";
 }
 
-TCPSocket::~TCPSocket() noexcept { Log(TRACE) << "TCPSocket is destructing"; }
+TCPSocket::~TCPSocket() noexcept {
+  Log(TRACE) << "TCPSocket is destructing";
+  CloseImpl();
+}
 
-void TCPSocket::Open() noexcept {
+void TCPSocket::Create() noexcept { CreateImpl(); }
+
+void TCPSocket::Close() noexcept { CloseImpl(); }
+
+void TCPSocket::CreateImpl() noexcept {
+  if (is_init_) return;
   fd_ = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (fd_ < 0) {
     Log(WARN) << "TCPSocket: " << GetError();
   } else {
     state_ = State::Socket;
     is_init_ = true;
+    Log(DEBUG) << "TCP Socket " << fd_ << " is created";
   }
 }
 
@@ -49,6 +58,7 @@ void TCPSocket::CloseImpl() noexcept {
   if (state_ != State::Init && state_ != State::Close) {
     ::close(fd_);
     state_ = State::Close;
+    is_close_ = true;
   }
 }
 

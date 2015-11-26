@@ -2,5 +2,5 @@
 
 namespace collie {
 
-Descriptor::~Descriptor() noexcept { Close(); }
+Descriptor::~Descriptor() noexcept {}
 }
