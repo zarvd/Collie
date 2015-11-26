@@ -8,22 +8,30 @@
 namespace collie {
 namespace tcp {
 
-TCPConnector::TCPConnector(std::shared_ptr<InetAddress> addr)
+TCPConnector::TCPConnector(std::shared_ptr<InetAddress> addr) noexcept
     : remote_address_(addr) {
   Log(TRACE) << "TCPConnector is constructing";
 }
 
-TCPConnector::~TCPConnector() { Log(TRACE) << "TCPConnector is destructing"; }
+TCPConnector::~TCPConnector() noexcept {
+  Log(TRACE) << "TCPConnector is destructing";
+}
 
 void TCPConnector::Connect(const size_t thread_num, const size_t connect_num) {
   threadpool_.reset(new event::ThreadPool(thread_num));
   threadpool_->Run();
 
   for (size_t i = 0; i < connect_num; ++i) {
-    threadpool_->Enqueue([this] {
+    threadpool_->Enqueue([
+      connect_callback = connect_callback_,
+      remote_address = remote_address_
+    ] {
       auto socket = std::make_shared<TCPSocket>(nullptr);
-      socket->Connect(remote_address_);
-      connect_callback_(socket);
+      if (socket->Connect(remote_address)) {
+        connect_callback(socket);
+      } else {
+        Log(WARN) << "TCP client socket cannot connect";
+      }
       socket->Close();
     });
   }

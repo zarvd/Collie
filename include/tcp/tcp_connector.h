@@ -24,10 +24,10 @@ class TCPConnector {
  public:
   using ConnectCallback = std::function<void(std::shared_ptr<TCPSocket>)>;
 
-  explicit TCPConnector(std::shared_ptr<InetAddress>);
+  explicit TCPConnector(std::shared_ptr<InetAddress>) noexcept;
   TCPConnector(const TCPConnector &) = delete;
   TCPConnector &operator=(const TCPConnector &) = delete;
-  ~TCPConnector();
+  ~TCPConnector() noexcept;
 
   void set_connect_callback(const ConnectCallback &cb) {
     connect_callback_ = cb;

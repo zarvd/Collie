@@ -18,14 +18,14 @@ class TCPSocket : public Descriptor,
                   public std::enable_shared_from_this<TCPSocket> {
  public:
   enum class State {
-    Init,
-    Socket,
-    Bind,
-    Listen,
-    Accept,
-    IllegalAccept,
-    Connect,
-    Close
+    Init = 1,
+    Socket = 2,
+    Bind = 3,
+    Listen = 4,
+    Accept = 5,
+    IllegalAccept = 6,
+    Connect = 7,
+    Close = 8
   };
   // Accept: which is the connection socket that accept() returned
   // IllegalAccept: which is the ILLEGAL connection socket that accept()

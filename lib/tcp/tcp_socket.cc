@@ -106,7 +106,11 @@ bool TCPSocket::Connect(std::shared_ptr<InetAddress> serv_address) {
   switch (serv_address->ip_version()) {
     case IP::V4:
       return ConnectV4(serv_address);
+    case IP::V6:
+      Log(WARN) << "IP v6 is not ready to go";
+      return false;
     default:
+      Log(ERROR) << "IP version is UNKNOWN " << serv_address->ip();
       return false;
   }
 }
@@ -124,9 +128,11 @@ bool TCPSocket::ConnectV4(std::shared_ptr<InetAddress> serv_address) {
       struct sockaddr_in local;
       int addrLen = sizeof(local);
       ::getsockname(fd_, (struct sockaddr *)&local, (socklen_t *)&addrLen);
-      *address_ = local;
+      address_ = std::make_shared<InetAddress>(local);
       return true;
     }
+  } else {
+    Log(WARN) << "TCP socket state is not able to connect" << int(state_);
   }
   return false;
 }

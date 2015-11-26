@@ -21,6 +21,7 @@ void TCPClient::Connect(const std::string& host, const unsigned port,
   }
 
   remote_address_ = InetAddress::GetInetAddress(host, port);
+
   connector_.reset(new TCPConnector(remote_address_));
   connector_->set_connect_callback(connect_callback_);
   connector_->Connect(thread_num, connect_num);
