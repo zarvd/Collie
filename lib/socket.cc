@@ -35,14 +35,14 @@ ssize_t socket::Send(std::shared_ptr<Descriptor> descriptor,
 }
 
 ssize_t socket::Recv(std::shared_ptr<Descriptor> descriptor,
-                     std::string &content, const int flags) {
+                     std::string &content, const size_t recv_size,
+                     const int flags) {
   const auto fd = descriptor->fd();
   if (fd < 2) {
     Log(WARN) << "Illegal socket fd " << fd;
   }
-  constexpr size_t kMsgLength = 8192;  // FIXME
-  char msg[kMsgLength];
-  const ssize_t size = ::recv(fd, msg, kMsgLength, flags);
+  char msg[recv_size];
+  const ssize_t size = ::recv(fd, msg, recv_size, flags);
   REQUIRE_SYS(size != -1);
   if (size == 0) {
     Log(DEBUG) << "Socket received nothing";
@@ -78,9 +78,9 @@ ssize_t socket::SendTo(std::shared_ptr<Descriptor> descriptor,
 ssize_t socket::RecvFrom(std::shared_ptr<Descriptor> descriptor,
                          std::string &content,
                          const std::shared_ptr<InetAddress> &remote_address,
-                         const int flags) {
+                         const size_t recv_size, const int flags) {
   const auto fd = descriptor->fd();
-  char buffer[8192];
+  char buffer[recv_size];
   struct sockaddr_in addr;
   socklen_t addr_length = sizeof(addr);
   const ssize_t size = ::recvfrom(fd, buffer, sizeof(buffer), flags,
@@ -98,14 +98,14 @@ ssize_t socket::RecvFrom(std::shared_ptr<Descriptor> descriptor,
 }
 
 bool socket::SendFile(std::shared_ptr<Descriptor> descriptor,
-                      const utils::File &file) {
+                      const utils::File &file, const size_t packet_size) {
   const auto fd = descriptor->fd();
   REQUIRE(file.is_existed() && file.IsRead());
   if (file.is_existed() && file.IsFile()) {
     off64_t offset = 0;
     size_t sent_size = 0;
     while (sent_size < file.GetSize()) {
-      const ssize_t ret = ::sendfile64(fd, file.fd(), &offset, file.GetSize());
+      const ssize_t ret = ::sendfile64(fd, file.fd(), &offset, packet_size);
       Log(DEBUG) << "sendfile64() return " << ret;
       if (ret == -1) {
         Log(ERROR) << GetError();

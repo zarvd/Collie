@@ -36,6 +36,7 @@ class TCPSocket : public Descriptor,
   TCPSocket &operator=(const TCPSocket &) = delete;
   ~TCPSocket() noexcept override;
 
+  void SetNoDelay() const;
   void Create() noexcept override;
   void Close() noexcept override;
 

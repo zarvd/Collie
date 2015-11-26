@@ -1,4 +1,4 @@
-#include <netinet/in.h>
+#include <netinet/tcp.h>
 #include <unistd.h>
 #include "../../include/tcp/tcp_socket.h"
 #include "../../include/socket.h"
@@ -44,7 +44,7 @@ void TCPSocket::Close() noexcept { CloseImpl(); }
 void TCPSocket::CreateImpl() noexcept {
   if (is_init_) return;
   fd_ = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-  if (fd_ < 0) {
+  if (fd_ == -1) {
     Log(WARN) << "TCPSocket: " << GetError();
   } else {
     state_ = State::Socket;
@@ -59,6 +59,15 @@ void TCPSocket::CloseImpl() noexcept {
     ::close(fd_);
     state_ = State::Close;
     is_close_ = true;
+  }
+}
+
+void TCPSocket::SetNoDelay() const {
+  int value = 1;
+  const int ret =
+      ::setsockopt(fd_, SOL_TCP, TCP_NODELAY, &value, sizeof(value));
+  if (ret == -1) {
+    Log(WARN) << "setsockopt() setting TCP_NODELAY: " << GetError();
   }
 }
 
@@ -77,7 +86,7 @@ bool TCPSocket::ListenV4() {
     struct sockaddr_in servAddr = address_->addr_v4();
 
     int ret = bind(fd_, (struct sockaddr *)&servAddr, sizeof(servAddr));
-    if (ret < 0) {
+    if (ret == -1) {
       Log(WARN) << "bind()" << GetError();
     } else {
       state_ = State::Bind;
@@ -88,7 +97,7 @@ bool TCPSocket::ListenV4() {
 
     Log(TRACE) << "Socket is listening";
 
-    if (::listen(fd_, SOMAXCONN) < 0) {
+    if (::listen(fd_, SOMAXCONN) == -1) {
       Log(WARN) << GetError();
     } else {
       state_ = State::Listen;
@@ -119,7 +128,7 @@ bool TCPSocket::ConnectV4(std::shared_ptr<InetAddress> serv_address) {
   struct sockaddr_in serv = serv_address->addr_v4();
   if (state_ == State::Socket) {
     int ret = ::connect(fd_, (struct sockaddr *)&serv, sizeof(serv));
-    if (ret < 0) {
+    if (ret == -1) {
       Log(WARN) << "connect()" << GetError();
     } else {
       state_ = State::Connect;
@@ -159,7 +168,7 @@ std::shared_ptr<TCPSocket> TCPSocket::AcceptV4(bool blocking) {
 
     const int ret =
         ::accept4(fd_, (struct sockaddr *)&clientAddr, &clientAddrLen, flags);
-    if (ret < 0) {
+    if (ret == -1) {
       Log(TRACE) << "accept(): " << GetError();
       return GetIllegalAcceptSocket();
     } else {
