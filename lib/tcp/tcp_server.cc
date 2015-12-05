@@ -59,6 +59,7 @@ void TCPServer::NewConnection(std::shared_ptr<TCPSocket> conn_socket) {
     g_local_thread_tcp_iostream_set.insert(iostream);
     // store iostream
     on_message_callback(iostream, local_address, peer_address);  // FIXME
+    if (channel->IsNoneEvent()) channel->Remove();
   });
   eventloop_threadpool_->PushChannel(channel);
 
