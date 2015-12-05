@@ -1,5 +1,4 @@
 #include "../../include/utils/file.h"
-#include "../../include/exception.h"
 #include "../../include/logging.h"
 #include <unistd.h>
 
@@ -20,11 +19,11 @@ File::File(const std::string& pathname, const Mode mode, int flags)
       const int creatFlags = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
       int ret = ::creat64(pathname.c_str(), creatFlags);
       if (ret == -1) {
-        Log(WARN) << "Path " << pathname << " can not be created"
-                  << " : " << GetError();
+        LOG(WARNING) << "Path" << pathname << "can not be created"
+                     << ":" << GetSystemError();
         is_existed_ = false;
       } else {
-        Log(INFO) << "Create file " << pathname;
+        LOG(INFO) << "Create file" << pathname;
         ::stat64(pathname.c_str(), &stat_);  // refresh stat;
         ::close(ret);  // creat() set ONLY WRITE, we need to reopen it
       }
@@ -34,9 +33,10 @@ File::File(const std::string& pathname, const Mode mode, int flags)
     // is file
     fd_ = ::open64(pathname.c_str(), static_cast<int>(mode), flags);
     if (fd_ != -1) {
-      Log(INFO) << "Open file " << pathname;
+      LOG(INFO) << "Open file" << pathname;
     } else {
-      Log(WARN) << "Can not open file " << pathname << " : " << GetError();
+      LOG(WARNING) << "Can not open file" << pathname << ":"
+                   << GetSystemError();
     }
   }
 }

@@ -3,7 +3,6 @@
 #include "../../include/tcp/tcp_socket.h"
 #include "../../include/inet_address.h"
 #include "../../include/utils/file.h"
-#include "../../include/exception.h"
 #include "../../include/logging.h"
 
 namespace collie {
@@ -13,7 +12,6 @@ TCPSocket::TCPSocket(std::shared_ptr<InetAddress> addr) noexcept
     : Descriptor(-1, false),
       state_(State::Init),
       address_(addr) {
-  Log(TRACE) << "TCPSocket is constructing";
   CreateImpl();
 }
 
@@ -21,20 +19,13 @@ TCPSocket::TCPSocket(std::shared_ptr<InetAddress> addr) noexcept
 TCPSocket::TCPSocket(const int fd, std::shared_ptr<InetAddress> addr) noexcept
     : Descriptor(fd, true),
       state_(State::Accept),
-      address_(addr) {
-  Log(TRACE) << "TCPSocket(Accept connection) is constructing";
-}
+      address_(addr) {}
 
 // construct illegal socket
 TCPSocket::TCPSocket() noexcept : Descriptor(-1, false),
-                                  state_(State::IllegalAccept) {
-  Log(TRACE) << "TCPSocket(IllegalAccept) is constructing";
-}
+                                  state_(State::IllegalAccept) {}
 
-TCPSocket::~TCPSocket() noexcept {
-  Log(TRACE) << "TCPSocket is destructing";
-  CloseImpl();
-}
+TCPSocket::~TCPSocket() noexcept { CloseImpl(); }
 
 void TCPSocket::Create() noexcept { CreateImpl(); }
 
@@ -44,16 +35,14 @@ void TCPSocket::CreateImpl() noexcept {
   if (is_init_) return;
   fd_ = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (fd_ == -1) {
-    Log(WARN) << "TCPSocket: " << GetError();
+    LOG(WARNING) << "TCPSocket: " << GetSystemError();
   } else {
     state_ = State::Socket;
     is_init_ = true;
-    Log(DEBUG) << "TCP Socket " << fd_ << " is created";
   }
 }
 
 void TCPSocket::CloseImpl() noexcept {
-  Log(TRACE) << "Socket closed";
   if (state_ != State::Init && state_ != State::Close) {
     ::close(fd_);
     state_ = State::Close;
@@ -63,15 +52,15 @@ void TCPSocket::CloseImpl() noexcept {
 
 // if state_ is Init, IllegalAccept or Close
 // it will throw ::collie::Exception
-// if operation fails, it will NOT throw but log WARN message
+// if operation fails, it will NOT throw but log WARNING message
 void TCPSocket::SetNoDelay() const {
-  REQUIRE(state_ != State::Init && state_ != State::IllegalAccept &&
-          state_ != State::Close);
+  CHECK(state_ != State::Init && state_ != State::IllegalAccept &&
+        state_ != State::Close);
   int value = 1;
   const int ret =
       ::setsockopt(fd_, SOL_TCP, TCP_NODELAY, &value, sizeof(value));
   if (ret == -1) {
-    Log(WARN) << "setsockopt() setting TCP_NODELAY: " << GetError();
+    LOG(WARNING) << "setsockopt() setting TCP_NODELAY: " << GetSystemError();
   }
 }
 
@@ -81,7 +70,7 @@ void TCPSocket::SetNoDelay() const {
 // if state == Bind, then Listen fd
 // if state == Listen, return true directly
 bool TCPSocket::BindAndListen() {
-  REQUIRE(address_);
+  CHECK(address_);
   switch (address_->ip_version()) {
     case IP::V4:
       return ListenV4();
@@ -100,18 +89,14 @@ bool TCPSocket::ListenV4() {
 
     int ret = bind(fd_, (struct sockaddr *)&servAddr, sizeof(servAddr));
     if (ret == -1) {
-      Log(WARN) << "bind()" << GetError();
+      LOG(WARNING) << "bind()" << GetSystemError();
     } else {
       state_ = State::Bind;
     }
   }
   if (state_ == State::Bind) {
-    Log(TRACE) << "Socket " << fd_ << " is binding";
-
-    Log(TRACE) << "Socket is listening";
-
     if (::listen(fd_, SOMAXCONN) == -1) {
-      Log(WARN) << GetError();
+      LOG(WARNING) << GetSystemError();
     } else {
       state_ = State::Listen;
     }
@@ -124,15 +109,15 @@ bool TCPSocket::ListenV4() {
 }
 
 bool TCPSocket::Connect(std::shared_ptr<InetAddress> serv_address) {
-  REQUIRE(serv_address);
+  CHECK(serv_address);
   switch (serv_address->ip_version()) {
     case IP::V4:
       return ConnectV4(serv_address);
     case IP::V6:
-      Log(WARN) << "IP v6 is not ready to go";
+      LOG(WARNING) << "IP v6 is not ready to go";
       return false;
     default:
-      Log(ERROR) << "IP version is UNKNOWN " << serv_address->ip();
+      LOG(ERROR) << "IP version is UNKNOWN " << serv_address->ip();
       return false;
   }
 }
@@ -142,7 +127,7 @@ bool TCPSocket::ConnectV4(std::shared_ptr<InetAddress> serv_address) {
   if (state_ == State::Socket) {
     int ret = ::connect(fd_, (struct sockaddr *)&serv, sizeof(serv));
     if (ret == -1) {
-      Log(WARN) << "connect()" << GetError();
+      LOG(WARNING) << "connect()" << GetSystemError();
     } else {
       state_ = State::Connect;
 
@@ -154,14 +139,14 @@ bool TCPSocket::ConnectV4(std::shared_ptr<InetAddress> serv_address) {
       return true;
     }
   } else {
-    Log(WARN) << "TCP socket state is not able to connect" << int(state_);
+    LOG(WARNING) << "TCP socket state is not able to connect" << int(state_);
   }
   return false;
 }
 
 // Thread safe
 std::shared_ptr<TCPSocket> TCPSocket::Accept(bool blocking) {
-  REQUIRE(address_);
+  CHECK(address_);
   switch (address_->ip_version()) {
     case IP::V4:
       return AcceptV4(blocking);
@@ -182,10 +167,10 @@ std::shared_ptr<TCPSocket> TCPSocket::AcceptV4(bool blocking) {
     const int ret =
         ::accept4(fd_, (struct sockaddr *)&clientAddr, &clientAddrLen, flags);
     if (ret == -1) {
-      Log(TRACE) << "accept(): " << GetError();
+      LOG(TRACE) << "accept(): " << GetSystemError();
       return GetIllegalAcceptSocket();
     } else {
-      Log(DEBUG) << "Socket accept " << ret;
+      LOG(DEBUG) << "Socket accept " << ret;
       auto addr = std::make_shared<InetAddress>(clientAddr);
       return GetAcceptSocket(ret, addr);
     }
@@ -195,7 +180,7 @@ std::shared_ptr<TCPSocket> TCPSocket::AcceptV4(bool blocking) {
 
 std::shared_ptr<TCPSocket> TCPSocket::GetAcceptSocket(
     const int fd, std::shared_ptr<InetAddress> addr) {
-  REQUIRE(fd > 0);
+  CHECK(fd > 0);
   return std::shared_ptr<TCPSocket>(new TCPSocket(fd, addr));
 }
 

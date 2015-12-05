@@ -1,19 +1,17 @@
 #include "../../include/event/eventloop_threadpool.h"
 #include "../../include/event/channel.h"
 #include "../../include/event/eventloop.h"
-#include "../../include/exception.h"
 #include "../../include/logging.h"
 
 namespace collie {
 namespace event {
 
 EventLoopThreadPool::EventLoopThreadPool(const size_t thread_num) noexcept
-    : kThreadNum(thread_num) {
-  Log(TRACE) << "Event loop with thread pool is constructing";
-}
+    : kThreadNum(thread_num),
+      terminate_(false) {}
 
 EventLoopThreadPool::~EventLoopThreadPool() noexcept {
-  Log(TRACE) << "Event loop with thread pool is destructing";
+  terminate_ = true;
 }
 
 void EventLoopThreadPool::StartLoop(
@@ -37,7 +35,6 @@ EventLoopThreadPool::GetNextLoop() {
 
 void EventLoopThreadPool::PushChannel(std::shared_ptr<Channel> channel) {
   // insert to NEXT loop
-  Log(TRACE) << "pushing channel";
   auto loop = GetNextLoop();
   std::lock_guard<std::mutex> lock(loop->mtx);
   loop->channels.push_back(channel);
@@ -61,6 +58,7 @@ void EventLoopThreadPool::RunInThread() {
 
   // loop
   while (true) {
+    TIMED_SCOPE(timerBlkObj, "event loop thread pool");
     std::vector<std::shared_ptr<Channel>> channels;
     // get new channel or terminate
     // Non blocking

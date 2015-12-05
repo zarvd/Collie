@@ -6,17 +6,14 @@
 #include "../../include/tcp/tcp_acceptor.h"
 #include "../../include/tcp/tcp_socket.h"
 #include "../../include/tcp/tcp_iostream.h"
-#include "../../include/exception.h"
 #include "../../include/logging.h"
 
 namespace collie {
 namespace tcp {
 
-TCPServer::TCPServer() : thread_num_(1), port_(0) {
-  Log(TRACE) << "TCPServer constructing";
-}
+TCPServer::TCPServer() : thread_num_(1), port_(0) {}
 
-TCPServer::~TCPServer() { Log(TRACE) << "TCPServer destructing"; }
+TCPServer::~TCPServer() {}
 
 void TCPServer::Bind(const std::string& host, const unsigned port) {
   host_ = host;
@@ -25,7 +22,8 @@ void TCPServer::Bind(const std::string& host, const unsigned port) {
 }
 
 void TCPServer::Start() {
-  Log(INFO) << "TCPServer start";
+  LOG(INFO) << "TCPServer start in" << local_address_->ip() << ":"
+            << local_address_->port();
 
   acceptor_.reset(new TCPAcceptor(local_address_));
   acceptor_->BindAndListen();
@@ -39,7 +37,7 @@ void TCPServer::Start() {
 }
 
 void TCPServer::NewConnection(std::shared_ptr<TCPSocket> conn_socket) {
-  Log(INFO) << "TCPServer accept fd(" << conn_socket->fd() << ") ip("
+  LOG(INFO) << "TCPServer accept fd(" << conn_socket->fd() << ") ip("
             << conn_socket->address()->ip() << ")";
 
   // new channel
@@ -51,7 +49,7 @@ void TCPServer::NewConnection(std::shared_ptr<TCPSocket> conn_socket) {
     peer_address = conn_socket->address()
   ](std::shared_ptr<event::Channel> channel) {
 
-    REQUIRE(channel);
+    CHECK(channel);
     channel->DisableRead();
     channel->DisableWrite();
     // new connection

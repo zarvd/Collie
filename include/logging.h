@@ -1,24 +1,26 @@
 #ifndef COLLIE_LOGGING_H_
 #define COLLIE_LOGGING_H_
 
-#include <logger/logger.h>
+// #include <logger/logger.h>
+#include "easylogging++.h"
+
+// enable thread safe logging
+#define ELPP_THREAD_SAFE
 
 namespace collie {
 
-using logger::LogLevel::TRACE;
-using logger::LogLevel::DEBUG;
-using logger::LogLevel::INFO;
-using logger::LogLevel::WARN;
-using logger::LogLevel::ERROR;
-using logger::LogLevel;
+inline std::string GetSystemError() { return std::string(strerror(errno)); }
 
-inline void InitLogger(const LogLevel log_level = DEBUG) {
-  auto& logging = logger::LogHandler::GetHandler();
-  logging.set_log_level(log_level);
-  logging.Init();
+inline void ConfigureLogger(
+    const std::string& logging_conf_path = "./logging.conf") {
+  el::Configurations conf(logging_conf_path);
+  el::Loggers::reconfigureAllLoggers(conf);
+  el::Loggers::addFlag(el::LoggingFlag::ColoredTerminalOutput);
+  el::Loggers::addFlag(el::LoggingFlag::AutoSpacing);
+}
 }
 
-#define TRACE_LOG Log(TRACE) << "TRACE log";
-}
+#define THROW_SYS LOG(FATAL) << ::collie::GetSystemError();
+#define CHECK_SYS(CONDITION) CHECK(CONDITION) << ::collie::GetSystemError();
 
 #endif /* COLLIE_LOGGING_H_ */

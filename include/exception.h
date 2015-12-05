@@ -54,30 +54,16 @@ class Exception : public std::exception {
     throw ::collie::Exception(EXC_DETAIL + "REQUIRE"); \
   }
 
-// if (!(CONDITION)) {                                               \
-  //   std::cout << EXC_DETAIL << std::endl << "REQUIRE" << std::endl; \
-  //   abort();                                                        \
-  // }
-
 #define REQUIRE_SYS(CONDITION)                                         \
   if (!(CONDITION)) {                                                  \
     throw ::collie::Exception(EXC_DETAIL + "REQUIRE\nSystem Error: " + \
                               ::collie::GetError());                   \
   }
-// if (!(CONDITION)) {                                                   \
-  //   std::cout << EXC_DETAIL << std::endl                                \
-  //             << "System Error: " << ::collie::GetError() << std::endl; \
-  //   abort();                                                            \
-  // }
 
-#define REQUIRE_(CONDITION, msg)                               \
-  if (!(CONDITION)) {                                          \
+#define REQUIRE_(CONDITION, msg)                             \
+  if (!(CONDITION)) {                                        \
     throw ::collie::Exception(EXC_DETAIL_(msg) + "REQUIRE"); \
   }
-// if (!(CONDITION)) {                                                     \
-  //   std::cout << EXC_DETAIL_(msg) << std::endl << "REQUIRE" << std::endl; \
-  //   abort();                                                              \
-  // }
 }
 
 #endif /* COLLIE_EXCEPTION_H */

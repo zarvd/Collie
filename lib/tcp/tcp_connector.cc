@@ -2,7 +2,6 @@
 #include "../../include/tcp/tcp_socket.h"
 #include "../../include/inet_address.h"
 #include "../../include/event/threadpool.h"
-#include "../../include/exception.h"
 #include "../../include/logging.h"
 
 namespace collie {
@@ -10,11 +9,9 @@ namespace tcp {
 
 TCPConnector::TCPConnector(std::shared_ptr<InetAddress> addr) noexcept
     : remote_address_(addr) {
-  Log(TRACE) << "TCPConnector is constructing";
 }
 
 TCPConnector::~TCPConnector() noexcept {
-  Log(TRACE) << "TCPConnector is destructing";
 }
 
 void TCPConnector::Connect(const size_t thread_num, const size_t connect_num) {
@@ -30,7 +27,7 @@ void TCPConnector::Connect(const size_t thread_num, const size_t connect_num) {
       if (socket->Connect(remote_address)) {
         connect_callback(socket);
       } else {
-        Log(WARN) << "TCP client socket cannot connect";
+        LOG(WARNING) << "TCP client socket cannot connect";
       }
       socket->Close();
     });

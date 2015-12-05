@@ -1,19 +1,15 @@
 #include "../../include/event/threadpool.h"
 #include "../../include/event/eventloop.h"
 #include "../../include/event/channel.h"
-#include "../../include/exception.h"
 #include "../../include/logging.h"
 
 namespace collie {
 namespace event {
 
 ThreadPool::ThreadPool(const size_t thread_num)
-    : kThreadNum(thread_num), terminate_(false) {
-  Log(TRACE) << "ThreadPool is constructing";
-}
+    : kThreadNum(thread_num), terminate_(false) {}
 
 ThreadPool::~ThreadPool() {
-  Log(TRACE) << "ThreadPool is destructing";
   if (!terminate_) Terminate();
 }
 
@@ -25,7 +21,6 @@ void ThreadPool::Run() {
 }
 
 void ThreadPool::Terminate() {
-  Log(TRACE) << "ThreadPool is shutting down";
   {
     // send terminate signal to threads
     std::lock_guard<std::mutex> lock(mtx_);

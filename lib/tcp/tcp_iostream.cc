@@ -1,6 +1,5 @@
 #include "../../include/tcp/tcp_iostream.h"
 #include "../../include/event/channel.h"
-#include "../../include/exception.h"
 #include "../../include/logging.h"
 #include "../../include/descriptor.h"
 #include <sys/socket.h>
@@ -35,7 +34,7 @@ void TCPIOStream::Close() {
 void TCPIOStream::ReadUntil(const std::string &delimiter,
                             const ReadCallback &callback,
                             const int max_length) {
-  REQUIRE(channel_ && !is_close_);
+  CHECK(channel_ && !is_close_);
 
   const unsigned content_length =
       max_length == -1 ? default_read_size_ : max_length;
@@ -58,7 +57,7 @@ void TCPIOStream::HandleReadUntil(const std::string &delimiter,
       ::recv(fd, content, max_length - read_buffer_.length(), MSG_DONTWAIT);
   if (recv_size == -1) {
     // get error
-    Log(WARN) << "TCPIOStream read error: " << GetError();
+    LOG(WARNING) << "TCPIOStream read error: " << GetSystemError();
     Close();
   } else if (recv_size == 0) {
     // get EOF and cannot find delimiter
@@ -90,7 +89,7 @@ void TCPIOStream::HandleReadUntil(const std::string &delimiter,
 // Asynchronously read until getting EOF
 void TCPIOStream::ReadUntilClose(const ReadCallback &callback,
                                  const int max_length) {
-  REQUIRE(channel_ && !is_close_);
+  CHECK(channel_ && !is_close_);
 
   const unsigned content_length =
       max_length == -1 ? default_read_size_ : max_length;
@@ -111,7 +110,7 @@ void TCPIOStream::HandleReadUntilClose(
       ::recv(fd, content, max_length - read_buffer_.length(), MSG_DONTWAIT);
   if (recv_size == -1) {
     // get error
-    Log(WARN) << "TCPIOStream read error: " << GetError();
+    LOG(WARNING) << "TCPIOStream read error: " << GetSystemError();
     Close();
   } else if (recv_size == 0) {
     // get EOF
@@ -130,7 +129,7 @@ void TCPIOStream::HandleReadUntilClose(
 
 void TCPIOStream::Write(const std::string &data, const int package_length,
                         const WriteCallback &callback) {
-  REQUIRE(channel_ && !is_close_);
+  CHECK(channel_ && !is_close_);
 
   write_buffer_ = std::move(data);
 
@@ -161,7 +160,7 @@ void TCPIOStream::HandleWrite(const WriteCallback &callback,
     int ret = ::send(fd, buffer, sizeof(buffer), MSG_DONTWAIT);
     if (ret == -1) {
       // get error
-      Log(WARN) << "TCPIOStream write error: " << GetError();
+      LOG(WARNING) << "TCPIOStream write error: " << GetSystemError();
       Close();
     } else {
       if (static_cast<unsigned>(ret) >= write_buffer_.length()) {
