@@ -5,7 +5,7 @@
 #include "../../include/tcp/tcp_server.h"
 #include "../../include/tcp/tcp_acceptor.h"
 #include "../../include/tcp/tcp_socket.h"
-#include "../../include/tcp/tcp_connection.h"
+#include "../../include/tcp/tcp_iostream.h"
 #include "../../include/exception.h"
 #include "../../include/logging.h"
 
@@ -47,20 +47,18 @@ void TCPServer::NewConnection(std::shared_ptr<TCPSocket> conn_socket) {
   // NOTE setting up channel in connection
   channel->set_insert_callback([
     on_message_callback = on_message_callback_,
-    local_address = local_address_
+    local_address = local_address_,
+    peer_address = conn_socket->address()
   ](std::shared_ptr<event::Channel> channel) {
 
+    REQUIRE(channel);
+    channel->DisableRead();
+    channel->DisableWrite();
     // new connection
-    auto connection = std::make_shared<TCPConnection>(channel, local_address);
-    connection->set_message_callback(on_message_callback);
-    // store this connection in server
-    g_local_thread_connections.insert(connection);
-
-    connection->set_terminate_callback([](std::shared_ptr<TCPConnection> conn) {
-      // remove this connection from server
-      Log(INFO) << "Connection close";
-      g_local_thread_connections.erase(conn);
-    });
+    auto iostream = std::make_shared<TCPIOStream>(channel);
+    g_local_thread_tcp_iostream_set.insert(iostream);
+    // store iostream
+    on_message_callback(iostream, local_address, peer_address);  // FIXME
   });
   eventloop_threadpool_->PushChannel(channel);
 

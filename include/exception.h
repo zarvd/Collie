@@ -21,7 +21,8 @@ inline std::string GetDetail(const std::string& file, const unsigned& line,
                              const std::string& msg = "") {
   const std::string File = "File: " + file + "(" + std::to_string(line) + ")";
   const std::string Function = "Function : " + func;
-  const std::string Message = "Message: " + msg;
+  std::string Message;
+  if (msg != "") Message = "Message: " + msg;
   return "\n" + File + "\n" + Function + "\n" + Message;
 }
 
@@ -48,24 +49,35 @@ class Exception : public std::exception {
   throw ::collie::Exception(EXC_DETAIL_(msg) + "\nSystem Error: " + \
                             ::collie::GetError());
 
-#define REQUIRE(CONDITION)                                          \
-  if (!(CONDITION)) {                                               \
-    std::cout << EXC_DETAIL << std::endl << "REQUIRE" << std::endl; \
-    abort();                                                        \
+#define REQUIRE(CONDITION)                             \
+  if (!(CONDITION)) {                                  \
+    throw ::collie::Exception(EXC_DETAIL + "REQUIRE"); \
   }
 
-#define REQUIRE_SYS(CONDITION)                                          \
-  if (!(CONDITION)) {                                                   \
-    std::cout << EXC_DETAIL << std::endl                                \
-              << "System Error: " << ::collie::GetError() << std::endl; \
-    abort();                                                            \
-  }
+// if (!(CONDITION)) {                                               \
+  //   std::cout << EXC_DETAIL << std::endl << "REQUIRE" << std::endl; \
+  //   abort();                                                        \
+  // }
 
-#define REQUIRE_(CONDITION, msg)                                          \
-  if (!(CONDITION)) {                                                     \
-    std::cout << EXC_DETAIL_(msg) << std::endl << "REQUIRE" << std::endl; \
-    abort();                                                              \
+#define REQUIRE_SYS(CONDITION)                                         \
+  if (!(CONDITION)) {                                                  \
+    throw ::collie::Exception(EXC_DETAIL + "REQUIRE\nSystem Error: " + \
+                              ::collie::GetError());                   \
   }
+// if (!(CONDITION)) {                                                   \
+  //   std::cout << EXC_DETAIL << std::endl                                \
+  //             << "System Error: " << ::collie::GetError() << std::endl; \
+  //   abort();                                                            \
+  // }
+
+#define REQUIRE_(CONDITION, msg)                               \
+  if (!(CONDITION)) {                                          \
+    throw ::collie::Exception(EXC_DETAIL_(msg) + "REQUIRE"); \
+  }
+// if (!(CONDITION)) {                                                     \
+  //   std::cout << EXC_DETAIL_(msg) << std::endl << "REQUIRE" << std::endl; \
+  //   abort();                                                              \
+  // }
 }
 
 #endif /* COLLIE_EXCEPTION_H */

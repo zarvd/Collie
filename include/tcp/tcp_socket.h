@@ -46,13 +46,7 @@ class TCPSocket : public Descriptor,
 
   bool Connect(std::shared_ptr<InetAddress>);
   bool BindAndListen();
-  std::shared_ptr<TCPSocket> Accept(bool blocking = false) noexcept;
-
-  // send and recv
-  ssize_t Recv(std::string &content, const int flags = 0);
-  ssize_t Send(const std::string &content, const int flags = 0);
-  bool SendFile(const utils::File &file);
-  bool RecvFile(const utils::File &file, const size_t recvSize);
+  std::shared_ptr<TCPSocket> Accept(bool blocking = false);
 
  private:
   // construct Accept connection socket
@@ -60,8 +54,8 @@ class TCPSocket : public Descriptor,
   // construct illegal socket
   TCPSocket() noexcept;
 
-  std::shared_ptr<TCPSocket> GetAcceptSocket(
-      const int fd, std::shared_ptr<InetAddress>) noexcept;
+  std::shared_ptr<TCPSocket> GetAcceptSocket(const int fd,
+                                             std::shared_ptr<InetAddress>);
   std::shared_ptr<TCPSocket> GetIllegalAcceptSocket() noexcept;
 
   void CreateImpl() noexcept;
@@ -70,9 +64,6 @@ class TCPSocket : public Descriptor,
   bool ListenV4();
   std::shared_ptr<TCPSocket> AcceptV4(bool blocking);
   bool ConnectV4(std::shared_ptr<InetAddress> servAddr);
-  // bool listenV6();
-  // int acceptV6(std::shared_ptr<InetAddress>, bool blocking);
-  // bool connectV6(std::shared_ptr<InetAddress>);
 
   State state_;
   std::shared_ptr<InetAddress> address_;

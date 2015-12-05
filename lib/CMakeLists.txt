@@ -11,8 +11,7 @@ set(BASE_SRC
 
 set(NETWORK_SRC
   inet_address.cc
-  socket.cc
-  tcp/tcp_connection.cc
+  tcp/tcp_iostream.cc
   tcp/tcp_server.cc
   tcp/tcp_socket.cc
   tcp/tcp_acceptor.cc

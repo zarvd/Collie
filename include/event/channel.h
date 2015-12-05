@@ -54,7 +54,7 @@ class Channel : public std::enable_shared_from_this<Channel> {
   bool in_eventloop() const { return in_eventloop_; }
 
   // event
-  bool IsNoneEvent() const { return events_ == 0; }
+  bool IsNoneEvent() const { return !IsRead() && !IsWrite(); }
   bool IsRead() const;
   bool IsWrite() const;
 

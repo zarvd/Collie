@@ -4,6 +4,7 @@
 #include <thread>
 #include <memory>
 #include <string>
+#include <unordered_set>
 
 namespace collie {
 
@@ -16,12 +17,15 @@ class InetAddress;
 namespace tcp {
 
 class TCPAcceptor;
-class TCPConnection;
 class TCPSocket;
+class TCPIOStream;
 
 class TCPServer {
  public:
-  using OnMessageCallback = std::function<void(std::shared_ptr<TCPConnection>)>;
+  using OnMessageCallback =
+      std::function<void(std::shared_ptr<TCPIOStream> iostream,
+                         std::shared_ptr<InetAddress> local_address,
+                         std::shared_ptr<InetAddress> peer_address)>;
   using ConnectedCallback = std::function<void()>;
 
   TCPServer();

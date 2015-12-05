@@ -1,7 +1,6 @@
 #include <netinet/tcp.h>
 #include <unistd.h>
 #include "../../include/tcp/tcp_socket.h"
-#include "../../include/socket.h"
 #include "../../include/inet_address.h"
 #include "../../include/utils/file.h"
 #include "../../include/exception.h"
@@ -62,7 +61,12 @@ void TCPSocket::CloseImpl() noexcept {
   }
 }
 
+// if state_ is Init, IllegalAccept or Close
+// it will throw ::collie::Exception
+// if operation fails, it will NOT throw but log WARN message
 void TCPSocket::SetNoDelay() const {
+  REQUIRE(state_ != State::Init && state_ != State::IllegalAccept &&
+          state_ != State::Close);
   int value = 1;
   const int ret =
       ::setsockopt(fd_, SOL_TCP, TCP_NODELAY, &value, sizeof(value));
@@ -71,6 +75,11 @@ void TCPSocket::SetNoDelay() const {
   }
 }
 
+// if address_ is NULL, it will throw ::collie::Exception
+// listen ip according ip version, return true when op success
+// if state == Socket, then Bind and Listen fd
+// if state == Bind, then Listen fd
+// if state == Listen, return true directly
 bool TCPSocket::BindAndListen() {
   REQUIRE(address_);
   switch (address_->ip_version()) {
@@ -81,6 +90,10 @@ bool TCPSocket::BindAndListen() {
   }
 }
 
+// listen ipv4, return true when op success
+// if state == Socket, then Bind and Listen fd
+// if state == Bind, then Listen fd
+// if state == Listen, return true directly
 bool TCPSocket::ListenV4() {
   if (state_ == State::Socket) {
     struct sockaddr_in servAddr = address_->addr_v4();
@@ -147,7 +160,7 @@ bool TCPSocket::ConnectV4(std::shared_ptr<InetAddress> serv_address) {
 }
 
 // Thread safe
-std::shared_ptr<TCPSocket> TCPSocket::Accept(bool blocking) noexcept {
+std::shared_ptr<TCPSocket> TCPSocket::Accept(bool blocking) {
   REQUIRE(address_);
   switch (address_->ip_version()) {
     case IP::V4:
@@ -180,28 +193,8 @@ std::shared_ptr<TCPSocket> TCPSocket::AcceptV4(bool blocking) {
   return GetIllegalAcceptSocket();
 }
 
-ssize_t TCPSocket::Recv(std::string &content, const int flags) {
-  REQUIRE(state_ == State::Connect || state_ == State::Accept);
-  return socket::Recv(shared_from_this(), content, flags);
-}
-
-ssize_t TCPSocket::Send(const std::string &content, const int flags) {
-  REQUIRE(state_ == State::Connect || state_ == State::Accept);
-  return socket::Send(shared_from_this(), content, flags);
-}
-
-bool TCPSocket::SendFile(const utils::File &file) {
-  REQUIRE(state_ == State::Connect || state_ == State::Accept);
-  return socket::SendFile(shared_from_this(), file);
-}
-
-bool TCPSocket::RecvFile(const utils::File &file, const size_t recv_size) {
-  REQUIRE(state_ == State::Connect || state_ == State::Accept);
-  return socket::RecvFile(shared_from_this(), file, recv_size);
-}
-
 std::shared_ptr<TCPSocket> TCPSocket::GetAcceptSocket(
-    const int fd, std::shared_ptr<InetAddress> addr) noexcept {
+    const int fd, std::shared_ptr<InetAddress> addr) {
   REQUIRE(fd > 0);
   return std::shared_ptr<TCPSocket>(new TCPSocket(fd, addr));
 }

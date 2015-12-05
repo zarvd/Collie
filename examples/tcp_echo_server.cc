@@ -1,11 +1,12 @@
 #include "../include/tcp/tcp_server.h"
-#include "../include/tcp/tcp_connection.h"
+#include "../include/tcp/tcp_iostream.h"
 #include "../include/inet_address.h"
 #include "../include/exception.h"
 #include "../include/logging.h"
 
 using collie::tcp::TCPServer;
-using collie::tcp::TCPConnection;
+using collie::tcp::TCPIOStream;
+using collie::InetAddress;
 using namespace collie;
 
 int main(int argc, char* argv[]) {
@@ -18,13 +19,17 @@ int main(int argc, char* argv[]) {
 
   TCPServer server;
   server.Bind("0.0.0.0", port);
-  server.set_on_message_callback([](std::shared_ptr<TCPConnection> conn) {
-    REQUIRE(conn);
-    const auto content = conn->RecvAll();
-    auto addr = conn->remote_address();
-    REQUIRE(addr);
-    Log(INFO) << addr->ip() << " (" << addr->port() << "): " << content;
-    conn->Send("Hi, here is server");
+  server.set_on_message_callback([](std::shared_ptr<TCPIOStream> iostream,
+                                    std::shared_ptr<InetAddress>,
+                                    std::shared_ptr<InetAddress> peer_address) {
+    Log(INFO) << peer_address->ip() << " (" << peer_address->port() << "): "
+              << "Connect";
+
+    iostream->ReadUntil("\n", [](const std::string& msg,
+                                 std::shared_ptr<TCPIOStream> iostream) {
+      iostream->Write("Hello, " + msg);
+    });
+
   });
   server.Start();
   return 0;
