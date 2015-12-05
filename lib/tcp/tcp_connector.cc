@@ -8,11 +8,9 @@ namespace collie {
 namespace tcp {
 
 TCPConnector::TCPConnector(std::shared_ptr<InetAddress> addr) noexcept
-    : remote_address_(addr) {
-}
+    : remote_address_(addr) {}
 
-TCPConnector::~TCPConnector() noexcept {
-}
+TCPConnector::~TCPConnector() noexcept {}
 
 void TCPConnector::Connect(const size_t thread_num, const size_t connect_num) {
   threadpool_.reset(new event::ThreadPool(thread_num));
