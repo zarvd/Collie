@@ -7,6 +7,7 @@ set(BASE_SRC
   poll/poller.cc
   poll/epoll_poller.cc
   utils/file.cc
+  utils/survival_time.cc
   )
 
 set(NETWORK_SRC

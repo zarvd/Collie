@@ -4,13 +4,15 @@
 #include <functional>
 #include <memory>
 #include "eventloop.h"
+#include "../utils/survival_time.h"
 
 namespace collie {
 class Descriptor;
 
 namespace event {
 
-class Channel : public std::enable_shared_from_this<Channel> {
+class Channel : public std::enable_shared_from_this<Channel>,
+                public utils::SurvivalTime {
  public:
   using Callback = std::function<void(std::shared_ptr<Channel>)>;
   using EventCallback = std::function<void(std::shared_ptr<Channel>)>;
@@ -18,7 +20,7 @@ class Channel : public std::enable_shared_from_this<Channel> {
   explicit Channel(std::shared_ptr<Descriptor>);
   Channel(const Channel &) = delete;
   Channel &operator=(const Channel &) = delete;
-  ~Channel();
+  ~Channel() override;
 
   // setter
   void set_read_callback(const EventCallback &cb) { read_callback_ = cb; }

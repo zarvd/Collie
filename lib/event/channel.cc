@@ -9,7 +9,8 @@ namespace collie {
 namespace event {
 
 Channel::Channel(std::shared_ptr<Descriptor> descriptor)
-    : in_eventloop_(false),
+    : SurvivalTime("Channel " + std::to_string(descriptor->fd())),
+      in_eventloop_(false),
       descriptor_(descriptor),
       events_(0),
       update_after_activate_(false) {
@@ -93,7 +94,7 @@ void Channel::DisableAll() {
 
 void Channel::Activate(const unsigned revents) {
   CHECK(in_eventloop_) << "Channel is not in event loop";
-  LOG(DEBUG) << "Channel" << descriptor_->fd() << "is activating" << revents;
+  LOG(DEBUG) << "Channel" << descriptor_->fd() << "is activating events " << revents;
   if (eventloop_->kPoller->IsError(revents)) {
     // error event
     CHECK(error_callback_) << "errorCallback is not callable";
