@@ -8,17 +8,22 @@
 namespace collie {
 
 class InetAddress;
-class Descriptor;
 
 namespace event {
 class Channel;
-class EventLoop;
 }
 
 namespace tcp {
 
 class TCPSocket;
 
+// `TCPAcceptor` generates TCP listening `Channel`
+// it creates a `TCPSocket` in constructor
+// Usage:
+//   TCPAcceptor acceptor(local_address);
+//   acceptor.BindAndListen();
+//   acceptor.set_accept_callback([] (auto conn_socket) {...});
+//   auto channel = acceptor->GetBaseChannel();
 class TCPAcceptor {
  public:
   using AcceptCallback =
@@ -32,7 +37,6 @@ class TCPAcceptor {
   void BindAndListen() const;
 
   // setter
-  void set_thread_num(const size_t thread_num);
   void set_accept_callback(const AcceptCallback &cb) noexcept {
     accept_callback_ = cb;
   }
@@ -47,10 +51,8 @@ class TCPAcceptor {
   void HandleRead();
   void HandleError();
 
-  size_t thread_num_;
   std::shared_ptr<InetAddress> local_address_;
-  std::shared_ptr<TCPSocket> tcp_socket_;  // listen socket
-  std::vector<event::EventLoop> eventloops_;
+  std::shared_ptr<TCPSocket> tcp_socket_;  // listening socket
   AcceptCallback accept_callback_;
 };
 }

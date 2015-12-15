@@ -21,6 +21,11 @@ void TCPServer::Bind(const std::string& host, const unsigned port) {
   local_address_ = InetAddress::GetInetAddress(host, port);
 }
 
+// Start TCP server
+// it creates a `EventloopThreadpool` object, and the thread number
+// of the thread pool depends on `this->thread_num_`
+// and then, `TCPAcceptor` inserts a base `Channel` into `EventloopThreadpool`
+// in the end, `EventloopThreadpool` starts looping
 void TCPServer::Start() {
   LOG(INFO) << "TCPServer start in" << local_address_->ip() << ":"
             << local_address_->port();

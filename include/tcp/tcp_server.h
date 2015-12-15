@@ -20,6 +20,20 @@ class TCPAcceptor;
 class TCPSocket;
 class TCPIOStream;
 
+// Non blocking TCP server
+// it creates a `EventLoopThreadPool` and a basic listening `Channel`
+// every loop listens this `Channel` and accepts new connections
+// `connected_callback_` is called when new connection is accepted
+// `on_message_callback_` is called when new connection is ready to READ
+// a unique `TCPIOStream` is created and it do all I/O operations
+// Usage:
+//   TCPServer server;
+//   server.Bind("0.0.0.0", port);
+//   server.set_thread_num(8);
+//   server.set_on_message_callback([](auto iostream,
+//                                     auto local_address,
+//                                     auto peer_address) { ... });
+//   server.Start();
 class TCPServer {
  public:
   using OnMessageCallback =

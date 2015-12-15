@@ -1,6 +1,5 @@
 #include "../../include/tcp/tcp_acceptor.h"
 #include "../../include/tcp/tcp_socket.h"
-#include "../../include/event/eventloop.h"
 #include "../../include/event/channel.h"
 #include "../../include/inet_address.h"
 #include "../../include/logging.h"
@@ -9,22 +8,19 @@ namespace collie {
 namespace tcp {
 
 TCPAcceptor::TCPAcceptor(std::shared_ptr<InetAddress> addr) noexcept
-    : thread_num_(1),
-      local_address_(addr),
+    : local_address_(addr),
       tcp_socket_(new TCPSocket(local_address_)) {}
 
 TCPAcceptor::~TCPAcceptor() noexcept {}
 
 void TCPAcceptor::BindAndListen() const { tcp_socket_->BindAndListen(); }
 
-void TCPAcceptor::set_thread_num(const size_t thread_num) {
-  thread_num_ = thread_num;
-}
-
+// Get a base channel which is binding the socket accept fd
+// and the channel is set ONE SHOT and READ mode
 std::shared_ptr<event::Channel> TCPAcceptor::GetBaseChannel() {
   CHECK(tcp_socket_) << "TCP Socket is NULL";
 
-  // create channel
+  // create new channel of socket accept fd
   auto channel = std::make_shared<event::Channel>(tcp_socket_);
   // set callback after setting event loop
   channel->set_insert_callback([this](std::shared_ptr<event::Channel> channel) {
@@ -38,8 +34,9 @@ std::shared_ptr<event::Channel> TCPAcceptor::GetBaseChannel() {
   return channel;
 }
 
+// `TCPSocket` accepts a new connection which is non-blocking
+// and call the `accept_callback_` if success
 void TCPAcceptor::HandleRead() {
-  // should be thread-safe
   auto connSocket = tcp_socket_->Accept();
   if (connSocket->state() == TCPSocket::State::IllegalAccept) {
     HandleError();
