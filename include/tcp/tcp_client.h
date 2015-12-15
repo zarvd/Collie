@@ -13,10 +13,14 @@ namespace tcp {
 
 class TCPConnector;
 class TCPSocket;
+class TCPIOStream;
 
 class TCPClient {
  public:
-  using ConnectCallback = std::function<void(std::shared_ptr<TCPSocket>)>;
+  using ConnectCallback =
+      std::function<void(std::shared_ptr<TCPIOStream> iostream,
+                         std::shared_ptr<InetAddress> local_address,
+                         std::shared_ptr<InetAddress> peer_address)>;
 
   TCPClient();
   TCPClient(const TCPClient &) = delete;
@@ -35,7 +39,7 @@ class TCPClient {
  private:
   std::unique_ptr<TCPConnector> connector_;
   ConnectCallback connect_callback_;
-  std::shared_ptr<InetAddress> remote_address_;
+  std::shared_ptr<InetAddress> peer_address_;
 };
 }
 }

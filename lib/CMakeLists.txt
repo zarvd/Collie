@@ -16,8 +16,8 @@ set(NETWORK_SRC
   tcp/tcp_server.cc
   tcp/tcp_socket.cc
   tcp/tcp_acceptor.cc
-  tcp/tcp_client.cc
-  tcp/tcp_connector.cc
+  # tcp/tcp_client.cc
+  # tcp/tcp_connector.cc
   udp/udp_socket.cc
   udp/udp_server.cc
   udp/udp_client.cc

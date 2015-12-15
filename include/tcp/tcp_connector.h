@@ -7,8 +7,7 @@
 namespace collie {
 
 namespace event {
-
-class ThreadPool;
+class Channel;
 }
 
 class InetAddress;
@@ -39,7 +38,6 @@ class TCPConnector {
   void Disconnect();
 
  private:
-  std::unique_ptr<event::ThreadPool> threadpool_;
   std::shared_ptr<InetAddress> remote_address_;
   ConnectCallback connect_callback_;
 };

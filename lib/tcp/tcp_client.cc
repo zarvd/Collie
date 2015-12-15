@@ -16,9 +16,9 @@ void TCPClient::Connect(const std::string& host, const unsigned port,
                         const size_t thread_num, const size_t connect_num) {
   CHECK(connect_callback_) << ("TCPClient connectCallback is not callable");
 
-  remote_address_ = InetAddress::GetInetAddress(host, port);
+  peer_address_ = InetAddress::GetInetAddress(host, port);
 
-  connector_.reset(new TCPConnector(remote_address_));
+  connector_.reset(new TCPConnector(peer_address_));
   connector_->set_connect_callback(connect_callback_);
   connector_->Connect(thread_num, connect_num);
 }
