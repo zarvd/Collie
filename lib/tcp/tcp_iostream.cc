@@ -25,12 +25,6 @@ void TCPIOStream::Close() {
   g_local_thread_tcp_iostream_set.erase(shared_from_this());
 }
 
-// Asynchronously read until we have found the given delimiter
-// if this haven't FINISHED and user call another read event, the new callback
-// will overwrite the old one
-// if max_length is not given, the connection will be closed
-// if more than default_read_size_ bytes have been read and the delimiter
-// is not found.
 void TCPIOStream::ReadUntil(const std::string &delimiter,
                             const ReadCallback &callback,
                             const int max_length) {
@@ -56,20 +50,19 @@ void TCPIOStream::HandleReadUntil(const std::string &delimiter,
   const ssize_t recv_size =
       ::recv(fd, content, max_length - read_buffer_.length(), MSG_DONTWAIT);
   if (recv_size == -1) {
-    // get error
+    // Gets error
     LOG(WARNING) << "TCPIOStream read error: " << GetSystemError();
     Close();
   } else if (recv_size == 0) {
-    // get EOF and cannot find delimiter
-    // close
+    // Gets EOF and cannot find delimiter
     Close();
   } else {
-    // get regular bytes
-    // find delimiter whether in recved string, then call callback
+    // Gets regular bytes
+    // Finds delimiter if it is in receiving string, then call `callback`
     const std::string content_string = content;
     auto found = content_string.find(delimiter);
     if (found != std::string::npos) {
-      // delimiter not found
+      // Delimiter not found
       channel->DisableRead();  // disable read before callback in case of
                                // calling another read event in callback
       const auto complete_content =
@@ -77,7 +70,7 @@ void TCPIOStream::HandleReadUntil(const std::string &delimiter,
       if (callback) callback(complete_content, shared_from_this());
       read_buffer_.clear();
     } else if (read_buffer_.length() + recv_size >= max_length) {
-      // read comes to max length, we should close iostream
+      // Comes to max length, closes the instance
       Close();
     } else {
       read_buffer_ += content_string;  // append recved content to buffer
@@ -86,7 +79,6 @@ void TCPIOStream::HandleReadUntil(const std::string &delimiter,
   if (channel->IsNoneEvent()) Close();
 }
 
-// Asynchronously read until getting EOF
 void TCPIOStream::ReadUntilClose(const ReadCallback &callback,
                                  const int max_length) {
   CHECK(channel_ && !is_close_);
@@ -109,19 +101,19 @@ void TCPIOStream::HandleReadUntilClose(
   const ssize_t recv_size =
       ::recv(fd, content, max_length - read_buffer_.length(), MSG_DONTWAIT);
   if (recv_size == -1) {
-    // get error
+    // Gets error
     LOG(WARNING) << "TCPIOStream read error: " << GetSystemError();
     Close();
   } else if (recv_size == 0) {
-    // get EOF
+    // Gets EOF
     channel->DisableRead();
     if (callback) callback(std::move(read_buffer_), shared_from_this());
     read_buffer_.clear();
   } else if (recv_size + read_buffer_.length() >= max_length) {
-    // read bytes over max length, close
+    // Comes to max length, closes the instance
     Close();
   } else {
-    // get regular bytes
+    // Get regular bytes
     read_buffer_ += content;
   }
   if (channel->IsNoneEvent()) Close();
@@ -146,11 +138,11 @@ void TCPIOStream::HandleWrite(const WriteCallback &callback,
                               const unsigned package_length,
                               std::shared_ptr<event::Channel> channel) {
   if (write_buffer_.empty()) {
-    // write complete
+    // Writes complete
     channel->DisableWrite();
     if (callback) callback(shared_from_this());
   } else {
-    // keep writing
+    // Keeps writing
     const auto fd = channel->descriptor()->fd();
     const unsigned p_len = package_length > write_buffer_.length()
                                ? write_buffer_.length()
@@ -159,17 +151,18 @@ void TCPIOStream::HandleWrite(const WriteCallback &callback,
     std::strncpy(buffer, write_buffer_.c_str(), sizeof(buffer));
     int ret = ::send(fd, buffer, sizeof(buffer), MSG_DONTWAIT);
     if (ret == -1) {
-      // get error
+      // Gets error
       LOG(WARNING) << "TCPIOStream write error: " << GetSystemError();
       Close();
     } else {
       if (static_cast<unsigned>(ret) >= write_buffer_.length()) {
-        // TODO log warn
+        // Sends all buffer
         write_buffer_.clear();
       } else {
         write_buffer_.substr(ret);
       }
       if (write_buffer_.empty()) {
+        // Writes complete
         channel->DisableWrite();
         if (callback) callback(shared_from_this());
       }
