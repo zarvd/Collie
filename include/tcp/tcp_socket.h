@@ -15,7 +15,8 @@ class File;
 namespace tcp {
 
 // TCP socket
-// Creates a tcp socket which is a listening socket(server), a connecting
+//
+// A tcp socket could be a listening socket(server), a connecting
 // socket(client) or an accepting socket(connection).
 //
 // The `state()` returns `State::Accept` when instance is an accepting socket.
@@ -23,6 +24,9 @@ namespace tcp {
 //
 // A socket, whose state is `State::Accept` or `State::Connect`, is able to be
 // wrote or read. And the socket with other states is not able to do so.
+//
+// It is an implementation of RAII which calls `CloseImpl()` when it destructs.
+// You are able to close it on your own initiative. Just calls `Close()`.
 //
 // Usages:
 //   auto tcp_socket = std::make_shared<TCPSocket>(local_address);
