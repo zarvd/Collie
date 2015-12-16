@@ -15,13 +15,11 @@ TCPSocket::TCPSocket(std::shared_ptr<InetAddress> addr) noexcept
   CreateImpl();
 }
 
-// construct Accept connection socket
 TCPSocket::TCPSocket(const int fd, std::shared_ptr<InetAddress> addr) noexcept
     : Descriptor(fd, true),
       state_(State::Accept),
       address_(addr) {}
 
-// construct illegal socket
 TCPSocket::TCPSocket() noexcept : Descriptor(-1, false),
                                   state_(State::IllegalAccept) {}
 
@@ -50,9 +48,6 @@ void TCPSocket::CloseImpl() noexcept {
   }
 }
 
-// if state_ is Init, IllegalAccept or Close
-// it will throw ::collie::Exception
-// if operation fails, it will NOT throw but log WARNING message
 void TCPSocket::SetNoDelay() const {
   CHECK(state_ != State::Init && state_ != State::IllegalAccept &&
         state_ != State::Close);
@@ -64,11 +59,11 @@ void TCPSocket::SetNoDelay() const {
   }
 }
 
-// if address_ is NULL, it will throw ::collie::Exception
-// listen ip according ip version, return true when op success
-// if state == Socket, then Bind and Listen fd
-// if state == Bind, then Listen fd
-// if state == Listen, return true directly
+// Throws if `address_` is NULL.
+// Listens ip according to ip version, returns true when the operation succeeds.
+// If `state_` == `State::Socket`, binds and listens it
+// If `state_` == `State::Bind`, listens it
+// If `state_` == `State::Listen`, returns true directly
 bool TCPSocket::BindAndListen() {
   CHECK(address_);
   switch (address_->ip_version()) {
@@ -79,10 +74,10 @@ bool TCPSocket::BindAndListen() {
   }
 }
 
-// listen ipv4, return true when op success
-// if state == Socket, then Bind and Listen fd
-// if state == Bind, then Listen fd
-// if state == Listen, return true directly
+// Listens ipv4, returns true when the operation succeeds
+// if `state_` == `State::Socket`, binds and listens it
+// if `state_` == `State::Bind`, listens it
+// if `state_` == `State::Listen`, returns true directly
 bool TCPSocket::ListenV4() {
   if (state_ == State::Socket) {
     struct sockaddr_in servAddr = address_->addr_v4();
