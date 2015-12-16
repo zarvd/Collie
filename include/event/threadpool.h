@@ -9,7 +9,7 @@
 #include <vector>
 #include <queue>
 #include <atomic>
-#include "../exception.h"
+#include "../logging.h"
 
 namespace collie {
 namespace event {
@@ -47,6 +47,11 @@ class ThreadPool {
 template <class Cb, class... Args>
 auto ThreadPool::Enqueue(Cb &&cb, Args &&... args)
     -> std::future<typename std::result_of<Cb(Args...)>::type> {
+  if (terminate_) {
+    LOG(WARNING) << "Enqueue on stopped ThreadPool";
+    return;
+  }
+
   using returnType = typename std::result_of<Cb(Args...)>::type;
 
   auto task = std::make_shared<std::packaged_task<returnType()>>(
@@ -56,10 +61,6 @@ auto ThreadPool::Enqueue(Cb &&cb, Args &&... args)
   {
     std::lock_guard<std::mutex> lock(mtx_);
 
-    // don't allow enqueueing after stopping the pool
-    if (terminate_) {
-      THROW_("enqueue on stopped ThreadPool");
-    }
     tasks_.emplace([task]() { (*task)(); });
   }
   condition_.notify_one();

@@ -21,12 +21,7 @@ void ThreadPool::Run() {
 }
 
 void ThreadPool::Terminate() {
-  {
-    // send terminate signal to threads
-    std::lock_guard<std::mutex> lock(mtx_);
-
-    terminate_ = true;
-  }
+  terminate_ = true;
   for (auto& worker : workers_) {
     worker.join();
   }

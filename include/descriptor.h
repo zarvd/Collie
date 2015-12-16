@@ -4,22 +4,7 @@
 namespace collie {
 
 /**
- * Descriptor interface
- *
- * Pure virtual method:
- * ~Descriptor() noexcept
- * Create()
- * Close()
- *
- * is_init_ is a flag for calling Create() successfully
- * is_close_ is a flag for calling Close() successfully
- *
- * NOTE: For RAII, Derived class's destructor should contains Close() method:
- * Derived::~Derived() {
- * ...
- * Close();
- * ...
- * }
+ * An interface describing the instance is a file or socket descriptor
  */
 class Descriptor {
  public:
