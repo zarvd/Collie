@@ -10,9 +10,19 @@
 namespace collie {
 namespace poll {
 
+// I/O multiplexing poller using epoll(Linux)
 class EPollPoller : public Poller {
  public:
   using Event = struct epoll_event;
+  enum class EventType : unsigned {
+    READ = EPOLLIN,
+    WRITE = EPOLLOUT,
+    ERROR = EPOLLERR,
+    CLOSE = EPOLLHUP,
+    ONE_SHOT = EPOLLONESHOT,
+    EDGE_TRIGGERED = EPOLLET,
+    PRIORITY = EPOLLPRI
+  };
 
   explicit EPollPoller(const unsigned maxEvent);
   EPollPoller(const EPollPoller &) = delete;
@@ -26,45 +36,35 @@ class EPollPoller : public Poller {
   void Remove(const int fd) override;
   void Poll(PollCallback cb, const int timeout = -1) override;
 
-  enum class Type : unsigned {
-    Read = EPOLLIN,
-    Write = EPOLLOUT,
-    Error = EPOLLERR,
-    Close = EPOLLHUP,
-    OneShot = EPOLLONESHOT,
-    EdgeTriggered = EPOLLET,
-    Priority = EPOLLPRI
-  };
-
   void EnableRead(unsigned &events) const noexcept override {
-    events |= (unsigned)Type::Read;
+    events |= (unsigned)EventType::READ;
   }
   void DisableRead(unsigned &events) const noexcept override {
-    events &= ~(unsigned)Type::Read;
+    events &= ~(unsigned)EventType::READ;
   }
   void EnableWrite(unsigned &events) const noexcept override {
-    events |= (unsigned)Type::Write;
+    events |= (unsigned)EventType::WRITE;
   }
   void DisableWrite(unsigned &events) const noexcept override {
-    events &= ~(unsigned)Type::Write;
+    events &= ~(unsigned)EventType::WRITE;
   }
   void EnableOneShot(unsigned &events) const noexcept override {
-    events |= (unsigned)Type::OneShot;
+    events |= (unsigned)EventType::ONE_SHOT;
   }
   void DisableOneShot(unsigned &events) const noexcept override {
-    events &= ~(unsigned)Type::OneShot;
+    events &= ~(unsigned)EventType::ONE_SHOT;
   }
   bool IsRead(const unsigned events) const noexcept override {
-    return (unsigned)Type::Read & events;
+    return events & (unsigned)EventType::READ;
   }
   bool IsWrite(const unsigned events) const noexcept override {
-    return (unsigned)Type::Write & events;
+    return events & (unsigned)EventType::WRITE;
   }
   bool IsError(const unsigned events) const noexcept override {
-    return (unsigned)Type::Error & events;
+    return events & (unsigned)EventType::ERROR;
   }
   bool IsClose(const unsigned events) const noexcept override {
-    return (unsigned)Type::Close & events;
+    return events & (unsigned)EventType::CLOSE;
   }
 
   // const unsigned MaxEvent;

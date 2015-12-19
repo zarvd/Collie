@@ -11,6 +11,7 @@ class Descriptor;
 
 namespace event {
 
+// Channel for event loop
 class Channel : public std::enable_shared_from_this<Channel>,
                 public utils::SurvivalTime {
  public:

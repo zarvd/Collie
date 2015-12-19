@@ -7,11 +7,15 @@
 namespace collie {
 namespace utils {
 
+// Log instance survival time when destructs
+// Time precise: milliseconds
+// Inherited class should
 class SurvivalTime {
  public:
-  explicit SurvivalTime(const std::string& object_name);
+  explicit SurvivalTime(const std::string& object_name = "Unknown instance");
   virtual ~SurvivalTime();
-  const std::chrono::steady_clock::time_point kBornTime;
+  const std::chrono::steady_clock::time_point kBornTime =
+      std::chrono::steady_clock::now();
   const std::string kObjectName;
 };
 }

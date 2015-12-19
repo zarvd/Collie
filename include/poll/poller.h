@@ -7,9 +7,7 @@
 namespace collie {
 namespace poll {
 
-/**
- * Abstract class
- */
+// I/O multiplexing polling base class
 class Poller : public Descriptor {
  public:
   using PollCallback =

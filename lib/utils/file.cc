@@ -5,7 +5,7 @@
 namespace collie {
 namespace utils {
 
-File::File(const std::string& pathname, const Mode mode, int flags)
+File::File(const std::string& pathname, const Mode mode, int flags) noexcept
     : kPathName(pathname),
       fd_(-1),
       is_existed_(true),
@@ -13,9 +13,9 @@ File::File(const std::string& pathname, const Mode mode, int flags)
       flags_(flags),
       mode_(mode) {
   if (::stat64(pathname.c_str(), &stat_) == -1) {
-    if (errno == ENOENT && flags & Flags::Creat) {
-      // file is not existed and flags contains CREAT
-      // then create a new file
+    if (errno == ENOENT && (flags & Flags::CREAT)) {
+      // file is not existed and flags contains `CREAT`
+      // then creates a new file
       const int creatFlags = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
       int ret = ::creat64(pathname.c_str(), creatFlags);
       if (ret == -1) {
@@ -24,8 +24,8 @@ File::File(const std::string& pathname, const Mode mode, int flags)
         is_existed_ = false;
       } else {
         LOG(INFO) << "Create file" << pathname;
-        ::stat64(pathname.c_str(), &stat_);  // refresh stat;
-        ::close(ret);  // creat() set ONLY WRITE, we need to reopen it
+        ::stat64(pathname.c_str(), &stat_);  // refreshs stat;
+        ::close(ret);  // creat() sets ONLY WRITE, we need to reopen it
       }
     }
   }
@@ -41,7 +41,7 @@ File::File(const std::string& pathname, const Mode mode, int flags)
   }
 }
 
-File::~File() {
+File::~File() noexcept {
   if (!is_close_ && IsFile()) Close();
 }
 

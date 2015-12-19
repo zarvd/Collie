@@ -5,12 +5,12 @@ namespace collie {
 namespace utils {
 
 SurvivalTime::SurvivalTime(const std::string& object_name)
-    : kBornTime(std::chrono::steady_clock::now()), kObjectName(object_name) {}
+    : kObjectName(object_name) {}
 
 SurvivalTime::~SurvivalTime() {
   auto end_time = std::chrono::steady_clock::now();
 
-  LOG(INFO) << "The survival time of " << kObjectName << " : "
+  LOG(INFO) << "The survival time of" << kObjectName << ":"
             << std::chrono::duration_cast<std::chrono::milliseconds>(end_time -
                                                                      kBornTime)
                    .count()
