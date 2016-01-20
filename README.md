@@ -2,5 +2,5 @@ Collie
 ====
 A light C++ network library
 
-#### Dependecies
-- [Logging-Plus-Plus](https://github.com/GallonChoi/Logging-Plus-Plus)
+#### UML
+![UML](https://raw.githubusercontent.com/Gallonchoi/Collie/master/uml.png)
