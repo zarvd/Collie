@@ -4,8 +4,7 @@ set(BASE_SRC
   event/channel.cc
   event/threadpool.cc
   event/eventloop_threadpool.cc
-  poll/poller.cc
-  poll/epoll_poller.cc
+  event/epoller.cc
   utils/file.cc
   utils/survival_time.cc
   )

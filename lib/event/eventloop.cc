@@ -1,6 +1,5 @@
 #include <vector>
-#include "../../include/poll/epoll_poller.h"
-#include "../../include/poll/poll_poller.h"
+#include "../../include/event/epoller.h"
 #include "../../include/event/eventloop.h"
 #include "../../include/event/channel.h"
 #include "../../include/descriptor.h"
@@ -9,9 +8,9 @@
 namespace collie {
 namespace event {
 
-EventLoop::EventLoop() : kPoller(new poll::EPollPoller(1024)) {}
+EventLoop::EventLoop() : kPoller(new EPoller(1024)) {}
 
-EventLoop::EventLoop(std::unique_ptr<poll::Poller> poller)
+EventLoop::EventLoop(std::unique_ptr<EPoller> poller)
     : kPoller(std::move(poller)) {}
 
 EventLoop::~EventLoop() {}

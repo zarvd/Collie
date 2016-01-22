@@ -1,22 +1,22 @@
 #include <unistd.h>
-#include "../../include/poll/epoll_poller.h"
+#include "../../include/event/epoller.h"
 #include "../../include/logging.h"
 
 namespace collie {
-namespace poll {
+namespace event {
 
-EPollPoller::EPollPoller(const unsigned max_event)
-    : Poller(max_event), revents_(new Event[kMaxEvent]) {
+EPoller::EPoller(const unsigned max_event)
+    : Descriptor(), kMaxEvent(max_event), revents_(new Event[kMaxEvent]) {
   CreateImpl();
 }
 
-EPollPoller::~EPollPoller() { CloseImpl(); }
+EPoller::~EPoller() { CloseImpl(); }
 
-void EPollPoller::Create() { CreateImpl(); }
+void EPoller::Create() { CreateImpl(); }
 
-void EPollPoller::Close() { CloseImpl(); }
+void EPoller::Close() { CloseImpl(); }
 
-void EPollPoller::CreateImpl() noexcept {
+void EPoller::CreateImpl() noexcept {
   if (is_init_) return;
   fd_ = epoll_create1(0);
   CHECK_SYS(fd_ != -1);
@@ -24,14 +24,14 @@ void EPollPoller::CreateImpl() noexcept {
   is_init_ = true;
 }
 
-void EPollPoller::CloseImpl() noexcept {
+void EPoller::CloseImpl() noexcept {
   if (is_init_ && !is_close_) {
     ::close(fd_);
     is_close_ = true;
   }
 }
 
-void EPollPoller::Insert(const int fd, const unsigned events) {
+void EPoller::Insert(const int fd, const unsigned events) {
   CHECK(is_init_) << "Epoller is not inited";
   Event event;
   event.data.fd = fd;
@@ -40,7 +40,7 @@ void EPollPoller::Insert(const int fd, const unsigned events) {
   CHECK_SYS(ret != -1);
 }
 
-void EPollPoller::Modify(const int fd, const unsigned events) {
+void EPoller::Modify(const int fd, const unsigned events) {
   CHECK(is_init_) << "Epoller is not inited";
   Event event;
   event.data.fd = fd;
@@ -49,7 +49,7 @@ void EPollPoller::Modify(const int fd, const unsigned events) {
   CHECK_SYS(ret != -1);
 }
 
-void EPollPoller::Remove(const int fd) {
+void EPoller::Remove(const int fd) {
   CHECK(is_init_) << "Epoller is not inited";
   // Since Linux 2.6.9, event can be specified as NULL when using
   // EPOLL_CTL_DEL.
@@ -57,14 +57,14 @@ void EPollPoller::Remove(const int fd) {
   CHECK_SYS(ret != -1);
 }
 
-void EPollPoller::Poll(PollCallback cb, const int timeout) {
+void EPoller::Poll(PollCallback cb, const int timeout) {
   CHECK(is_init_) << "Epoller is not inited";
   int event_num = epoll_wait(fd_, revents_.get(), kMaxEvent, timeout);
   CHECK_SYS(event_num != -1);
-  LOG(DEBUG) << "EPollPoller get" << event_num << "events";
+  LOG(DEBUG) << "EPoller get" << event_num << "events";
 
   for (int idx = 0; idx < event_num; ++idx) {
-    const Event& cur_event = revents_.get()[idx];
+    const Event &cur_event = revents_.get()[idx];
     CHECK(cb) << "PollCallback is not callable";
     cb(cur_event.data.fd, cur_event.events);  // XXX
   }

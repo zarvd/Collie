@@ -3,10 +3,9 @@
 #include "../include/inet_address.h"
 #include "../include/logging.h"
 
-using collie::tcp::TCPServer;
-using collie::tcp::TCPIOStream;
-using collie::InetAddress;
 using namespace collie;
+using tcp::TCPServer;
+using tcp::TCPIOStream;
 
 // initialize logging
 INITIALIZE_EASYLOGGINGPP;

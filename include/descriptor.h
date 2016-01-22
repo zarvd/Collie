@@ -8,6 +8,7 @@ namespace collie {
  */
 class Descriptor {
  public:
+  Descriptor() noexcept : Descriptor(-1, false) {}
   Descriptor(const int fd, const bool is_init) noexcept : fd_(fd),
                                                           is_init_(is_init),
                                                           is_close_(false) {}

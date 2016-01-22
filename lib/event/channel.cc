@@ -1,7 +1,7 @@
 #include "../../include/event/channel.h"
 #include "../../include/descriptor.h"
 #include "../../include/event/eventloop.h"
-#include "../../include/poll/epoll_poller.h"
+#include "../../include/event/epoller.h"
 #include "../../include/logging.h"
 #include <unistd.h>
 
@@ -94,7 +94,8 @@ void Channel::DisableAll() {
 
 void Channel::Activate(const unsigned revents) {
   CHECK(in_eventloop_) << "Channel is not in event loop";
-  LOG(DEBUG) << "Channel" << descriptor_->fd() << "is activating events " << revents;
+  LOG(DEBUG) << "Channel" << descriptor_->fd() << "is activating events "
+             << revents;
   if (eventloop_->kPoller->IsError(revents)) {
     // error event
     CHECK(error_callback_) << "errorCallback is not callable";
