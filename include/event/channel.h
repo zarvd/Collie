@@ -25,25 +25,10 @@ class Channel : public std::enable_shared_from_this<Channel>,
 
   // setter
   void set_read_callback(const EventCallback &cb) { read_callback_ = cb; }
-  void set_read_callback(const EventCallback &&cb) {
-    read_callback_ = std::move(cb);
-  }
   void set_write_callback(const EventCallback &cb) { write_callback_ = cb; }
-  void set_write_callback(const EventCallback &&cb) {
-    write_callback_ = std::move(cb);
-  }
   void set_close_callback(const EventCallback &cb) { close_callback_ = cb; }
-  void set_close_callback(const EventCallback &&cb) {
-    close_callback_ = std::move(cb);
-  }
   void set_error_callback(const EventCallback &cb) { error_callback_ = cb; }
-  void set_error_callback(const EventCallback &&cb) {
-    error_callback_ = std::move(cb);
-  }
   void set_insert_callback(const Callback &cb) { insert_callback_ = cb; }
-  void set_insert_callback(const Callback &&cb) {
-    insert_callback_ = std::move(cb);
-  }
   void set_update_after_activate(const bool update) {
     update_after_activate_ = update;
   }
@@ -77,7 +62,7 @@ class Channel : public std::enable_shared_from_this<Channel>,
   friend void EventLoop::RemoveChannel(std::shared_ptr<Channel>);
 
  private:
-  bool in_eventloop_;                       // whether eventLoop is setting up
+  bool in_eventloop_;
   std::shared_ptr<Descriptor> descriptor_;  // file descriptor
   unsigned events_;
   std::shared_ptr<EventLoop> eventloop_;

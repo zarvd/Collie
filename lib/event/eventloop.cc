@@ -15,13 +15,13 @@ EventLoop::EventLoop(std::unique_ptr<EPoller> poller)
 
 EventLoop::~EventLoop() {}
 
-void EventLoop::LoopOne() {
+void EventLoop::LoopOne(const unsigned timeout) {
   CHECK(kPoller->is_init());
   using namespace std::placeholders;
   kPoller->Poll(std::bind(&EventLoop::PollCallback, this, _1, _2));
 }
 
-void EventLoop::Loop() {
+void EventLoop::Loop(const unsigned timeout) {
   CHECK(kPoller->is_init());
   while (true) {
     using namespace std::placeholders;

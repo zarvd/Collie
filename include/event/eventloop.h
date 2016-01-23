@@ -5,15 +5,11 @@
 #include <map>
 
 namespace collie {
-
 namespace event {
 
 class EPoller;
 class Channel;
 
-/**
- * Thread safe is not required
- */
 class EventLoop : public std::enable_shared_from_this<EventLoop> {
  public:
   EventLoop();
@@ -22,8 +18,8 @@ class EventLoop : public std::enable_shared_from_this<EventLoop> {
   EventLoop &operator=(const EventLoop &) = delete;
   ~EventLoop();
 
-  void LoopOne();  // main method, TODO setting timeout
-  void Loop();     // main method, TODO setting timeout
+  void LoopOne(const unsigned timeout = 0);
+  void Loop(const unsigned timeout = 0);
   void LoopNonBlocking();
   void UpdateChannel(std::shared_ptr<Channel>);  // update or insert
   void RemoveChannel(std::shared_ptr<Channel>);
