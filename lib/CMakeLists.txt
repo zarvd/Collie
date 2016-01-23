@@ -14,7 +14,6 @@ set(NETWORK_SRC
   tcp/tcp_iostream.cc
   tcp/tcp_server.cc
   tcp/tcp_socket.cc
-  tcp/tcp_acceptor.cc
   # tcp/tcp_client.cc
   # tcp/tcp_connector.cc
   udp/udp_socket.cc

@@ -9,10 +9,6 @@
 
 namespace collie {
 
-namespace event {
-class EventLoopThreadPool;
-}
-
 namespace tcp {
 
 class TCPSocket;
@@ -28,16 +24,12 @@ class TCPIOStream;
 //   TCPServer server;
 //   server.Bind("0.0.0.0", port);
 //   server.set_thread_num(8);
-//   server.set_on_message_callback([](auto iostream,
-//                                     auto local_address,
-//                                     auto peer_address) { ... });
+//   server.set_on_message_callback([](auto iostream) { ... });
 //   server.Start();
 class TCPServer {
  public:
   using OnMessageCallback =
-      std::function<void(std::shared_ptr<TCPIOStream> iostream,
-                         std::shared_ptr<InetAddress> local_address,
-                         std::shared_ptr<InetAddress> peer_address)>;
+      std::function<void(std::shared_ptr<TCPIOStream> iostream)>;
   using ConnectedCallback = std::function<void()>;
 
   TCPServer();
@@ -59,16 +51,18 @@ class TCPServer {
   size_t thread_num() const { return thread_num_; }
   std::string host() const { return host_; }
   unsigned port() const { return port_; }
-  InetAddress local_address() const { return local_address_; }
+  InetAddress local_address() const { return *local_address_; }
 
  private:
-  void NewConnection(std::shared_ptr<TCPSocket> conn_socket);
+  void HandleAccept();
+  void HandleError();
+  void HandleConnection(std::shared_ptr<TCPSocket> conn_socket);
 
+  std::shared_ptr<TCPSocket> listen_socket_;
   size_t thread_num_;
   std::string host_;
   unsigned port_;
-  InetAddress local_address_;
-  std::unique_ptr<event::EventLoopThreadPool> eventloop_threadpool_;
+  std::shared_ptr<InetAddress> local_address_;
   ConnectedCallback connected_callback_;
   OnMessageCallback on_message_callback_;
 };

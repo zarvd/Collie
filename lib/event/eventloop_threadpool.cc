@@ -6,16 +6,13 @@
 namespace collie {
 namespace event {
 
-EventLoopThreadPool::EventLoopThreadPool(const size_t thread_num) noexcept
-    : kThreadNum(thread_num),
-      terminate_(false) {}
+EventLoopThreadPool::EventLoopThreadPool(const size_t thread_num)
+    : kThreadNum(thread_num), terminate_(false) {}
 
-EventLoopThreadPool::~EventLoopThreadPool() noexcept {
-  terminate_ = true;
-}
+EventLoopThreadPool::~EventLoopThreadPool() { terminate_ = true; }
 
 void EventLoopThreadPool::StartLoop(
-    std::vector<std::shared_ptr<Channel>> base_channels) noexcept {
+    std::vector<std::shared_ptr<Channel>> base_channels) {
   base_channels_ = base_channels;
   for (size_t i = 1; i < kThreadNum; ++i) {
     workers_.emplace_back(&EventLoopThreadPool::RunInThread, this);
@@ -23,32 +20,38 @@ void EventLoopThreadPool::StartLoop(
   RunInThread();
 }
 
-std::shared_ptr<EventLoopThreadPool::EventLoopThread>
-EventLoopThreadPool::GetNextLoop() {
+std::shared_ptr<EventLoop> EventLoopThreadPool::GetCurrentEventLoop() {
+  auto global_pool = GetEventLoopThreadPool();
+  return global_pool->eventloops_.at(std::this_thread::get_id());
+}
+
+std::shared_ptr<EventLoopThreadPool::ChannelQueue>
+EventLoopThreadPool::GetNextQueue() {
   std::lock_guard<std::mutex> lock(eventloop_thread_mtx_);
-  static auto it = eventloop_threads_.begin();
-  if (it == eventloop_threads_.end()) {
-    it = eventloop_threads_.begin();
+  static auto it = channel_queues_.begin();
+  if (it == channel_queues_.end()) {
+    it = channel_queues_.begin();
   }
   return *(it++);
 }
 
 void EventLoopThreadPool::PushChannel(std::shared_ptr<Channel> channel) {
   // insert to NEXT loop
-  auto loop = GetNextLoop();
-  std::lock_guard<std::mutex> lock(loop->mtx);
-  loop->channels.push_back(channel);
+  auto global_pool = GetEventLoopThreadPool();
+  auto queue = global_pool->GetNextQueue();
+  std::lock_guard<std::mutex> lock(queue->mtx);
+  queue->channels.push_back(channel);
 }
 
 void EventLoopThreadPool::RunInThread() {
-  auto eventloop_thread = std::make_shared<EventLoopThread>();
-  {
-    std::lock_guard<std::mutex> lock(eventloop_thread_mtx_);
-    eventloop_threads_.push_back(eventloop_thread);
-  }
-
+  auto channel_queue = std::make_shared<ChannelQueue>();
   // one loop per thread
   auto eventloop = std::make_shared<EventLoop>();
+  {
+    std::lock_guard<std::mutex> lock(eventloop_thread_mtx_);
+    channel_queues_.push_back(channel_queue);
+    eventloops_[std::this_thread::get_id()] = eventloop;
+  }
 
   // insert base channels to loop
   for (auto channel : base_channels_) {
@@ -62,12 +65,12 @@ void EventLoopThreadPool::RunInThread() {
     std::vector<std::shared_ptr<Channel>> channels;
     // get new channel or terminate
     // Non blocking
-    if (eventloop_thread->mtx.try_lock()) {
-      if (terminate_ || !eventloop_thread->channels.empty()) {
-        if (terminate_ && eventloop_thread->channels.empty()) return;  // exit
-        std::swap(eventloop_thread->channels, channels);
+    if (channel_queue->mtx.try_lock()) {
+      if (terminate_ || !channel_queue->channels.empty()) {
+        if (terminate_ && channel_queue->channels.empty()) return;  // exit
+        std::swap(channel_queue->channels, channels);
       }
-      eventloop_thread->mtx.unlock();
+      channel_queue->mtx.unlock();
     }
     // insert channel
     for (auto channel : channels) {
