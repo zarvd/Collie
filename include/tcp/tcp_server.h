@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 #include <unordered_set>
+#include "../../include/inet_address.h"
 
 namespace collie {
 
@@ -12,11 +13,8 @@ namespace event {
 class EventLoopThreadPool;
 }
 
-class InetAddress;
-
 namespace tcp {
 
-class TCPAcceptor;
 class TCPSocket;
 class TCPIOStream;
 
@@ -54,17 +52,14 @@ class TCPServer {
   void set_connected_callback(const ConnectedCallback &cb) {
     connected_callback_ = cb;
   }
-  void set_connected_callback(const ConnectedCallback &&cb) {
-    connected_callback_ = std::move(cb);
-  }
   void set_on_message_callback(const OnMessageCallback &cb) {
     on_message_callback_ = cb;
   }
-  void set_on_message_callback(const OnMessageCallback &&cb) {
-    on_message_callback_ = std::move(cb);
-  }
   // getter
+  size_t thread_num() const { return thread_num_; }
+  std::string host() const { return host_; }
   unsigned port() const { return port_; }
+  InetAddress local_address() const { return local_address_; }
 
  private:
   void NewConnection(std::shared_ptr<TCPSocket> conn_socket);
@@ -72,9 +67,8 @@ class TCPServer {
   size_t thread_num_;
   std::string host_;
   unsigned port_;
-  std::shared_ptr<InetAddress> local_address_;
+  InetAddress local_address_;
   std::unique_ptr<event::EventLoopThreadPool> eventloop_threadpool_;
-  std::unique_ptr<TCPAcceptor> acceptor_;
   ConnectedCallback connected_callback_;
   OnMessageCallback on_message_callback_;
 };
