@@ -2,5 +2,14 @@ Collie
 ====
 A light C++ network library
 
-#### UML
-![UML](https://raw.githubusercontent.com/Gallonchoi/Collie/master/uml.png)
+**Refactoring**
+
+#### Targets
+- [x] Logger
+- [x] Timer
+- [x] I/O Multiplexing(epoll, select, etc.)
+- [x] Thread pool
+- [ ] TCP
+- [ ] AsyncTCP
+- [ ] UDP
+- [ ] HTTP 0.1
