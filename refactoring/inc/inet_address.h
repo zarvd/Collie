@@ -8,26 +8,37 @@
 
 namespace collie {
 
-enum class IPVersion { IPV4, IPV6, UNKNOWN };
+enum class IPFamily { IPv4, IPv6, UNKNOWN };
 
-// 网络地址抽象类
+inline std::string to_string(const IPFamily& family) {
+  switch (family) {
+    case IPFamily::IPv4:
+      return "IPv4";
+    case IPFamily::IPv6:
+      return "IPv6";
+    case IPFamily::UNKNOWN:
+      return "Unknown";
+  }
+}
+
+// Abstract class
 class InetAddress : public NonCopyable {
  public:
   using Host = std::string;
   using Port = unsigned;
   using Address = sockaddr*;
 
-  InetAddress() {}
+  InetAddress() noexcept : address_(nullptr) {}
 
-  virtual ~InetAddress() = 0;
+  virtual ~InetAddress() noexcept = 0;
 
-  virtual IPVersion ip_version() const = 0;
-  Host host() const { return host_; }
-  Port port() const { return port_; }
-  Address address() const { return address_; }
+  virtual IPFamily ip_version() const = 0;
+  Host host() const noexcept { return host_; }
+  Port port() const noexcept { return port_; }
+  Address address() const noexcept { return address_; }
 
-  static std::shared_ptr<InetAddress> GetInetAddress(const Host& host,
-                                                     const Port port);
+  static std::shared_ptr<InetAddress> GetInetAddress(
+      const Host&, const Port) throw(std::runtime_error);
 
  protected:
   Host host_;
@@ -35,22 +46,22 @@ class InetAddress : public NonCopyable {
   Address address_;
 };
 
-// IPv4地址
-class IPV4Address : public InetAddress {
+// IPv4 address
+class IPv4Address : public InetAddress {
  public:
-  IPV4Address() {}
-  ~IPV4Address() noexcept override {}
+  IPv4Address() noexcept {}
+  ~IPv4Address() noexcept override {}
 
-  IPVersion ip_version() const override { return IPVersion::IPV4; }
+  IPFamily ip_version() const override { return IPFamily::IPv4; }
 };
 
-// IPv6地址
-class IPV6Address : public InetAddress {
+// IPv6 address
+class IPv6Address : public InetAddress {
  public:
-  IPV6Address() {}
-  ~IPV6Address() noexcept override {}
+  IPv6Address() noexcept {}
+  ~IPv6Address() noexcept override {}
 
-  IPVersion ip_version() const override { return IPVersion::IPV4; }
+  IPFamily ip_version() const override { return IPFamily::IPv6; }
 };
 }
 
