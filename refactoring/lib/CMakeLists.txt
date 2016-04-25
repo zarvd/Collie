@@ -1,5 +1,7 @@
 set(BASE_SRC
   timer.cc
+  log_stream.cc
+  log_handler.cc
   logger.cc
   poll/poller.cc
   poll/epoll_poller.cc
