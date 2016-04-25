@@ -1,4 +1,5 @@
 #include <iostream>
+#include <ctime>
 #include "../inc/logger.h"
 
 namespace collie {
@@ -6,7 +7,15 @@ namespace collie {
 void Logger::Log(const collie::LogLevel level, const std::string &msg,
                  const std::string &file, const std::string &,
                  unsigned int) noexcept {
-  std::cout << '['<< LogLevelToString(level) << ']' << file << msg << std::endl;
+  ::time_t now;
+  ::time(&now);
+  char buffer[80];
+  ::strftime(buffer, 80, "%d-%m-%Y %I:%M:%S", localtime(&now));
+
+  std::cout << std::endl
+            << LOG_COLOR_HEADER << buffer << LOG_COLOR_ENDC << std::endl
+            << '[' << LogLevelToString(level) << ']' << file << LOG_COLOR_BOLD
+            << msg << LOG_COLOR_ENDC << std::endl;
 }
 
 LogStream::LogStream(LogLevel level, const std::string &file,

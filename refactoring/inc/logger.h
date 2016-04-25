@@ -5,18 +5,27 @@
 #include <string>
 
 namespace collie {
+const std::string LOG_COLOR_HEADER = "\033[95m";
+const std::string LOG_COLOR_OKBLUE = "\033[94m";
+const std::string LOG_COLOR_OKGREEN = "\033[92m";
+const std::string LOG_COLOR_WARNING = "\033[93m";
+const std::string LOG_COLOR_FAIL = "\033[91m";
+const std::string LOG_COLOR_ENDC = "\033[0m";
+const std::string LOG_COLOR_BOLD = "\033[1m";
+const std::string LOG_COLOR_UNDERLINE = "\033[4m";
+
 enum LogLevel { DEBUG = 1, INFO = 2, WARN = 3, ERROR = 4 };
 
 inline std::string LogLevelToString(LogLevel level) {
   switch (level) {
     case DEBUG:
-      return "DEBUG";
+      return LOG_COLOR_OKBLUE + "DEBUG" + LOG_COLOR_ENDC;
     case INFO:
-      return "INFO";
+      return LOG_COLOR_OKGREEN + "INFO" + LOG_COLOR_ENDC;
     case WARN:
-      return "WARN";
+      return LOG_COLOR_WARNING + "WARN" + LOG_COLOR_ENDC;
     case ERROR:
-      return "ERROR";
+      return LOG_COLOR_FAIL + "ERROR" + LOG_COLOR_ENDC;
   }
 }
 
@@ -58,7 +67,7 @@ class LogStream : public NonCopyable {
   }
 
   template <typename T = char>
-  LogStream& operator<<(T msg[]) noexcept {
+  LogStream& operator<<(const T msg[]) noexcept {
     content_ += msg;
     return *this;
   }
@@ -103,10 +112,10 @@ constexpr int32_t basename_index(const char* const path,
   else                             \
   LogStream(log_level, __FILENAME__, __func__, __LINE__)
 
-#define ASSERT(x)                   \
-  if (!(x)) {                       \
-    LOG(ERROR) << "ASSERTION FAIL"; \
-    throw;                          \
+#define ASSERT(x)                             \
+  if (!(x)) {                                 \
+    LOG(ERROR) << "ASSERTION FAIL";           \
+    throw std::logic_error("ASSERTION FAIL"); \
   }
 }
 

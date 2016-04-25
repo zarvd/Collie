@@ -37,9 +37,11 @@ class ThreadPool : public NonCopyable {
 
   void ClearTask() noexcept;
 
-  void set_thread_num(const unsigned thread_num) { thread_num_ = thread_num; }
-  bool is_running() const { return is_running_; }
-  unsigned thread_num() const { return thread_num_; }
+  void set_thread_num(const unsigned thread_num) noexcept {
+    thread_num_ = thread_num;
+  }
+  bool is_running() const noexcept { return is_running_; }
+  unsigned thread_num() const noexcept { return thread_num_; }
 
  private:
   void worker(const ThreadId&);  // working thread function
