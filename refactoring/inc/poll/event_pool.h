@@ -23,6 +23,7 @@ class EventPool : public NonCopyable {
   void LoopOne() noexcept;
   void Init() noexcept;
   void Destroy() noexcept;
+
   void Insert(std::shared_ptr<Event>, Event::Type) noexcept;
   void Update(std::shared_ptr<Event>, Event::Type) noexcept;
   void Delete(std::shared_ptr<Event>) noexcept;
