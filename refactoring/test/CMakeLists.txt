@@ -7,3 +7,5 @@ target_link_libraries(test_timer collie)
 add_executable(test_logger test_logger)
 target_link_libraries(test_logger collie)
 
+add_executable(test_epoll test_epoll)
+target_link_libraries(test_epoll collie)

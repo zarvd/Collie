@@ -9,7 +9,10 @@ EPollPoller::EPollPoller() : Poller() {}
 EPollPoller::~EPollPoller() noexcept {}
 
 void EPollPoller::Init() throw(PollException) {
-  ASSERT(poll_fd_ == -1)
+  if (poll_fd_ != -1) {
+    LOG(WARN) << "EPollPoller is already inited";
+    return;
+  }
   poll_fd_ = ::epoll_create1(0);
   if (poll_fd_ == -1) {
     throw PollException("EPoll cannot init");
@@ -17,7 +20,10 @@ void EPollPoller::Init() throw(PollException) {
 }
 
 void EPollPoller::Destroy() throw(PollException) {
-  ASSERT(poll_fd_ != -1)
+  if (poll_fd_ == -1) {
+    LOG(WARN) << "EPollPoller is already destoried";
+    return;
+  }
   if (::close(poll_fd_) == -1) {
     throw PollException("EPoll cannot close");
   } else {
