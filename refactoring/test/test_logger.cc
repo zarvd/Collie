@@ -3,7 +3,7 @@
 using namespace collie;
 
 int main(void) {
-  init_logger();
+  Logger::Init();
   std::string hi = "Hi;";
   Logger::SetLogLevel(DEBUG);
   LOG(INFO) << hi;

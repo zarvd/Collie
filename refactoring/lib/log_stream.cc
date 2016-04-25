@@ -1,11 +1,8 @@
-#include "../inc/log_stream.h"
-#include "../inc/log_handler.h"
+// #include "../inc/log_stream.h"
+// #include "../inc/log_handler.h"
+#include "../inc/logger.h"
 
 namespace collie {
-
-std::vector<std::unique_ptr<LogHandler> > LogStream::handlers_;
-
-std::mutex LogStream::handlers_mutex_;
 
 LogStream::LogStream(LogLevel level, const std::string& file,
                      const std::string& func, unsigned line) noexcept
@@ -15,20 +12,9 @@ LogStream::LogStream(LogLevel level, const std::string& file,
       line_(line) {}
 
 LogStream::~LogStream() noexcept {
-  std::lock_guard<std::mutex> lock(handlers_mutex_);
-  for (auto& handler : handlers_) {
+  std::lock_guard<std::mutex> lock(Logger::handlers_mutex_);
+  for (auto& handler : Logger::handlers_) {
     handler->Log(level_, content_, file_, func_, line_);
   }
-}
-
-void LogStream::AddLogHandler(
-    std::unique_ptr<LogHandler> log_handler) noexcept {
-  std::lock_guard<std::mutex> lock(handlers_mutex_);
-  handlers_.push_back(std::move(log_handler));
-}
-
-void LogStream::ClearLogHandler() noexcept {
-  std::lock_guard<std::mutex> lock(handlers_mutex_);
-  handlers_.clear();
 }
 }

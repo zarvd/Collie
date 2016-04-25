@@ -36,19 +36,11 @@ class LogStream : public NonCopyable {
     return *this;
   }
 
-  // Thread safe
-  static void AddLogHandler(std::unique_ptr<LogHandler>) noexcept;
-  static void ClearLogHandler() noexcept;
-  static unsigned GetLoggerNum() noexcept { return handlers_.size(); }
-
  private:
   const LogLevel level_;
   const std::string file_;
   const std::string func_;
   const unsigned line_;
-  static std::vector<std::unique_ptr<LogHandler> > handlers_;
-  static std::mutex handlers_mutex_;
-
   std::string content_;
 };
 }

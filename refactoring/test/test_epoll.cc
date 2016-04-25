@@ -3,9 +3,8 @@
 
 using namespace collie;
 
-
-int main(void)
-{
+int main(void) {
+  Logger::Init();
   EPollPoller poller;
   LOG(INFO) << poller.GetDescriptor();
   poller.Init();

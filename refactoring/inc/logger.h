@@ -6,20 +6,27 @@
 
 namespace collie {
 
-inline void init_logger() { LogStream::AddLogHandler(std::make_unique<LogHandler>()); }
-
 // Global logger configuration
 class Logger {
  public:
   ~Logger() {}
 
-  static void SetLogLevel(LogLevel level) noexcept { log_level_ = level; }
+  static void Init() { AddLogHandler(std::make_unique<LogHandler>()); }
 
+  // Thread safe
+  static void SetLogLevel(LogLevel level) noexcept { log_level_ = level; }
   static LogLevel GetLogLevel() noexcept { return log_level_; }
+  static void AddLogHandler(std::unique_ptr<LogHandler>) noexcept;
+  static void ClearLogHandler() noexcept;
+  static unsigned GetLoggerNum() noexcept { return handlers_.size(); }
 
  private:
   Logger() {}
+  static std::vector<std::unique_ptr<LogHandler> > handlers_;
+  static std::mutex handlers_mutex_;
   static std::atomic<LogLevel> log_level_;
+
+  friend class LogStream;
 };
 
 // MACRO for logger
