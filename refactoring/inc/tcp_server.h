@@ -4,11 +4,12 @@
 #include <memory>
 #include <functional>
 #include "util/noncopyable.h"
-#include "tcp_stream.h"
+#include "exception.h"
 
 namespace collie {
 
 class InetAddress;
+class TcpStream;
 
 class TcpServer : public NonCopyable {
  public:

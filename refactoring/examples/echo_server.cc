@@ -1,4 +1,5 @@
 #include "../inc/tcp_server.h"
+#include "../inc/tcp_stream.h"
 #include "../inc/logger.h"
 
 using namespace collie;

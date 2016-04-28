@@ -1,6 +1,7 @@
 #include "../inc/tcp_server.h"
 #include "../inc/inet_address.h"
 #include "../inc/logger.h"
+#include "../inc/tcp_stream.h"
 #include <sys/socket.h>
 #include <unistd.h>
 
@@ -41,11 +42,11 @@ TcpServer& TcpServer::Listen(Address host_address) throw(TcpException) {
   int err_code = 0;
 
   if (host_address_->ip_family() == IPFamily::IPv4) {
-    sockaddr_in* ipv4_addr = (sockaddr_in*)host_address->address();
+    auto ipv4_addr = host_address->GetIPv4Address();
     err_code = ::bind(local_fd_, (sockaddr*)ipv4_addr, sizeof(*ipv4_addr));
 
   } else {
-    sockaddr_in6* ipv6_addr = (sockaddr_in6*)host_address->address();
+    auto ipv6_addr = host_address->GetIPv6Address();
     err_code = ::bind(local_fd_, (sockaddr*)ipv6_addr, sizeof(*ipv6_addr));
   }
   if (err_code == -1) {
