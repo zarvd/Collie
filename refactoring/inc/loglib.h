@@ -17,7 +17,7 @@ const std::string LOG_COLOR_UNDERLINE = "\033[4m";
 enum LogLevel { DEBUG = 1, INFO = 2, WARN = 3, ERROR = 4 };
 
 // Log Level to string with console color
-inline std::string LogLevelToString(LogLevel level, bool with_color = true) {
+inline std::string to_string(LogLevel level, bool with_color = true) {
   std::string color_begin;
   std::string level_str;
   std::string color_end = LOG_COLOR_ENDC;

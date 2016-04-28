@@ -14,7 +14,7 @@ void LogHandler::Log(const collie::LogLevel level, const std::string &msg,
 
   std::cout << std::endl
             << LOG_COLOR_HEADER << buffer << LOG_COLOR_ENDC << std::endl
-            << '[' << LogLevelToString(level) << ']' << file << "(" << line
+            << '[' << to_string(level) << ']' << file << "(" << line
             << "): " << LOG_COLOR_BOLD << msg << LOG_COLOR_ENDC << std::endl;
 }
 }
