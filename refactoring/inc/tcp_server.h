@@ -10,18 +10,20 @@ namespace collie {
 
 class InetAddress;
 class TcpStream;
+class TcpSocket;
 
 class TcpServer : public NonCopyable {
  public:
   using Address = std::shared_ptr<InetAddress>;
   using Port = unsigned;
+  using Host = std::string;
   using RequestHandler = std::function<void(TcpStream&)>;
 
   TcpServer() noexcept;
   ~TcpServer() noexcept;
 
   TcpServer& Listen(const Port port,
-                    const char host[] = "0.0.0.0") throw(TcpException);
+                    const Host& host = "0.0.0.0") throw(TcpException);
   TcpServer& Listen(Address host_address) throw(TcpException);
 
   void Start(const bool is_loop = true) throw(TcpException);
@@ -35,12 +37,11 @@ class TcpServer : public NonCopyable {
     return *this;
   }
 
- private:
+ protected:
   void Accept() throw(TcpException);
 
-  int local_fd_;
+  std::shared_ptr<TcpSocket> socket_fd_;
   RequestHandler req_handler_;
-  Address host_address_;
 };
 }
 

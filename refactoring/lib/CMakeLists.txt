@@ -12,6 +12,8 @@ set(NETWORK_SRC
   tcp_stream.cc
   tcp_server.cc
   tcp_client.cc
+  socket.cc
+  tcp_socket.cc
   )
 
 set(UTIL_SRC

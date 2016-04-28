@@ -1,61 +1,27 @@
-#include "../inc/tcp_server.h"
 #include "../inc/inet_address.h"
 #include "../inc/logger.h"
+#include "../inc/tcp_server.h"
 #include "../inc/tcp_stream.h"
+#include "../inc/tcp_socket.h"
 #include <sys/socket.h>
 #include <unistd.h>
 
 namespace collie {
 
-TcpServer::TcpServer() noexcept : local_fd_(-1),
-                                  req_handler_(nullptr),
-                                  host_address_(nullptr) {}
-TcpServer::~TcpServer() noexcept {
-  LOG(INFO) << "TCP closing";
-  if (local_fd_ != -1) {
-    if (::shutdown(local_fd_, SHUT_RDWR) < 0) {
-      LOG(WARN) << "TCP shutdown: " << ::strerror(errno);
-    }
-    if (::close(local_fd_) < 0) {
-      LOG(WARN) << "TCP close: " << ::strerror(errno);
-    }
-    local_fd_ = -1;
-  }
-}
+TcpServer::TcpServer() noexcept : req_handler_(nullptr) {}
+TcpServer::~TcpServer() noexcept {}
 
 TcpServer& TcpServer::Listen(const Port port,
-                             const char* host) throw(TcpException) {
-  host_address_ = InetAddress::GetInetAddress(host, port);
-  return Listen(host_address_);
+                             const Host& host) throw(TcpException) {
+  return Listen(InetAddress::GetInetAddress(host, port));
 }
 
 TcpServer& TcpServer::Listen(Address host_address) throw(TcpException) {
-  host_address_ = host_address;
-  auto ip_family = AF_INET;
-  if (host_address_->ip_family() == IPFamily::IPv6) {
-    ip_family = AF_INET6;
-  }
-  local_fd_ = ::socket(ip_family, SOCK_STREAM, IPPROTO_TCP);
-  if (local_fd_ == -1) {
-    throw TcpException("TCP init");
-  }
-  int err_code = 0;
-
-  if (host_address_->ip_family() == IPFamily::IPv4) {
-    auto ipv4_addr = host_address->GetIPv4Address();
-    err_code = ::bind(local_fd_, (sockaddr*)ipv4_addr, sizeof(*ipv4_addr));
-
-  } else {
-    auto ipv6_addr = host_address->GetIPv6Address();
-    err_code = ::bind(local_fd_, (sockaddr*)ipv6_addr, sizeof(*ipv6_addr));
-  }
-  if (err_code == -1) {
-    throw TcpException("TCP bind");
-  }
-
-  err_code = ::listen(local_fd_, SOMAXCONN);
-  if (err_code == -1) {
-    throw TcpException("TCP listen");
+  try {
+    socket_fd_ = std::make_shared<TcpSocket>();
+    socket_fd_->Listen(host_address);
+  } catch (TcpException& e) {
+    LOG(ERROR) << e.what();
   }
 
   return *this;
@@ -69,13 +35,13 @@ void TcpServer::Start(const bool is_loop) throw(TcpException) {
 }
 
 void TcpServer::Accept() throw(TcpException) {
-  sockaddr client_address;
-  socklen_t client_address_len = sizeof(client_address);
-  int peer_fd = ::accept4(local_fd_, &client_address, &client_address_len, 0);
-  if (peer_fd == -1) {
-    throw TcpException("TCP accept");
+  std::shared_ptr<TcpSocket> client;
+  try {
+    client = socket_fd_->Accept();
+  } catch (TcpException& e) {
+    LOG(ERROR) << e.what();
   }
-  TcpStream tcp_stream(host_address_, nullptr, peer_fd);
+  TcpStream tcp_stream(client);
   req_handler_(tcp_stream);
 }
 }
