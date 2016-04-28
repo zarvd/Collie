@@ -27,8 +27,10 @@ class InetAddress : public NonCopyable {
   using Host = std::string;
   using Port = unsigned;
   using Address = sockaddr*;
+  using AddressV4 = sockaddr_in*;
+  using AddressV6 = sockaddr_in6*;
 
-  InetAddress() noexcept : address_(nullptr) {}
+  InetAddress() noexcept : address_() {}
 
   virtual ~InetAddress() noexcept = 0;
 
@@ -36,6 +38,8 @@ class InetAddress : public NonCopyable {
   Host host() const noexcept { return host_; }
   Port port() const noexcept { return port_; }
   Address address() const noexcept { return address_; }
+  AddressV4 GetIPv4Address() const throw(std::runtime_error);
+  AddressV6 GetIPv6Address() const throw(std::runtime_error);
 
   static std::shared_ptr<InetAddress> GetInetAddress(
       const Host&, const Port) throw(std::runtime_error);

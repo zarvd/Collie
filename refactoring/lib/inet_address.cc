@@ -53,4 +53,19 @@ std::shared_ptr<InetAddress> InetAddress::GetInetAddress(
 
   return inet_address;
 }
+
+InetAddress::AddressV4 InetAddress::GetIPv4Address() const
+    throw(std::runtime_error) {
+  if (ip_version() != IPFamily::IPv4) {
+    throw std::runtime_error("Cannot transfer the address to IPv4 address");
+  }
+  return AddressV4(address_);
+}
+InetAddress::AddressV6 InetAddress::GetIPv6Address() const
+    throw(std::runtime_error) {
+  if (ip_version() != IPFamily::IPv6) {
+    throw std::runtime_error("Cannot transfer the address to IPv6 address");
+  }
+  return AddressV6(address_);
+}
 }

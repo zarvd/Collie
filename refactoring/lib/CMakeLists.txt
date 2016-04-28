@@ -9,6 +9,8 @@ set(BASE_SRC
 
 set(NETWORK_SRC
   inet_address.cc
+  tcp_stream.cc
+  tcp_server.cc
   )
 
 set(UTIL_SRC

@@ -1,5 +1,5 @@
-#ifndef COLLIE_UTIL_NONCOPYABLE_H
-#define COLLIE_UTIL_NONCOPYABLE_H
+#ifndef COLLIE_UTIL_NONCOPYABLE_H_
+#define COLLIE_UTIL_NONCOPYABLE_H_
 
 namespace collie {
 
@@ -12,4 +12,4 @@ class NonCopyable {
 };
 }
 
-#endif /* COLLIE_UTIL_NONCOPYABLE_H */
+#endif /* COLLIE_UTIL_NONCOPYABLE_H_ */
