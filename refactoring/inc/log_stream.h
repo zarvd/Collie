@@ -19,13 +19,17 @@ class LogStream : public NonCopyable {
             unsigned line) noexcept;
   ~LogStream() noexcept;
 
-  LogStream& operator<<(const std::string& msg) noexcept {
+  LogStream& operator<<(std::string& msg) noexcept {
     content_ += msg;
     return *this;
   }
 
-  template <typename T = char>
-  LogStream& operator<<(const T msg[]) noexcept {
+  LogStream& operator<<(const char msg[]) noexcept {
+    content_ += msg;
+    return *this;
+  }
+
+  LogStream& operator<<(char* msg) noexcept {
     content_ += msg;
     return *this;
   }

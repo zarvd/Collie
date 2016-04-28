@@ -4,6 +4,14 @@
 
 namespace collie {
 
+InetAddress::InetAddress(const Host &host, const Port &port,
+                         const Address address,
+                         const IPFamily &ip_family) noexcept
+    : host_(host),
+      port_(port),
+      address_(address),
+      ip_family_(ip_family) {}
+
 InetAddress::~InetAddress() noexcept {}
 
 std::shared_ptr<InetAddress> InetAddress::GetInetAddress(
@@ -16,11 +24,10 @@ std::shared_ptr<InetAddress> InetAddress::GetInetAddress(
                              ::gai_strerror(err_code));
   }
 
-  std::shared_ptr<InetAddress> inet_address = nullptr;
+  std::shared_ptr<InetAddress> inet_address;
 
   if (addr_info->ai_family == AF_INET) {
     // IPv4
-    inet_address = std::make_shared<IPv4Address>();
     char host_address[INET_ADDRSTRLEN];
     sockaddr_in *addr = ((sockaddr_in *)addr_info->ai_addr);
     addr->sin_port = ::htons(port);
@@ -28,11 +35,11 @@ std::shared_ptr<InetAddress> InetAddress::GetInetAddress(
       throw std::runtime_error(std::string("Cannot parse host: ") +
                                ::strerror(errno));
     }
-    inet_address->host_ = host_address;
+    inet_address = std::make_shared<InetAddress>(
+        host_address, port, addr_info->ai_addr, IPFamily::IPv4);
 
   } else if (addr_info->ai_family == AF_INET6) {
     // IPv6
-    inet_address = std::make_shared<IPv6Address>();
     char host_address[INET6_ADDRSTRLEN];
     sockaddr_in6 *addr = ((sockaddr_in6 *)addr_info->ai_addr);
     addr->sin6_port = ::htons(port);
@@ -41,14 +48,13 @@ std::shared_ptr<InetAddress> InetAddress::GetInetAddress(
       throw std::runtime_error(std::string("Cannot parse host: ") +
                                ::strerror(errno));
     }
-    inet_address->host_ = host_address;
+    inet_address = std::make_shared<InetAddress>(
+        host_address, port, addr_info->ai_addr, IPFamily::IPv6);
 
   } else {
     ::freeaddrinfo(addr_info);
     throw std::runtime_error("Cannot parse host: Unknown family");
   }
-  inet_address->port_ = port;
-  inet_address->address_ = addr_info->ai_addr;
   ::freeaddrinfo(addr_info);
 
   return inet_address;
@@ -56,14 +62,14 @@ std::shared_ptr<InetAddress> InetAddress::GetInetAddress(
 
 InetAddress::AddressV4 InetAddress::GetIPv4Address() const
     throw(std::runtime_error) {
-  if (ip_version() != IPFamily::IPv4) {
+  if (ip_family() != IPFamily::IPv4) {
     throw std::runtime_error("Cannot transfer the address to IPv4 address");
   }
   return AddressV4(address_);
 }
 InetAddress::AddressV6 InetAddress::GetIPv6Address() const
     throw(std::runtime_error) {
-  if (ip_version() != IPFamily::IPv6) {
+  if (ip_family() != IPFamily::IPv6) {
     throw std::runtime_error("Cannot transfer the address to IPv6 address");
   }
   return AddressV6(address_);

@@ -10,5 +10,5 @@ target_link_libraries(logger collie)
 add_executable(epoll epoll)
 target_link_libraries(epoll collie)
 
-add_executable(tcp_server tcp_server)
-target_link_libraries(tcp_server collie)
+add_executable(echo_server echo_server)
+target_link_libraries(echo_server collie)

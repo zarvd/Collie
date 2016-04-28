@@ -2,12 +2,25 @@
 #include "../inc/inet_address.h"
 #include "../inc/logger.h"
 #include <sys/socket.h>
+#include <unistd.h>
 
 namespace collie {
 
-TcpServer::TcpServer() noexcept : req_handler_(nullptr),
+TcpServer::TcpServer() noexcept : local_fd_(-1),
+                                  req_handler_(nullptr),
                                   host_address_(nullptr) {}
-TcpServer::~TcpServer() noexcept {}
+TcpServer::~TcpServer() noexcept {
+  LOG(INFO) << "TCP closing";
+  if (local_fd_ != -1) {
+    if (::shutdown(local_fd_, SHUT_RDWR) < 0) {
+      LOG(WARN) << "TCP shutdown: " << ::strerror(errno);
+    }
+    if (::close(local_fd_) < 0) {
+      LOG(WARN) << "TCP close: " << ::strerror(errno);
+    }
+    local_fd_ = -1;
+  }
+}
 
 TcpServer& TcpServer::Listen(const Port port,
                              const char* host) throw(TcpException) {
@@ -18,7 +31,7 @@ TcpServer& TcpServer::Listen(const Port port,
 TcpServer& TcpServer::Listen(Address host_address) throw(TcpException) {
   host_address_ = host_address;
   auto ip_family = AF_INET;
-  if (host_address_->ip_version() == IPFamily::IPv6) {
+  if (host_address_->ip_family() == IPFamily::IPv6) {
     ip_family = AF_INET6;
   }
   local_fd_ = ::socket(ip_family, SOCK_STREAM, IPPROTO_TCP);
@@ -27,7 +40,7 @@ TcpServer& TcpServer::Listen(Address host_address) throw(TcpException) {
   }
   int err_code = 0;
 
-  if (host_address_->ip_version() == IPFamily::IPv4) {
+  if (host_address_->ip_family() == IPFamily::IPv4) {
     sockaddr_in* ipv4_addr = (sockaddr_in*)host_address->address();
     err_code = ::bind(local_fd_, (sockaddr*)ipv4_addr, sizeof(*ipv4_addr));
 

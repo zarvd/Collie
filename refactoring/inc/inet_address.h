@@ -30,11 +30,11 @@ class InetAddress : public NonCopyable {
   using AddressV4 = sockaddr_in*;
   using AddressV6 = sockaddr_in6*;
 
-  InetAddress() noexcept : address_() {}
+  InetAddress(const Host&, const Port&, const Address,
+              const IPFamily&) noexcept;
+  ~InetAddress() noexcept;
 
-  virtual ~InetAddress() noexcept = 0;
-
-  virtual IPFamily ip_version() const = 0;
+  IPFamily ip_family() const { return ip_family_; }
   Host host() const noexcept { return host_; }
   Port port() const noexcept { return port_; }
   Address address() const noexcept { return address_; }
@@ -44,28 +44,11 @@ class InetAddress : public NonCopyable {
   static std::shared_ptr<InetAddress> GetInetAddress(
       const Host&, const Port) throw(std::runtime_error);
 
- protected:
+ private:
   Host host_;
   Port port_;
   Address address_;
-};
-
-// IPv4 address
-class IPv4Address : public InetAddress {
- public:
-  IPv4Address() noexcept {}
-  ~IPv4Address() noexcept override {}
-
-  IPFamily ip_version() const override { return IPFamily::IPv4; }
-};
-
-// IPv6 address
-class IPv6Address : public InetAddress {
- public:
-  IPv6Address() noexcept {}
-  ~IPv6Address() noexcept override {}
-
-  IPFamily ip_version() const override { return IPFamily::IPv6; }
+  IPFamily ip_family_;
 };
 }
 

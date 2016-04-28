@@ -6,15 +6,9 @@
 #include <functional>
 #include "../util/noncopyable.h"
 #include "../util/descriptor.h"
+#include "../exception.h"
 
 namespace collie {
-
-class PollException : public std::runtime_error {
- public:
-  explicit PollException(const std::string& message) noexcept
-      : std::runtime_error(message + ": " + ::strerror(errno)) {}
-  ~PollException() noexcept override {}
-};
 
 class Poller : public NonCopyable, public Descriptor {
  public:
