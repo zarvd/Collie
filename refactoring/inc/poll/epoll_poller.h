@@ -12,10 +12,14 @@ class EPollPoller : public Poller {
 
   void Init() throw(PollException) override;
   void Destroy() throw(PollException) override;
-  void Poll(PollHandler&, const int timeout) throw(PollException) override;
-  void Insert(const Descriptor&, const Events) throw(PollException) override;
-  void Update(const Descriptor&, const Events) throw(PollException) override;
-  void Delete(const Descriptor&) throw(PollException) override;
+  void Poll(const PollHandler&,
+            const int timeout) throw(PollException) override;
+  void Insert(unsigned fd, const Event&) throw(PollException) override;
+  void Update(unsigned fd, const Event&) throw(PollException) override;
+  void Delete(unsigned fd) throw(PollException) override;
+
+  static unsigned GetEvents(const Event&) noexcept;
+  static Event GetEvent(unsigned events) noexcept;
 
  private:
 };

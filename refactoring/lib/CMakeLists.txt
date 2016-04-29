@@ -5,6 +5,8 @@ set(BASE_SRC
   logger.cc
   poll/poller.cc
   poll/epoll_poller.cc
+  poll/event_pool.cc
+  poll/event_thread_pool.cc
   )
 
 set(NETWORK_SRC

@@ -2,7 +2,7 @@
 #define COLLIE_POLL_EVENT_POOL_H_
 
 #include <memory>
-#include <vector>
+#include <unordered_map>
 
 #ifdef __linux__
 #include "epoll_poller.h"
@@ -14,30 +14,31 @@
 
 namespace collie {
 
+class AsyncIOStream;
+
 // Singleton
 class EventPool : public NonCopyable {
  public:
-  ~EventPool();
+  EventPool() noexcept;
+  ~EventPool() noexcept;
 
-  void Loop() noexcept;
-  void LoopOne() noexcept;
-  void Init() noexcept;
-  void Destroy() noexcept;
+  void Loop(int timeout = -1) throw(PollException);
+  void LoopOne(int timeout = -1) throw(PollException);
+  void Init() throw(PollException);
+  void Destroy() throw(PollException);
 
-  void Insert(std::shared_ptr<Event>, Event::Type) noexcept;
-  void Update(std::shared_ptr<Event>, Event::Type) noexcept;
-  void Delete(std::shared_ptr<Event>) noexcept;
-  unsigned GetEventNum() const noexcept { return events_.size(); }
+  void Update(std::shared_ptr<AsyncIOStream>) throw(PollException);
+  void Delete(std::shared_ptr<AsyncIOStream>) throw(PollException);
 
-  static EventPool& GetInstance() {
-    static EventPool instance;
-    return instance;
-  }
+  unsigned GetIONum() const noexcept { return io_streams_.size(); }
+  bool IsEmpty() const noexcept { return io_streams_.empty(); }
 
  private:
-  EventPool();
+  void PollHandler(unsigned fd, Event revents) noexcept;
 
-  std::vector<std::shared_ptr<Event> > events_;
+  std::unique_ptr<Poller> poller_;
+
+  std::unordered_map<int, std::shared_ptr<AsyncIOStream> > io_streams_;
 };
 }
 

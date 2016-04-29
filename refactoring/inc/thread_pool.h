@@ -18,7 +18,7 @@ class ThreadPool : public NonCopyable {
   using ThreadId = unsigned;
 
   ThreadPool(const unsigned thread_num) noexcept : thread_num_(thread_num) {}
-  ~ThreadPool();
+  ~ThreadPool() noexcept;
 
   void Start() noexcept;
   void Stop() noexcept;

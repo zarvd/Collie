@@ -1,6 +1,7 @@
 #ifndef COLLIE_POLL_POLLER_H_
 #define COLLIE_POLL_POLLER_H_
 
+#include <memory>
 #include <atomic>
 #include <string.h>
 #include <functional>
@@ -10,10 +11,11 @@
 
 namespace collie {
 
+class Event;
+
 class Poller : public NonCopyable, public Descriptor {
  public:
-  using Events = unsigned;
-  using PollHandler = std::function<void(unsigned fd, Events revents)>;
+  using PollHandler = std::function<void(unsigned fd, const Event& revents)>;
 
   Poller() : poll_fd_(-1), max_event_num_(200000) {}
   virtual ~Poller() noexcept = 0;
@@ -26,10 +28,11 @@ class Poller : public NonCopyable, public Descriptor {
   // while specifying a timeout equal to zero cause Poller to return
   // immediately,
   // even if no events are available.
-  virtual void Poll(PollHandler&, const int timeout) throw(PollException) = 0;
-  virtual void Insert(const Descriptor&, const Events) throw(PollException) = 0;
-  virtual void Update(const Descriptor&, const Events) throw(PollException) = 0;
-  virtual void Delete(const Descriptor&) throw(PollException) = 0;
+  virtual void Poll(const PollHandler&,
+                    const int timeout) throw(PollException) = 0;
+  virtual void Insert(unsigned fd, const Event&) throw(PollException) = 0;
+  virtual void Update(unsigned fd, const Event&) throw(PollException) = 0;
+  virtual void Delete(unsigned fd) throw(PollException) = 0;
   int GetDescriptor() const noexcept override { return poll_fd_; }
 
   unsigned max_event_num() const noexcept { return max_event_num_; }
