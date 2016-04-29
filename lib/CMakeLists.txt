@@ -1,28 +1,30 @@
 set(BASE_SRC
-  descriptor.cc
-  event/eventloop.cc
-  event/channel.cc
-  event/threadpool.cc
-  event/eventloop_threadpool.cc
-  event/epoller.cc
-  utils/file.cc
-  utils/survival_time.cc
+  timer.cc
+  log_stream.cc
+  log_handler.cc
+  logger.cc
+  poll/poller.cc
+  poll/epoll_poller.cc
+  poll/event_pool.cc
+  poll/event_thread_pool.cc
   )
 
 set(NETWORK_SRC
   inet_address.cc
-  tcp/tcp_iostream.cc
-  tcp/tcp_server.cc
-  tcp/tcp_socket.cc
-  # tcp/tcp_client.cc
-  # tcp/tcp_connector.cc
-  udp/udp_socket.cc
-  udp/udp_server.cc
-  udp/udp_client.cc
+  tcp_stream.cc
+  tcp_server.cc
+  tcp_client.cc
+  socket.cc
+  tcp_socket.cc
+  )
+
+set(UTIL_SRC
+  util/noncopyable.cc
   )
 
 set(LIB_SRC
   ${BASE_SRC}
-  ${NETWORK_SRC})
+  ${NETWORK_SRC}
+  ${UTIL_SRC})
 add_library(collie STATIC ${LIB_SRC})
-install(TARGETS collie DESTINATION /usr/local/lib)
+#install(TARGETS collie DESTINATION /usr/local/lib)

@@ -1,12 +1,18 @@
-add_executable(tcp_echo_server tcp_echo_server)
-target_link_libraries(tcp_echo_server collie)
-# add_executable(tcp_echo_client tcp_echo_client)
-# add_executable(tcp_file_server tcp_file_server)
-# add_executable(tcp_file_client tcp_file_client)
-# add_executable(udp_echo_server udp_echo_server)
-# add_executable(udp_echo_client udp_echo_client)
-# target_link_libraries(tcp_echo_client collie /usr/local/lib/liblogger.a)
-# target_link_libraries(udp_echo_server collie /usr/local/lib/liblogger.a)
-# target_link_libraries(udp_echo_client collie /usr/local/lib/liblogger.a)
-# target_link_libraries(tcp_file_server collie /usr/local/lib/liblogger.a)
-# target_link_libraries(tcp_file_client collie /usr/local/lib/liblogger.a)
+add_executable(inet_address inet_address)
+target_link_libraries(inet_address collie)
+
+add_executable(timer timer)
+target_link_libraries(timer collie)
+
+add_executable(logger logger)
+target_link_libraries(logger collie)
+
+add_executable(epoll epoll)
+target_link_libraries(epoll collie)
+
+add_executable(echo_server echo_server)
+target_link_libraries(echo_server collie)
+
+add_executable(echo_client echo_client)
+target_link_libraries(echo_client collie)
+
