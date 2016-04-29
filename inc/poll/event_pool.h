@@ -16,8 +16,9 @@ namespace collie {
 
 class AsyncIOStream;
 
-// Singleton
-class EventPool : public NonCopyable {
+// should be shared pointer
+class EventPool : public NonCopyable,
+                  public std::enable_shared_from_this<EventPool> {
  public:
   EventPool() noexcept;
   ~EventPool() noexcept;

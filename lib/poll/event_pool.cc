@@ -33,6 +33,7 @@ void EventPool::Update(std::shared_ptr<AsyncIOStream> stream) throw(
     // new io
     io_streams_.insert({stream->GetDescriptor(), stream});
     poller_->Insert(stream->GetDescriptor(), stream->event());
+    stream->event_pool_ = shared_from_this();
   } else {
     poller_->Update(stream->GetDescriptor(), stream->event());
   }
@@ -47,6 +48,7 @@ void EventPool::Delete(std::shared_ptr<AsyncIOStream> stream) throw(
     return;
   }
 
+  stream->event_pool_ = nullptr;
   io_streams_.erase(it);
 }
 }

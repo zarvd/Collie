@@ -23,7 +23,7 @@ class AsyncIOStream : public NonCopyable, public Descriptor {
   Event event() const noexcept { return event_; }
   std::shared_ptr<EventPool> event_pool() const noexcept { return event_pool_; }
 
-  friend class EventThreadPool;
+  friend class EventPool;
 
  protected:
   Event event_;
