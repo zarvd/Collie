@@ -13,3 +13,5 @@ A light C++ network library
 - [x] AsyncTCP
 - [ ] UDP
 - [ ] HTTP 0.1
+- [ ] Web Socket
+- [ ] JSON
