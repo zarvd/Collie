@@ -29,7 +29,7 @@ void EventPool::LoopOne(int timeout) throw(PollException) {
 
 void EventPool::Update(std::shared_ptr<AsyncIOStream> stream) throw(
     PollException) {
-  if (io_streams_.find(stream->GetDescriptor()) != io_streams_.end()) {
+  if (io_streams_.find(stream->GetDescriptor()) == io_streams_.end()) {
     // new io
     io_streams_.insert({stream->GetDescriptor(), stream});
     poller_->Insert(stream->GetDescriptor(), stream->event());
@@ -50,5 +50,25 @@ void EventPool::Delete(std::shared_ptr<AsyncIOStream> stream) throw(
 
   stream->event_pool_ = nullptr;
   io_streams_.erase(it);
+}
+
+void EventPool::PollHandler(unsigned int fd, collie::Event revents) noexcept {
+  auto io = io_streams_[fd];
+  if (revents.IsRead()) {
+    LOG(DEBUG) << fd << "read events";
+    io->HandleRead();
+  }
+  if (revents.IsWrite()) {
+    LOG(DEBUG) << fd << "write events";
+    io->HandleWrite();
+  }
+  if (revents.IsError()) {
+    LOG(DEBUG) << fd << "error events";
+    io->HandleError();
+  }
+  if (revents.IsClose()) {
+    LOG(DEBUG) << fd << "close events";
+    io->HandleClose();
+  }
 }
 }

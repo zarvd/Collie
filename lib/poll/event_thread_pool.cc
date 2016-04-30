@@ -5,72 +5,68 @@
 
 namespace collie {
 
+thread_local std::shared_ptr<EventPool> EventThreadPool::CurrentEventPool;
+
 EventThreadPool::EventThreadPool(unsigned thread_num) noexcept
     : thread_num_(thread_num) {}
 
 EventThreadPool::~EventThreadPool() noexcept {
   try {
+    LOG(WARN) << "event thread pool is stopping";
     Stop();
   } catch (...) {
   }
 }
 
 void EventThreadPool::Start() {
-  std::lock_guard<std::mutex> lock(worker_mutex_);
-
   if (is_running_) {
     LOG(WARN) << "Event thread pool is running";
     return;
   }
 
-  for (unsigned i = 0; i < thread_num_; ++i) {
+  for (unsigned i = 1; i < thread_num_; ++i) {
     workers_.emplace_back(&EventThreadPool::EventLoop, this);
   }
   is_running_ = true;
+
+  EventLoop();
 }
 
 void EventThreadPool::Stop() {
-  std::lock_guard<std::mutex> lock(worker_mutex_);
-
   if (!is_running_) {
     LOG(WARN) << "Event thread pool is not running";
     return;
   }
 
+  is_running_ = false;
   for (auto& worker : workers_) {
     worker.join();
   }
-  is_running_ = false;
   workers_.clear();
 }
 
-void EventThreadPool::Push(IOStream io) noexcept {
-  std::lock_guard<std::mutex> lock(worker_mutex_);
-  if (!is_running_) {
-    LOG(WARN) << "Event thread pool should start first";
-    return;
-  }
+void EventThreadPool::PushInit(IOStream io) noexcept {
+  init_ios_.push_back(io);
+}
 
-  ios_.push_back(io);
-  io_condition_.notify_one();
+void EventThreadPool::Push(IOStream io) noexcept {
+  CurrentEventPool->Update(io);
 }
 
 void EventThreadPool::EventLoop() {
-  auto event_pool = std::make_shared<EventPool>();
+  CurrentEventPool = std::make_shared<EventPool>();
 
-  event_pool->Init();
+  CurrentEventPool->Init();
+  LOG(INFO) << "event pool started";
 
-  while (is_running_) {
-    std::vector<IOStream> ios;
-    {
-      std::unique_lock<std::mutex> lock(worker_mutex_);
-      if (event_pool->IsEmpty() && ios_.empty()) io_condition_.wait(lock);
-      ios.swap(ios_);
-    }
-    for (auto& io : ios) event_pool->Update(io);
-
-    event_pool->LoopOne();
+  for (auto& io : init_ios_) {
+    CurrentEventPool->Update(io);
   }
-  event_pool->Destroy();
+
+  LOG(INFO) << "event pool looping";
+  CurrentEventPool->Loop();
+
+  LOG(INFO) << "event pool stopped";
+  CurrentEventPool->Destroy();
 }
 }

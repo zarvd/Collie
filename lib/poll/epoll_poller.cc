@@ -55,6 +55,7 @@ void EPollPoller::Update(unsigned fd,
     throw PollException("EPoll cannot update");
   }
 }
+
 void EPollPoller::Delete(unsigned fd) throw(PollException) {
   ASSERT(poll_fd_ != -1)
 

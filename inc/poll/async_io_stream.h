@@ -12,8 +12,8 @@ class EventPool;
 
 class AsyncIOStream : public NonCopyable, public Descriptor {
  public:
-  AsyncIOStream();
-  virtual ~AsyncIOStream() = 0;
+  AsyncIOStream() noexcept {}
+  virtual ~AsyncIOStream() noexcept {};
 
   virtual int GetDescriptor() const noexcept = 0;
   virtual void HandleRead() noexcept = 0;
@@ -21,6 +21,7 @@ class AsyncIOStream : public NonCopyable, public Descriptor {
   virtual void HandleClose() noexcept = 0;
   virtual void HandleError() noexcept = 0;
   Event event() const noexcept { return event_; }
+  void set_event(const Event& event) noexcept { event_ = event; }
   std::shared_ptr<EventPool> event_pool() const noexcept { return event_pool_; }
 
   friend class EventPool;

@@ -12,7 +12,7 @@ class TcpSocket : public Socket {
 
   void Listen(Address) throw(TcpException);
   void Connect(Address) throw(TcpException);
-  std::shared_ptr<TcpSocket> Accept() throw(TcpException);
+  std::shared_ptr<TcpSocket> Accept(bool is_block = true) const throw(TcpException);
 };
 }
 

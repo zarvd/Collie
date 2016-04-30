@@ -1,6 +1,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/fcntl.h>
 #include "../inc/socket.h"
 #include "../inc/logger.h"
 
@@ -11,6 +12,13 @@ Socket::Socket() noexcept : fd_(-1) {}
 Socket::~Socket() noexcept {
   if (fd_ != -1) {
     Close();
+  }
+}
+
+void Socket::SetNonBlocking() noexcept {
+  // FIXME
+  if (::fcntl(fd_, F_SETFL, O_NONBLOCK) == -1) {
+    LOG(ERROR) << "Cannot set " << fd_ << " non-blocking";
   }
 }
 

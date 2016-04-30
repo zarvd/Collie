@@ -23,11 +23,15 @@ class EventThreadPool : public NonCopyable {
 
   void Start();
   void Stop();
-  void Push(IOStream) noexcept;
+  void Push(IOStream) noexcept;      // push io into CURRENT event pool
+  void PushInit(IOStream) noexcept;  // for init iostream
 
   unsigned thread_num() const noexcept { return thread_num_; }
   void set_thread_num(unsigned num) noexcept { thread_num_ = num; }
   bool is_running() const { return is_running_; }
+
+  static thread_local std::shared_ptr<EventPool>
+      CurrentEventPool;  // event pool in current thread
 
  private:
   void EventLoop();
@@ -35,10 +39,8 @@ class EventThreadPool : public NonCopyable {
   std::atomic<bool> is_running_;
   unsigned thread_num_;
   std::vector<std::thread> workers_;
-  std::mutex worker_mutex_;
 
-  std::vector<IOStream> ios_;
-  std::condition_variable io_condition_;
+  std::vector<IOStream> init_ios_;
 };
 }
 

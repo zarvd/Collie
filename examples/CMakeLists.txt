@@ -16,3 +16,5 @@ target_link_libraries(echo_server collie)
 add_executable(echo_client echo_client)
 target_link_libraries(echo_client collie)
 
+add_executable(async_echo_server async_echo_server)
+target_link_libraries(async_echo_server collie)

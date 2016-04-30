@@ -16,6 +16,8 @@ set(NETWORK_SRC
   tcp_client.cc
   socket.cc
   tcp_socket.cc
+  async_tcp_stream.cc
+  async_tcp_server.cc
   )
 
 set(UTIL_SRC

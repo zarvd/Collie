@@ -69,12 +69,13 @@ void TcpSocket::Connect(Address serv_addr) throw(TcpException) {
   address_ = serv_addr;
 }
 
-std::shared_ptr<TcpSocket> TcpSocket::Accept() throw(TcpException) {
+std::shared_ptr<TcpSocket> TcpSocket::Accept(bool) const throw(TcpException) {
   sockaddr client_address;
   socklen_t client_address_len = sizeof(client_address);
   int peer_fd = ::accept4(fd_, &client_address, &client_address_len, 0);
   if (peer_fd == -1) {
-    throw TcpException("TCP Socket accept");
+    LOG(DEBUG) << "TCP Socket Accept: " << ::strerror(errno);
+    return nullptr;
   }
   auto socket = std::make_shared<TcpSocket>();
   socket->fd_ = peer_fd;

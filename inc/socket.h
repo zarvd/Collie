@@ -17,6 +17,7 @@ class Socket : public NonCopyable, public Descriptor {
   Socket() noexcept;
   virtual ~Socket() noexcept = 0;
 
+  void SetNonBlocking() noexcept;
   int GetDescriptor() const noexcept override { return fd_; }
   void Close() noexcept;
   Address address() const noexcept { return address_; }
