@@ -9,7 +9,7 @@ A light C++ network library
 - [x] Timer
 - [x] I/O Multiplexing(epoll, select, etc.)
 - [x] Thread pool
-- [ ] TCP
-- [ ] AsyncTCP
+- [x] TCP
+- [x] AsyncTCP
 - [ ] UDP
 - [ ] HTTP 0.1
