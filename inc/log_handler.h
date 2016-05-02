@@ -1,5 +1,5 @@
-#ifndef COLLIE_LOGGER_H_
-#define COLLIE_LOGGER_H_
+#ifndef COLLIE_LOG_HANDLER_H_
+#define COLLIE_LOG_HANDLER_H_
 
 #include <atomic>
 #include "util/noncopyable.h"
@@ -26,4 +26,4 @@ class LogHandler : public NonCopyable {
 };
 }
 
-#endif /* COLLIE_LOGGER_H_ */
+#endif /* COLLIE_LOG_HANDLER_H_ */

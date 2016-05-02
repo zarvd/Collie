@@ -74,9 +74,6 @@ void AsyncTcpStream::Read(const AsyncCallback& callback) throw(TcpException) {
     char buffer[stream->read_size_];
     const int recv_size = ::recv(stream->GetDescriptor(), buffer,
                                  stream->read_size_, MSG_DONTWAIT);
-    // int recv_size = ::read(stream->GetDescriptor(), buffer,
-    // stream->read_size_);
-    LOG(DEBUG) << buffer << stream->read_size_;
 
     if (recv_size == -1) {
       throw TcpException("TCP recv");

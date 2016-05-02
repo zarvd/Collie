@@ -9,17 +9,17 @@ int main(void) {
 
   TcpServer server;
 
-  // try {
-  server.SetRequestHandler([](TcpStream& tcp_stream) {
-          auto greeting = tcp_stream.Read();
-          LOG(INFO) << "Read: " << greeting;
-          tcp_stream.Write(greeting);
-          tcp_stream.Abort();
-        })
-      .Listen(8080)
-      .Start();
-  // } catch (TcpException& e) {
-  //   LOG(WARN) << e.what();
-  // }
+  try {
+    server.SetRequestHandler([](TcpStream& tcp_stream) {
+      RUN_FUNC;
+      auto greeting = tcp_stream.Read();
+      LOG(INFO) << "Read: " << greeting;
+      tcp_stream.Write(greeting);
+      tcp_stream.Abort();
+    });
+    server.Listen(8080).Start();
+  } catch (TcpException& e) {
+    LOG(WARN) << e.what();
+  }
   return 0;
 }

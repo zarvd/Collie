@@ -6,6 +6,7 @@ using namespace collie;
 
 int main(void) {
   Logger::Init();
+  RUN_FUNC;
 
   TcpClient::Connect("127.0.0.1", 8080, [](TcpStream& tcp_stream) {
     tcp_stream.Write("Hello, world!");

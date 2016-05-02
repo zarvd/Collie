@@ -1,5 +1,5 @@
-#ifndef COLLIE_LOG_STREAM_H
-#define COLLIE_LOG_STREAM_H
+#ifndef COLLIE_LOG_STREAM_H_
+#define COLLIE_LOG_STREAM_H_
 
 #include <vector>
 #include <memory>
@@ -19,7 +19,7 @@ class LogStream : public NonCopyable {
             unsigned line) noexcept;
   ~LogStream() noexcept;
 
-  LogStream& operator<<(std::string& msg) noexcept {
+  LogStream& operator<<(const std::string& msg) noexcept {
     content_ += msg;
     return *this;
   }
@@ -49,4 +49,4 @@ class LogStream : public NonCopyable {
 };
 }
 
-#endif /* COLLIE_LOG_STREAM_H */
+#endif /* COLLIE_LOG_STREAM_H_ */

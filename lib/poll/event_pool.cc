@@ -55,19 +55,19 @@ void EventPool::Delete(std::shared_ptr<AsyncIOStream> stream) throw(
 void EventPool::PollHandler(unsigned int fd, collie::Event revents) noexcept {
   auto io = io_streams_[fd];
   if (revents.IsRead()) {
-    LOG(DEBUG) << fd << "read events";
+    LOG(DEBUG) << "read events";
     io->HandleRead();
   }
   if (revents.IsWrite()) {
-    LOG(DEBUG) << fd << "write events";
+    LOG(DEBUG) << "write events";
     io->HandleWrite();
   }
   if (revents.IsError()) {
-    LOG(DEBUG) << fd << "error events";
+    LOG(DEBUG) << "error events";
     io->HandleError();
   }
   if (revents.IsClose()) {
-    LOG(DEBUG) << fd << "close events";
+    LOG(DEBUG) << "close events";
     io->HandleClose();
   }
 }
