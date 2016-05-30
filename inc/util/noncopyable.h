@@ -6,7 +6,7 @@ namespace util {
 
 class NonCopyable {
  public:
-  NonCopyable() noexcept {};
+  constexpr NonCopyable() noexcept {};
   NonCopyable(const NonCopyable&) = delete;
   NonCopyable& operator=(const NonCopyable&) = delete;
   virtual ~NonCopyable() noexcept = 0;
