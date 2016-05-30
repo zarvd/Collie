@@ -11,7 +11,7 @@ namespace collie {
 class InetAddress;
 class TcpSocket;
 
-class TcpStream : public NonCopyable {
+class TcpStream : public util::NonCopyable {
  public:
   enum Status { OK, ABORT };
   using Address = std::shared_ptr<InetAddress>;

@@ -2,15 +2,15 @@
 #define COLLIE_SOCKET_H_
 
 #include <memory>
-#include "util/noncopyable.h"
-#include "util/descriptor.h"
 #include "exception.h"
+#include "util/descriptor.h"
+#include "util/noncopyable.h"
 
 namespace collie {
 
 class InetAddress;
 
-class Socket : public NonCopyable, public Descriptor {
+class Socket : public util::NonCopyable, public Descriptor {
  public:
   using Address = std::shared_ptr<InetAddress>;
 
@@ -18,13 +18,13 @@ class Socket : public NonCopyable, public Descriptor {
   virtual ~Socket() noexcept = 0;
 
   void SetNonBlocking() noexcept;
-  int GetDescriptor() const noexcept override { return fd_; }
+  int GetDescriptor() const noexcept override { return fd; }
   void Close() noexcept;
-  Address address() const noexcept { return address_; }
+  Address GetAddress() const noexcept { return address; }
 
  protected:
-  int fd_;
-  Address address_;
+  int fd;
+  Address address;
 };
 }
 

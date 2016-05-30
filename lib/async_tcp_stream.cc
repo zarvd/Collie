@@ -7,28 +7,28 @@
 namespace collie {
 
 AsyncTcpStream::AsyncTcpStream(std::shared_ptr<TcpSocket> peer_fd) noexcept
-    : peer_fd_(peer_fd),
-      read_size_(3000) {
-  write_handler_ = [](auto) { LOG(WARN) << "No write handler"; };
-  read_handler_ = [](auto) { LOG(WARN) << "No write handler"; };
-  error_handler_ = [](auto) { LOG(WARN) << "No error handler"; };
-  close_handler_ = [](auto) { LOG(WARN) << "No close handler"; };
+    : peer_fd(peer_fd),
+      read_size(3000) {
+  write_handler = [](auto) { LOG(WARN) << "No write handler"; };
+  read_handler = [](auto) { LOG(WARN) << "No write handler"; };
+  error_handler = [](auto) { LOG(WARN) << "No error handler"; };
+  close_handler = [](auto) { LOG(WARN) << "No close handler"; };
 }
 
 AsyncTcpStream::~AsyncTcpStream() noexcept {}
 
 int AsyncTcpStream::GetDescriptor() const noexcept {
-  return peer_fd_->GetDescriptor();
+  return peer_fd->GetDescriptor();
 }
 
 void AsyncTcpStream::Write(const std::string& buf,
                            const AsyncCallback& callback) throw(TcpException) {
-  if (status_ == ABORT) {
+  if (status == ABORT) {
     LOG(WARN) << "TCP stream is closed";
     return;
   }
-  write_handler_ = [buf, callback](std::shared_ptr<AsyncTcpStream> stream) {
-    if (stream->status() == ABORT) {
+  write_handler = [buf, callback](std::shared_ptr<AsyncTcpStream> stream) {
+    if (stream->GetStatus() == ABORT) {
       // FIXME
       LOG(WARN) << "TCP stream is closed";
       return;
@@ -65,15 +65,15 @@ void AsyncTcpStream::Write(const std::string& buf,
 }
 
 void AsyncTcpStream::Read(const AsyncCallback& callback) throw(TcpException) {
-  if (status_ == ABORT) {
+  if (status == ABORT) {
     LOG(WARN) << "TCP stream is closed";
     return;
   }
 
-  read_handler_ = [callback](std::shared_ptr<AsyncTcpStream> stream) {
-    char buffer[stream->read_size_];
+  read_handler = [callback](std::shared_ptr<AsyncTcpStream> stream) {
+    char buffer[stream->read_size];
     const int recv_size = ::recv(stream->GetDescriptor(), buffer,
-                                 stream->read_size_, MSG_DONTWAIT);
+                                 stream->read_size, MSG_DONTWAIT);
 
     if (recv_size == -1) {
       throw TcpException("TCP recv");
@@ -85,7 +85,7 @@ void AsyncTcpStream::Read(const AsyncCallback& callback) throw(TcpException) {
     LOG(DEBUG) << "recv: " << buffer;
     stream->event_.SetRead(false);
     stream->event_pool_->Update(stream);
-    stream->read_buffer_ = buffer;
+    stream->read_buffer = buffer;
 
     if (!callback) {
       stream->Abort();

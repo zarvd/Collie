@@ -1,5 +1,7 @@
 #include "../../inc/util/noncopyable.h"
 
 namespace collie {
-NonCopyable::~NonCopyable() {}
+namespace util {
+NonCopyable::~NonCopyable() noexcept {}
+}
 }

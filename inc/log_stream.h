@@ -13,7 +13,7 @@ class LogHandler;
 
 // Does logging when destructing
 // Uses stream style input
-class LogStream : public NonCopyable {
+class LogStream : public util::NonCopyable {
  public:
   LogStream(LogLevel, const std::string& file, const std::string& func,
             unsigned line) noexcept;

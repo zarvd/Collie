@@ -2,14 +2,16 @@
 #define COLLIE_UTIL_NONCOPYABLE_H_
 
 namespace collie {
+namespace util {
 
 class NonCopyable {
  public:
-  NonCopyable(){};
+  NonCopyable() noexcept {};
   NonCopyable(const NonCopyable&) = delete;
   NonCopyable& operator=(const NonCopyable&) = delete;
-  virtual ~NonCopyable() = 0;
+  virtual ~NonCopyable() noexcept = 0;
 };
+}
 }
 
 #endif /* COLLIE_UTIL_NONCOPYABLE_H_ */

@@ -31,7 +31,7 @@ AsyncTcpServer& AsyncTcpServer::Listen(Address host_address) throw(
 void AsyncTcpServer::SetLoop(std::shared_ptr<EventThreadPool> pool) noexcept {
   event_thread_pool_ = pool;
   socket_stream_ = std::make_shared<AsyncTcpStream>(socket_fd_);
-  socket_stream_->set_read_hander([this](auto) { this->Accept(); });
+  socket_stream_->SetReadHander([this](auto) { this->Accept(); });
   Event event;
   event.SetRead(true);
   event.SetEdgeTriggeder(true);  // set edge triggered

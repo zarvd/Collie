@@ -7,30 +7,30 @@
 
 namespace collie {
 
-Socket::Socket() noexcept : fd_(-1) {}
+Socket::Socket() noexcept : fd(-1) {}
 
 Socket::~Socket() noexcept {
-  if (fd_ != -1) {
+  if (fd != -1) {
     Close();
   }
 }
 
 void Socket::SetNonBlocking() noexcept {
   // FIXME
-  if (::fcntl(fd_, F_SETFL, O_NONBLOCK) == -1) {
-    LOG(ERROR) << "Cannot set " << fd_ << " non-blocking";
+  if (::fcntl(fd, F_SETFL, O_NONBLOCK) == -1) {
+    LOG(ERROR) << "Cannot set " << fd << " non-blocking";
   }
 }
 
 void Socket::Close() noexcept {
-  if (fd_ != -1) {
-    if (::shutdown(fd_, SHUT_RDWR) < 0) {
+  if (fd != -1) {
+    if (::shutdown(fd, SHUT_RDWR) < 0) {
       LOG(WARN) << "TCP shutdown: " << ::strerror(errno);
     }
-    if (::close(fd_) < 0) {
+    if (::close(fd) < 0) {
       LOG(WARN) << "TCP close: " << ::strerror(errno);
     }
-    fd_ = -1;
+    fd = -1;
   }
 }
 }

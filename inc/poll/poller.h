@@ -13,7 +13,7 @@ namespace collie {
 
 class Event;
 
-class Poller : public NonCopyable, public Descriptor {
+class Poller : public util::NonCopyable, public Descriptor {
  public:
   using PollHandler = std::function<void(unsigned fd, const Event& revents)>;
 

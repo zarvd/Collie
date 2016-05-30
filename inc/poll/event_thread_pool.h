@@ -1,12 +1,12 @@
 #ifndef COLLIE_POLL_EVENT_THREAD_POOL_H_
 #define COLLIE_POLL_EVENT_THREAD_POOL_H_
 
-#include <memory>
-#include <vector>
-#include <thread>
 #include <atomic>
-#include <mutex>
 #include <condition_variable>
+#include <memory>
+#include <mutex>
+#include <thread>
+#include <vector>
 #include "../util/noncopyable.h"
 
 namespace collie {
@@ -14,7 +14,7 @@ namespace collie {
 class AsyncIOStream;
 class EventPool;
 
-class EventThreadPool : public NonCopyable {
+class EventThreadPool : public util::NonCopyable {
  public:
   using IOStream = std::shared_ptr<AsyncIOStream>;
 

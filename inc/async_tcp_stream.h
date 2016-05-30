@@ -2,9 +2,9 @@
 #define COLLIE_ASYNC_TCP_STREAM_H_
 
 #include <memory>
-#include "poll/async_io_stream.h"
 #include "exception.h"
 #include "logger.h"
+#include "poll/async_io_stream.h"
 
 namespace collie {
 
@@ -25,28 +25,28 @@ class AsyncTcpStream : public AsyncIOStream,
 
   int GetDescriptor() const noexcept override;
   void HandleRead() noexcept override {
-    if (read_handler_)
-      read_handler_(shared_from_this());
+    if (read_handler)
+      read_handler(shared_from_this());
     else
       LOG(ERROR) << "read handler is not callable";
   }
   void HandleWrite() noexcept override {
-    if (write_handler_)
-      write_handler_(shared_from_this());
+    if (write_handler)
+      write_handler(shared_from_this());
     else
       LOG(ERROR) << "read handler is not callable";
   }
 
   void HandleClose() noexcept override {
-    if (close_handler_)
-      close_handler_(shared_from_this());
+    if (close_handler)
+      close_handler(shared_from_this());
     else
       LOG(ERROR) << "read handler is not callable";
   }
 
   void HandleError() noexcept override {
-    if (error_handler_)
-      error_handler_(shared_from_this());
+    if (error_handler)
+      error_handler(shared_from_this());
     else
       LOG(ERROR) << "read handler is not callable";
   }
@@ -57,36 +57,36 @@ class AsyncTcpStream : public AsyncIOStream,
   void ReadLine(const AsyncCallback&) throw(TcpException);
   void Abort() noexcept;
 
-  const Address peer_address() const noexcept;
+  const Address GetPeerAddress() const noexcept;
 
-  const char* read_buffer() const noexcept { return read_buffer_.c_str(); }
-  void set_read_size(unsigned size) noexcept { read_size_ = size; }
-  unsigned read_size() const noexcept { return read_size_; }
-  Status status() const noexcept { return status_; }
+  const char* GetReadBuffer() const noexcept { return read_buffer.c_str(); }
+  void SetReadSize(unsigned size) noexcept { read_size = size; }
+  unsigned GetReadSize() const noexcept { return read_size; }
+  Status GetStatus() const noexcept { return status; }
 
-  void set_write_hander(const AsyncIOHandler& handler) noexcept {
-    write_handler_ = handler;
+  void SetWriteHander(const AsyncIOHandler& handler) noexcept {
+    write_handler = handler;
   }
-  void set_read_hander(const AsyncIOHandler& handler) noexcept {
-    read_handler_ = handler;
+  void SetReadHander(const AsyncIOHandler& handler) noexcept {
+    read_handler = handler;
   }
-  void set_close_hander(const AsyncIOHandler& handler) noexcept {
-    close_handler_ = handler;
+  void SetCloseHander(const AsyncIOHandler& handler) noexcept {
+    close_handler = handler;
   }
-  void set_error_hander(const AsyncIOHandler& handler) noexcept {
-    error_handler_ = handler;
+  void SetErrorHander(const AsyncIOHandler& handler) noexcept {
+    error_handler = handler;
   }
 
  protected:
-  AsyncIOHandler write_handler_;
-  AsyncIOHandler read_handler_;
-  AsyncIOHandler error_handler_;
-  AsyncIOHandler close_handler_;
+  AsyncIOHandler write_handler;
+  AsyncIOHandler read_handler;
+  AsyncIOHandler error_handler;
+  AsyncIOHandler close_handler;
 
-  const std::shared_ptr<TcpSocket> peer_fd_;
-  unsigned read_size_;
-  Status status_;
-  std::string read_buffer_;
+  const std::shared_ptr<TcpSocket> peer_fd;
+  unsigned read_size;
+  Status status;
+  std::string read_buffer;
 };
 }
 

@@ -2,10 +2,11 @@
 #define COLLIE_UTIL_DESCRIPTOR_H_
 
 namespace collie {
+
 class Descriptor {
  public:
-  Descriptor() {}
-  virtual ~Descriptor() {}
+  Descriptor() noexcept {}
+  virtual ~Descriptor() noexcept {}
 
   virtual int GetDescriptor() const noexcept = 0;
 };

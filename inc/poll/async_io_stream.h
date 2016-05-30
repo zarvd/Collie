@@ -10,7 +10,7 @@ namespace collie {
 
 class EventPool;
 
-class AsyncIOStream : public NonCopyable, public Descriptor {
+class AsyncIOStream : public util::NonCopyable, public Descriptor {
  public:
   AsyncIOStream() noexcept {}
   virtual ~AsyncIOStream() noexcept {};

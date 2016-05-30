@@ -1,10 +1,10 @@
 #ifndef COLLIE_TCP_SERVER_H_
 #define COLLIE_TCP_SERVER_H_
 
-#include <memory>
 #include <functional>
-#include "util/noncopyable.h"
+#include <memory>
 #include "exception.h"
+#include "util/noncopyable.h"
 
 namespace collie {
 
@@ -12,7 +12,7 @@ class InetAddress;
 class TcpStream;
 class TcpSocket;
 
-class TcpServer : public NonCopyable {
+class TcpServer : public util::NonCopyable {
  public:
   using Address = std::shared_ptr<InetAddress>;
   using Port = unsigned;

@@ -7,10 +7,10 @@ namespace collie {
 InetAddress::InetAddress(const Host &host, const Port &port,
                          const Address address,
                          const IPFamily &ip_family) noexcept
-    : host_(host),
-      port_(port),
-      address_(address),
-      ip_family_(ip_family) {}
+    : host(host),
+      port(port),
+      address(address),
+      ip_family(ip_family) {}
 
 InetAddress::~InetAddress() noexcept {}
 
@@ -62,16 +62,16 @@ std::shared_ptr<InetAddress> InetAddress::GetInetAddress(
 
 InetAddress::AddressV4 InetAddress::GetIPv4Address() const
     throw(std::runtime_error) {
-  if (ip_family() != IPFamily::IPv4) {
+  if (ip_family != IPFamily::IPv4) {
     throw std::runtime_error("Cannot transfer the address to IPv4 address");
   }
-  return AddressV4(address_);
+  return AddressV4(address);
 }
 InetAddress::AddressV6 InetAddress::GetIPv6Address() const
     throw(std::runtime_error) {
-  if (ip_family() != IPFamily::IPv6) {
+  if (ip_family != IPFamily::IPv6) {
     throw std::runtime_error("Cannot transfer the address to IPv6 address");
   }
-  return AddressV6(address_);
+  return AddressV6(address);
 }
 }

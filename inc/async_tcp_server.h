@@ -13,7 +13,7 @@ class AsyncTcpStream;
 class TcpSocket;
 class EventThreadPool;
 
-class AsyncTcpServer : public NonCopyable {
+class AsyncTcpServer : public util::NonCopyable {
  public:
   using Address = std::shared_ptr<InetAddress>;
   using Port = unsigned;

@@ -8,7 +8,7 @@
 namespace collie {
 
 // Default log handler
-class LogHandler : public NonCopyable {
+class LogHandler : public util::NonCopyable {
  public:
   LogHandler() noexcept : log_level_(INFO) {}
   virtual ~LogHandler() noexcept {}

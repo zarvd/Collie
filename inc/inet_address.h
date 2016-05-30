@@ -22,7 +22,7 @@ inline std::string to_string(const IPFamily& family) {
 }
 
 // Abstract class
-class InetAddress : public NonCopyable {
+class InetAddress : public util::NonCopyable {
  public:
   using Host = std::string;
   using Port = unsigned;
@@ -34,10 +34,10 @@ class InetAddress : public NonCopyable {
               const IPFamily&) noexcept;
   ~InetAddress() noexcept;
 
-  IPFamily ip_family() const { return ip_family_; }
-  Host host() const noexcept { return host_; }
-  Port port() const noexcept { return port_; }
-  Address address() const noexcept { return address_; }
+  IPFamily GetIPFamily() const { return ip_family; }
+  Host GetHost() const noexcept { return host; }
+  Port GetPort() const noexcept { return port; }
+  Address GetAddress() const noexcept { return address; }
   AddressV4 GetIPv4Address() const throw(std::runtime_error);
   AddressV6 GetIPv6Address() const throw(std::runtime_error);
 
@@ -45,10 +45,10 @@ class InetAddress : public NonCopyable {
       const Host&, const Port) throw(std::runtime_error);
 
  private:
-  Host host_;
-  Port port_;
-  Address address_;
-  IPFamily ip_family_;
+  Host host;
+  Port port;
+  Address address;
+  IPFamily ip_family;
 };
 }
 

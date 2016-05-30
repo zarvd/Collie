@@ -17,8 +17,8 @@ int main(void) {
   server.SetRequestHandler([](IOStream stream) {
     // stream->Write("Hello, world", nullptr);
     stream->Read([](IOStream stream) {
-      LOG(DEBUG) << "recv: " << stream->read_buffer();
-      stream->Write(stream->read_buffer(), nullptr);
+      LOG(DEBUG) << "recv: " << stream->GetReadBuffer();
+      stream->Write(stream->GetReadBuffer(), nullptr);
     });
   });
 

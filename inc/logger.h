@@ -62,7 +62,7 @@ constexpr int32_t basename_index(const char* const path,
     throw std::logic_error("ASSERTION FAIL"); \
   }
 
-class RunTimeLogger : public NonCopyable {
+class RunTimeLogger : public util::NonCopyable {
  public:
   RunTimeLogger(const std::string& functor) noexcept
       : begin_time_(std::chrono::high_resolution_clock::now()),
