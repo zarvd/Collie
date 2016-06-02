@@ -5,7 +5,7 @@ namespace collie {
 
 class Descriptor {
  public:
-  Descriptor() noexcept {}
+  constexpr Descriptor() noexcept {}
   virtual ~Descriptor() noexcept {}
 
   virtual int GetDescriptor() const noexcept = 0;

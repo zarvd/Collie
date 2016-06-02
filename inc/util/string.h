@@ -3,7 +3,8 @@
 
 #include <string>
 #include "../collie.h"
-#include "iterable.h"
+#include "iterator.h"
+#include "noncopyable.h"
 
 namespace collie {
 namespace util {
@@ -12,37 +13,46 @@ constexpr Size length_of_char(const char* str) {
   return *str ? 1 + length_of_char(str + 1) : 0;
 }
 
-class StringIterator : public Iterator<char> {
+class StringIterator : public ConstIterator<StringIterator, char> {
  public:
   using Self = StringIterator;
-  constexpr StringIterator(const char* value, Size position) noexcept
-      : value(value),
-        position(position) {}
-  ~StringIterator() noexcept override {}
+  constexpr StringIterator(const char* value, Size length,
+                           Size position) noexcept : value(value),
+                                                     position(position),
+                                                     length(length) {}
 
-  Self& operator++() noexcept override { return *this; }
-  Self& operator+(unsigned) noexcept override { return *this; }
+  constexpr StringIterator(const Self& that) noexcept : value(that.value),
+                                                        position(that.position),
+                                                        length(that.length) {}
 
-  Self& operator--() noexcept override { return *this; }
-  Self& operator-(unsigned) noexcept override { return *this; }
+  ~StringIterator() noexcept {}
 
-  bool operator==(const Iterator<char>&) const noexcept override {
-    return true;
+  virtual bool HasNext() const noexcept override {
+    return position + 1 < length;
   }
-  bool operator!=(const Iterator<char>&) const noexcept override {
-    return true;
+  virtual bool HasPrevious() const noexcept override { return position > 0; }
+
+  virtual const char& GetValue() const noexcept override {
+    return value[position];
   }
 
-  const char& operator*() const noexcept override { return *value; }
+  virtual void ToNext(const unsigned offset = 1) noexcept override {
+    position += offset;
+  }
+  virtual void ToPrevious(const unsigned offset = 1) noexcept override {
+    position -= offset;
+  }
 
-  char operator->() const noexcept override { return *value; }
+  virtual void ToFirst() noexcept override { position = 0; }
+  virtual void ToLast() noexcept override { position = length - 1; }
 
  protected:
-  const char* value;
+  const char* const value;
   Size position;
+  Size length;
 };
 
-class String : public NonCopyable, public Iterable<char> {
+class String : public NonCopyable, public ConstIterable<StringIterator, char> {
  public:
   using Iterator = StringIterator;
 
@@ -60,27 +70,21 @@ class String : public NonCopyable, public Iterable<char> {
 
   ~String() noexcept override {}
 
-  String* operator+(const String*) noexcept;
-  String* Replace(const String* old_value, const String* new_value) noexcept;
-  String* Trim() noexcept;
-  Size Length() const { return length; }
+  String operator+(const String*) const noexcept;
+  String Replace(const String* old_value, const String* new_value) const
+      noexcept;
+  String Trim() const noexcept;
+  Size Length() const noexcept { return length; }
 
-  Iterator* begin() noexcept override { return Begin(); }
-  Iterator* end() noexcept override { return End(); }
-  const Iterator* begin() const noexcept override { return Begin(); }
-  const Iterator* end() const noexcept override { return End(); }
-
-  Iterator* Begin() noexcept override { return new Iterator(buffer, 0); }
-  Iterator* End() noexcept override { return new Iterator(buffer, 0); }
-  const Iterator* Begin() const noexcept override {
-    return new Iterator(buffer, length);
+  Iterator GetIterator() const noexcept override {
+    return Iterator(buffer, 0, length);
   }
-  const Iterator* End() const noexcept override {
-    return new Iterator(buffer, length);
+  Iterator GetReversedIterator() const noexcept override {
+    return Iterator(buffer, length - 1, length);
   }
 
  private:
-  const char* buffer;
+  const char* const buffer;
   const Size length;
 };
 }
