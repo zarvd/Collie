@@ -17,22 +17,22 @@ class TcpServer : public util::NonCopyable {
   using Address = std::shared_ptr<InetAddress>;
   using Port = unsigned;
   using Host = std::string;
-  using RequestHandler = std::function<void(TcpStream&)>;
+  using RequestHandler = std::function<void(TcpStream &)>;
 
   TcpServer() noexcept;
   ~TcpServer() noexcept;
 
-  TcpServer& Listen(const Port port,
-                    const Host& host = "0.0.0.0") throw(TcpException);
-  TcpServer& Listen(Address host_address) throw(TcpException);
+  TcpServer &Listen(const Port port,
+                    const Host &host = "0.0.0.0") throw(TcpException);
+  TcpServer &Listen(Address host_address) throw(TcpException);
 
   void Start(const bool is_loop = true) throw(TcpException);
 
-  TcpServer& SetRequestHandler(const RequestHandler& handler) noexcept {
+  TcpServer &SetRequestHandler(const RequestHandler &handler) noexcept {
     req_handler_ = handler;
     return *this;
   };
-  TcpServer& SetRequestHandler(RequestHandler&& handler) noexcept {
+  TcpServer &SetRequestHandler(RequestHandler &&handler) noexcept {
     req_handler_ = std::move(handler);
     return *this;
   }

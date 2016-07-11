@@ -1,8 +1,8 @@
 #ifndef COLLIE_TCP_CLIENT_H_
 #define COLLIE_TCP_CLIENT_H_
 
-#include <memory>
 #include <functional>
+#include <memory>
 #include "exception.h"
 
 namespace collie {
