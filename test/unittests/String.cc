@@ -74,3 +74,10 @@ TEST(String, MoveConstructor) {
   ASSERT_EQ(s3.Length(), s4.Length());
   ASSERT_GE(s4.Capacity(), s4.Length());
 }
+
+TEST(String, Trim) {
+  String s1("   ab  cd ef   g    ");
+  s1.Trim();
+  ASSERT_EQ(13, s1.Length());
+  ASSERT_STREQ("ab  cd ef   g", s1.RawData());
+}

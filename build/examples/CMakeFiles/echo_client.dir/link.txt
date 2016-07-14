@@ -1,1 +1,0 @@
-/usr/bin/clang++    -Wall -pthread -std=c++14   CMakeFiles/echo_client.dir/echo_client.cc.o  -o echo_client -rdynamic ../lib/libcollie.a 

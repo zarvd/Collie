@@ -1,2 +1,0 @@
-/usr/bin/ar qc libcollie.a  CMakeFiles/collie.dir/base/String.cc.o
-/usr/bin/ranlib libcollie.a

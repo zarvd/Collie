@@ -31,6 +31,8 @@ class String {
 
   ~String() noexcept;
 
+  String& TrimLeft() noexcept;
+  String& TrimRight() noexcept;
   String& Trim() noexcept;
   String& Replace(const String& old_value, const String& new_value) noexcept;
   String& Remove(const String&) noexcept;

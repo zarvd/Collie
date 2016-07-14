@@ -1,1 +1,0 @@
-/usr/bin/clang++    -Wall -pthread -std=c++14   CMakeFiles/timer.dir/timer.cc.o  -o timer -rdynamic ../lib/libcollie.a 

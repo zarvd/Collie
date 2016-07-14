@@ -60,5 +60,50 @@ String& String::operator=(String&& that) noexcept {
 String::~String() noexcept {
   if (data) delete[] data;
 }
+
+String& String::TrimLeft() noexcept {
+  if (length == 0) return *this;
+  bool is_content_begin = false;
+  Size new_length = length;
+  for (Size x = 0, i = 0; i < length; ++i) {
+    if (!is_content_begin) {
+      if (data[i] == ' ') {
+        continue;
+      }
+      is_content_begin = true;
+      new_length = length - i;
+    }
+    data[x++] = data[i];
+  }
+  length = new_length;
+  return *this;
+}
+
+String& String::TrimRight() noexcept {
+  if (length == 0) return *this;
+  Size new_length = length;
+  for (int i = length - 1; i >= 0; --i) {
+    if (data[i] == ' ') {
+      --new_length;
+    } else {
+      break;
+    }
+  }
+  data[new_length] = '\0';
+  length = new_length;
+  return *this;
+}
+
+String& String::Trim() noexcept {
+  if (length == 0) return *this;
+  TrimLeft();
+  TrimRight();
+  return *this;
+}
+
+// String& String::Replace(const collie::base::String& old_value,
+//                         const collie::base::String& new_value) noexcept {
+//   return *this;
+// }
 }
 }
