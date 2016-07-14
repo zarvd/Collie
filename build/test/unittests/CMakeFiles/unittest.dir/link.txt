@@ -1,0 +1,1 @@
+/usr/bin/clang++    -Wall -pthread -std=c++14   CMakeFiles/unittest.dir/main.cc.o CMakeFiles/unittest.dir/String.cc.o  -o unittest -rdynamic ../../lib/libcollie.a -lgtest 

@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/gallon/workSpace/private/Collie/inc/base/String.h
+string.h
+-
+../collie.h
+/home/gallon/workSpace/private/Collie/inc/collie.h
+
+/home/gallon/workSpace/private/Collie/inc/collie.h
+
+/home/gallon/workSpace/private/Collie/lib/base/String.cc
+../../inc/base/String.h
+/home/gallon/workSpace/private/Collie/inc/base/String.h
+

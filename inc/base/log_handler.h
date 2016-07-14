@@ -1,8 +1,8 @@
-#ifndef COLLIE_LOG_HANDLER_H_
-#define COLLIE_LOG_HANDLER_H_
+#ifndef COLLIE_BASE_LOG_HANDLER_H_
+#define COLLIE_BASE_LOG_HANDLER_H_
 
 #include <atomic>
-#include "util/noncopyable.h"
+#include "../util/noncopyable.h"
 #include "loglib.h"
 
 namespace collie {
@@ -10,20 +10,20 @@ namespace collie {
 // Default log handler
 class LogHandler : public util::NonCopyable {
  public:
-  LogHandler() noexcept : log_level_(INFO) {}
+  LogHandler() noexcept : log_level(INFO) {}
   virtual ~LogHandler() noexcept {}
 
   virtual void Log(const LogLevel, const std::string& msg,
                    const std::string& file, const std::string& func,
                    unsigned line) const noexcept;
 
-  LogLevel level() const noexcept { return log_level_; }
+  LogLevel GetLevel() const noexcept { return log_level; }
   // Thread safe
-  void set_level(LogLevel level) noexcept { log_level_ = level; }
+  void SetLevel(LogLevel level) noexcept { log_level = level; }
 
  protected:
-  std::atomic<LogLevel> log_level_;
+  std::atomic<LogLevel> log_level;
 };
 }
 
-#endif /* COLLIE_LOG_HANDLER_H_ */
+#endif /* COLLIE_BASE_LOG_HANDLER_H_ */

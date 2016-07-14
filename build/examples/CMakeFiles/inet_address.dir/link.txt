@@ -1,0 +1,1 @@
+/usr/bin/clang++    -Wall -pthread -std=c++14   CMakeFiles/inet_address.dir/inet_address.cc.o  -o inet_address -rdynamic ../lib/libcollie.a 

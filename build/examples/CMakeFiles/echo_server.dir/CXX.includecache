@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/gallon/workSpace/private/Collie/examples/echo_server.cc
+../inc/tcp_server.h
+/home/gallon/workSpace/private/Collie/inc/tcp_server.h
+../inc/tcp_stream.h
+/home/gallon/workSpace/private/Collie/inc/tcp_stream.h
+../inc/logger.h
+/home/gallon/workSpace/private/Collie/inc/logger.h
+

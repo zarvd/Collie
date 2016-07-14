@@ -1,0 +1,1 @@
+/usr/bin/clang++    -Wall -pthread -std=c++14   CMakeFiles/logger.dir/logger.cc.o  -o logger -rdynamic ../lib/libcollie.a 

@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/gallon/workSpace/private/Collie/inc/base/String.h
+string.h
+-
+../collie.h
+/home/gallon/workSpace/private/Collie/inc/collie.h
+
+/home/gallon/workSpace/private/Collie/inc/collie.h
+
+/home/gallon/workSpace/private/Collie/test/unittests/String.cc
+../../inc/base/String.h
+/home/gallon/workSpace/private/Collie/inc/base/String.h
+gtest/gtest.h
+-
+
+/home/gallon/workSpace/private/Collie/test/unittests/main.cc
+gtest/gtest.h
+-
+

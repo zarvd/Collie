@@ -1,21 +1,30 @@
-#ifndef COLLIE_TIMER_H_
-#define COLLIE_TIMER_H_
+#ifndef COLLIE_BASE_TIMER_H_
+#define COLLIE_BASE_TIMER_H_
 
-#include <functional>
-#include <chrono>
-#include <thread>
-#include <queue>  // storing timeout handler
-#include <vector>
-#include <mutex>
-#include <memory>
 #include <atomic>
-#include "util/noncopyable.h"
+#include <chrono>
+#include <functional>
+#include <memory>
+#include <mutex>
+#include <queue>
+#include <thread>
+#include <vector>
+#include "../util/noncopyable.h"
 
 namespace collie {
+namespace base {
 
 using TimeoutHandler = std::function<void()>;
 enum class TimerPolicy { Once, Reapeat };
 
+template <class TimeUnit>
+class TimerQueue;
+
+template <class TimeUnit>
+struct TimerCmpGreater;
+
+// Timer
+template <class TimeUnit = std::chrono::milliseconds>
 class Timer : public util::NonCopyable {
  public:
   enum Status { Timeout, Waiting, Removed };
@@ -32,23 +41,30 @@ class Timer : public util::NonCopyable {
   TimerPolicy policy;
   std::atomic<Status> status;
 
-  friend class TimerQueue;
-  friend struct TimerCmpGreater;
+  friend class TimerQueue<TimeUnit>;
+  friend struct TimerCmpGreater<TimeUnit>;
 };
 
+// Compare timer
+template <class TimeUnit = std::chrono::milliseconds>
 struct TimerCmpGreater {
-  bool operator()(const Timer* x, const Timer* y) {
+  using TimerPtr = std::shared_ptr<Timer<TimeUnit> >;
+
+  bool operator()(const TimerPtr x, const TimerPtr y) {
     return x->timeout_point > y->timeout_point;
   }
 };
 
-// Singleton
+// Timer queue
+template <class TimeUnit = std::chrono::milliseconds>
 class TimerQueue : public util::NonCopyable {
  public:
-  using TimeUnit = std::chrono::milliseconds;
+  // using TimeUnit = std::chrono::milliseconds;
+  using TimerPtr = std::shared_ptr<Timer<TimeUnit> >;
   using TimePoint = std::chrono::high_resolution_clock::time_point;
   enum Status { Running, Stopped };
 
+  constexpr TimerQueue() noexcept;
   ~TimerQueue() noexcept;
 
   // Thread safe
@@ -56,37 +72,37 @@ class TimerQueue : public util::NonCopyable {
   // Thread safe
   void Stop() noexcept;
   // Thread safe
-  void SetFrequecy(TimeUnit&& frequency) noexcept { this->frequency = frequency; }
+  void SetFrequecy(TimeUnit&& frequency) noexcept {
+    this->frequency = frequency;
+  }
   const TimeUnit GetFrequency() const noexcept { return frequency; }
   // Thread safe
-  Timer* Insert(const TimeUnit&, const TimeoutHandler&,
-                const TimerPolicy = TimerPolicy::Once) noexcept;
+  TimerPtr Insert(const TimeUnit&, const TimeoutHandler&,
+                  const TimerPolicy = TimerPolicy::Once) noexcept;
+
+  // Modifies timer if it's waiting
+  // Inserts timer if it's timeout or removed
+  TimerPtr Insert(TimerPtr) noexcept;
   // Thread safe
-  void Remove(Timer* const) noexcept;
+  void Remove(TimerPtr) noexcept;
 
   // Thread safe
   void Clear() noexcept;
-
-  // Thread safe
-  static TimerQueue& GetInstance() noexcept {
-    static TimerQueue instance;
-    return instance;
-  }
 
   unsigned GetTimerNum() const noexcept { return queue.size(); }
   Status GetStatus() const noexcept { return status; }
 
  private:
-  TimerQueue() noexcept;
-
   void Counter();
   std::mutex counter_mutex;
   std::thread counter;
-  std::priority_queue<Timer*, std::vector<Timer*>, TimerCmpGreater>
+  std::priority_queue<TimerPtr, std::vector<TimerPtr>,
+                      TimerCmpGreater<TimeUnit> >
       queue;  // min-heap
   Status status;
   std::atomic<TimeUnit> frequency;
 };
 }
+}
 
-#endif /* COLLIE_TIMER_H_ */
+#endif /* COLLIE_BASE_TIMER_H_ */

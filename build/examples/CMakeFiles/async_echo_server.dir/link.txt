@@ -1,0 +1,1 @@
+/usr/bin/clang++    -Wall -pthread -std=c++14   CMakeFiles/async_echo_server.dir/async_echo_server.cc.o  -o async_echo_server -rdynamic ../lib/libcollie.a 
