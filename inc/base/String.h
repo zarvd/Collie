@@ -9,7 +9,7 @@ namespace base {
 
 class String {
  public:
-  template <Size size>
+  template <SizeType size>
   String(const char (&chars)[size]) noexcept : length(::strlen(chars)),
                                                capacity(length),
                                                data(new char[capacity]) {
@@ -36,13 +36,13 @@ class String {
   String& Trim() noexcept;
   String& Replace(const String& old_value, const String& new_value) noexcept;
   String& Remove(const String&) noexcept;
-  Size Length() const noexcept { return length; }
-  Size Capacity() const noexcept { return capacity; }
+  SizeType Length() const noexcept { return length; }
+  SizeType Capacity() const noexcept { return capacity; }
   const char* RawData() const noexcept { return data; }
 
  private:
-  Size length;
-  Size capacity;
+  SizeType length;
+  SizeType capacity;
   char* data;
 };
 }

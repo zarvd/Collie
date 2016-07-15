@@ -3,7 +3,7 @@
 
 namespace collie {
 
-using Size = unsigned long;
+using SizeType = unsigned long;
 }
 
 #endif /* COLLIE_COLLIE_H_ */
