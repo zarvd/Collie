@@ -101,9 +101,139 @@ String& String::Trim() noexcept {
   return *this;
 }
 
-// String& String::Replace(const collie::base::String& old_value,
-//                         const collie::base::String& new_value) noexcept {
-//   return *this;
-// }
+String String::From(int num) noexcept {
+  char* str = new char[16];
+  ::sprintf(str, "%d", num);
+  String s(str);
+  delete[] str;
+  return s;
+}
+
+String String::From(long num) noexcept {
+  char* str = new char[16];
+  ::sprintf(str, "%ld", num);
+  String s(str);
+  delete[] str;
+  return s;
+}
+
+String String::From(long long num) noexcept {
+  char* str = new char[16];
+  ::sprintf(str, "%lld", num);
+  String s(str);
+  delete[] str;
+  return s;
+}
+
+String String::From(float num) noexcept {
+  char* str = new char[16];
+  ::sprintf(str, "%f", num);
+  String s(str);
+  delete[] str;
+  return s;
+}
+
+String String::From(double num) noexcept {
+  char* str = new char[16];
+  ::sprintf(str, "%f", num);
+  String s(str);
+  delete[] str;
+  return s;
+}
+
+String String::From(long double num) noexcept {
+  char* str = new char[16];
+  ::sprintf(str, "%Lf", num);
+  String s(str);
+  delete[] str;
+  return s;
+}
+
+String String::From(unsigned num) noexcept {
+  char* str = new char[16];
+  ::sprintf(str, "%u", num);
+  String s(str);
+  delete[] str;
+  return s;
+}
+
+String String::From(unsigned long num) noexcept {
+  char* str = new char[16];
+  ::sprintf(str, "%lu", num);
+  String s(str);
+  delete[] str;
+  return s;
+}
+
+String String::From(unsigned long long num) noexcept {
+  char* str = new char[16];
+  ::sprintf(str, "%llu", num);
+  String s(str);
+  delete[] str;
+  return s;
+}
+
+String String::From(bool b) noexcept { return String(b ? "true" : "false"); }
+
+String& String::operator+=(const String& that) noexcept {
+  if (!that.data || that.length == 0) return *this;
+
+  if (that.length <= capacity - length) {
+    for (SizeType i = length, j = 0; i < capacity; ++i, ++j) {
+      data[i] = that.data[j];
+    }
+  } else if (!data) {
+    capacity = that.length;
+    data = new char[capacity];
+    ::strncpy(data, that.data, that.length);
+    length = capacity;
+  } else {
+    const auto new_capacity = length + that.length;
+    auto new_data = new char[new_capacity];
+    ::strncpy(new_data, data, length);
+    for (SizeType i = length, j = 0; i < new_capacity; ++i, ++j) {
+      new_data[i] = that.data[j];
+    }
+    delete[] data;
+    data = new_data;
+    capacity = new_capacity;
+    length = capacity;
+  }
+
+  return *this;
+}
+
+String String::operator+(const String& that) const noexcept {
+  if (!data || length == 0) return that;
+  if (!that.data || that.length == 0) return *this;
+
+  String str;
+  str.capacity = length + that.length;
+  str.length = length + that.length;
+  str.data = new char[str.capacity];
+
+  ::strncpy(str.data, data, length);
+
+  for (SizeType i = length, j = 0; i < str.length; ++i, ++j) {
+    str.data[i] = that.data[j];
+  }
+
+  return str;
+}
+
+bool String::operator==(const String& that) const noexcept {
+  if (length != that.length) return false;
+  if (length == 0) return true;
+
+  for (SizeType i = 0; i < length; ++i) {
+    if (data[i] != that.data[i]) return false;
+  }
+
+  return true;
+}
+
+bool String::operator!=(const String& that) const noexcept {
+  return !(*this == that);
+}
 }
 }

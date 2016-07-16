@@ -46,15 +46,22 @@ class String {
     return os;
   }
 
-  String& operator+=(const String&);
-  String& operator+(const String&) const;
+  String& operator+=(const String&) noexcept;
+  String operator+(const String&) const noexcept;
+  const String& operator[](const SizeType) const;
+  String& operator[](const SizeType);
+  bool operator==(const String&) const noexcept;
+  bool operator!=(const String&) const noexcept;
 
   static String From(int) noexcept;
   static String From(long) noexcept;
   static String From(long long) noexcept;
   static String From(unsigned) noexcept;
   static String From(unsigned long) noexcept;
+  static String From(unsigned long long) noexcept;
+  // FIXME precise
   static String From(double) noexcept;
+  static String From(long double) noexcept;
   static String From(float) noexcept;
   static String From(bool) noexcept;
 
