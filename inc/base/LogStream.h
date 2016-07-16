@@ -1,52 +1,38 @@
 #ifndef COLLIE_BASE_LOG_STREAM_H_
 #define COLLIE_BASE_LOG_STREAM_H_
 
-#include <memory>
-#include <mutex>
-#include <vector>
 #include "../util/noncopyable.h"
-#include "loglib.h"
+#include "LogLib.h"
+#include "String.h"
 
 namespace collie {
 namespace base {
-
-class LogHandler;
 
 // Does logging when destructing
 // Uses stream style input
 class LogStream : public util::NonCopyable {
  public:
-  LogStream(LogLevel, const std::string& file, const std::string& func,
+  LogStream(LogLevel level, const String& file, const String& func,
             unsigned line) noexcept;
   ~LogStream() noexcept;
 
-  LogStream& operator<<(const std::string& msg) noexcept {
-    content += msg;
-    return *this;
-  }
-
-  LogStream& operator<<(const char msg[]) noexcept {
-    content += msg;
-    return *this;
-  }
-
-  LogStream& operator<<(char* msg) noexcept {
+  LogStream& operator<<(const String& msg) noexcept {
     content += msg;
     return *this;
   }
 
   template <typename T>
   LogStream& operator<<(const T& msg) noexcept {
-    content += std::to_string(msg);
+    content += String::From(msg);
     return *this;
   }
 
  private:
   const LogLevel level;
-  const std::string file;
-  const std::string func;
+  const String file;
+  const String func;
   const unsigned line;
-  std::string content;
+  String content;
 };
 }
 }

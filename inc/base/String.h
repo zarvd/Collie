@@ -2,6 +2,7 @@
 #define COLLIE_BASE_STRING_H_
 
 #include <string.h>
+#include <ostream>
 #include "../collie.h"
 
 namespace collie {
@@ -39,6 +40,23 @@ class String {
   SizeType Length() const noexcept { return length; }
   SizeType Capacity() const noexcept { return capacity; }
   const char* RawData() const noexcept { return data; }
+
+  friend std::ostream& operator<<(std::ostream& os, const String& str) {
+    os << str.data;
+    return os;
+  }
+
+  String& operator+=(const String&);
+  String& operator+(const String&) const;
+
+  static String From(int) noexcept;
+  static String From(long) noexcept;
+  static String From(long long) noexcept;
+  static String From(unsigned) noexcept;
+  static String From(unsigned long) noexcept;
+  static String From(double) noexcept;
+  static String From(float) noexcept;
+  static String From(bool) noexcept;
 
  private:
   SizeType length;

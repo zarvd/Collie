@@ -1,36 +1,45 @@
-#ifndef COLLIE_LOGGER_H_
-#define COLLIE_LOGGER_H_
+#ifndef COLLIE_BASE_LOGGER_H_
+#define COLLIE_BASE_LOGGER_H_
 
-#include "log_handler.h"
-#include "log_stream.h"
+#include <mutex>
+#include <vector>
+#include "../collie.h"
+#include "LogHandler.h"
+#include "LogStream.h"
 
 namespace collie {
+namespace base {
 
 // Global logger configuration
 class Logger {
  public:
-  ~Logger() noexcept {}
+  ~Logger() noexcept;
 
-  static void Init() { AddLogHandler(std::make_unique<LogHandler>()); }
+  static void Init();
+  static void SetLevel(LogLevel level) noexcept;
+  static LogLevel Level() noexcept;
 
-  // Thread safe
-  static void SetLogLevel(LogLevel level) noexcept { log_level_ = level; }
-  static LogLevel GetLogLevel() noexcept { return log_level_; }
-  static void AddLogHandler(std::unique_ptr<LogHandler>) noexcept;
+  template <class Handler>
+  static void AddLogHandler() noexcept {
+    Handler* handler = new Handler;  // XXX use default constructor
+    std::lock_guard<std::mutex> lock(logger.handlers_mutex);
+    logger.handlers.push_back(handler);
+  }
   static void ClearLogHandler() noexcept;
-  static unsigned GetLoggerNum() noexcept { return handlers_.size(); }
+  static SizeType NumOfHandler() noexcept;
+  static void Log(const LogLevel level, const String& msg, const String& file,
+                  const String& func, unsigned line) noexcept;
 
  private:
   Logger() noexcept {}
-  static std::vector<std::unique_ptr<LogHandler> > handlers_;
-  static std::mutex handlers_mutex_;
-  static std::atomic<LogLevel> log_level_;
 
-  friend class LogStream;
+  static Logger logger;  // singleton object
+  std::vector<LogHandler*> handlers;
+  std::mutex handlers_mutex;
+  std::atomic<LogLevel> log_level;
 };
 
 // MACRO for logger
-
 constexpr int32_t basename_index(const char* const path,
                                  const int32_t index = 0,
                                  const int32_t slash_index = -1) {
@@ -50,10 +59,10 @@ constexpr int32_t basename_index(const char* const path,
     __FILE__ + basename_idx;                                      \
   })
 
-#define LOG(log_level)                   \
-  if (log_level < Logger::GetLogLevel()) \
-    ;                                    \
-  else                                   \
+#define LOG(log_level)             \
+  if (log_level < Logger::Level()) \
+    ;                              \
+  else                             \
   LogStream(log_level, __FILENAME__, __func__, __LINE__)
 
 #define ASSERT(x)                             \
@@ -62,16 +71,18 @@ constexpr int32_t basename_index(const char* const path,
     throw std::logic_error("ASSERTION FAIL"); \
   }
 
+// Run time logger for logging it's life time
 class RunTimeLogger : public util::NonCopyable {
  public:
-  RunTimeLogger(const std::string& functor) noexcept
+  RunTimeLogger(const String& functor) noexcept
       : begin_time_(std::chrono::high_resolution_clock::now()),
-        functor_(functor) {}
+        functor(functor) {}
 
   ~RunTimeLogger() noexcept {
     const auto end_time = std::chrono::high_resolution_clock::now();
 
-    std::string time_unit = "ns";
+    // Format time unit
+    String time_unit = "ns";
     auto elpased_time = std::chrono::duration_cast<std::chrono::nanoseconds>(
         end_time - begin_time_);
     if (elpased_time.count() > 1000000) {
@@ -84,17 +95,18 @@ class RunTimeLogger : public util::NonCopyable {
           std::chrono::duration_cast<std::chrono::microseconds>(elpased_time);
       time_unit = "us";
     }
-    LOG(INFO) << "Run time of " << functor_ << " is " << elpased_time.count()
+    LOG(INFO) << "Run time of " << functor << " is " << elpased_time.count()
               << time_unit;
   }
 
  private:
   const std::chrono::high_resolution_clock::time_point begin_time_;
-  const std::string functor_;
+  const String functor;
 };
 
 #define RUN_FUNC RunTimeLogger(__func__);
 #define RUN(name) RunTimeLogger(name);
 }
+}
 
-#endif /* COLLIE_LOGGER_H_ */
+#endif /* COLLIE_BASE_LOGGER_H_ */
