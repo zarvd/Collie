@@ -4,7 +4,6 @@
 #include "../../inc/base/Logger.h"
 
 namespace collie {
-namespace base {
 
 EventPool::EventPool() noexcept {}
 
@@ -84,6 +83,5 @@ void EventPool::PollHandler(unsigned int fd, EventType revents) noexcept {
     LOG(DEBUG) << "close events";
     io->HandleClose();
   }
-}
 }
 }

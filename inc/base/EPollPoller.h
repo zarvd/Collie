@@ -4,7 +4,6 @@
 #include "Poller.h"
 
 namespace collie {
-namespace base {
 
 class EPollPoller : public Poller {
  public:
@@ -23,7 +22,6 @@ class EPollPoller : public Poller {
 
  private:
 };
-}
 }
 
 #endif /* COLLIE_BASE_EPOLL_POLLER_H_ */

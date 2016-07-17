@@ -6,7 +6,6 @@
 #include "../collie.h"
 
 namespace collie {
-namespace base {
 
 class String final {
  public:
@@ -72,7 +71,6 @@ class String final {
   SizeType capacity;
   char* data;
 };
-}
 }
 
 #endif /* COLLIE_BASE_STRING_H_ */

@@ -2,7 +2,6 @@
 #define COLLIE_BASE_SERIALIZABLE_H_
 
 namespace collie {
-namespace base {
 
 class String;
 
@@ -13,7 +12,6 @@ class Serializable {
 
   virtual String ToString() const noexcept = 0;
 };
-}
 }
 
 #endif /* COLLIE_BASE_SERIALIZABLE_H_ */

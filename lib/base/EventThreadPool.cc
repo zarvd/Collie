@@ -6,7 +6,7 @@
 #include "../../inc/base/Logger.h"
 
 namespace collie {
-namespace base {
+
 sig_atomic_t SIGNAL_STOP_FLAG = true;
 
 thread_local std::shared_ptr<EventPool> EventThreadPool::current_event_pool;
@@ -77,6 +77,5 @@ void EventThreadPool::EventLoop() {
 
   LOG(DEBUG) << "event pool stopped";
   current_event_pool->Destroy();
-}
 }
 }

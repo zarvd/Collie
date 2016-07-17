@@ -3,7 +3,6 @@
 #include <iostream>
 
 namespace collie {
-namespace base {
 
 constexpr char LOG_COLOR_HEADER[] = "\033[95m";
 constexpr char LOG_COLOR_OKBLUE[] = "\033[94m";
@@ -55,6 +54,5 @@ void LogHandler::Log(const LogLevel level, const String& msg,
             << LOG_COLOR_HEADER << buffer << LOG_COLOR_ENDC << std::endl
             << '[' << ToString(level) << ']' << file << "(" << line
             << "): " << LOG_COLOR_BOLD << msg << LOG_COLOR_ENDC << std::endl;
-}
 }
 }

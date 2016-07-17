@@ -14,7 +14,6 @@
 #endif
 
 namespace collie {
-namespace base {
 
 class AsyncIOStream;
 
@@ -42,7 +41,6 @@ class EventPool : public util::NonCopyable,
 
   std::unordered_map<int, std::shared_ptr<AsyncIOStream> > io_streams;
 };
-}
 }
 
 #endif /* COLLIE_BASE_EVENT_POOL_H_ */

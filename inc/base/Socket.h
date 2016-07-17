@@ -5,7 +5,6 @@
 #include "../util/NonCopyable.h"
 
 namespace collie {
-namespace base {
 
 class InetAddress;
 
@@ -24,7 +23,6 @@ class Socket : public util::NonCopyable {
   int fd;
   AddressPtr address;
 };
-}
 }
 
 #endif /* COLLIE_BASE_SOCKET_H_ */

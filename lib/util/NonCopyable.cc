@@ -1,4 +1,4 @@
-#include "../../inc/util/noncopyable.h"
+#include "../../inc/util/NonCopyable.h"
 
 namespace collie {
 namespace util {

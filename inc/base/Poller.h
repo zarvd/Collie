@@ -6,7 +6,6 @@
 #include "../util/NonCopyable.h"
 
 namespace collie {
-namespace base {
 
 class EventType;
 
@@ -38,7 +37,6 @@ class Poller : public util::NonCopyable {
   int fd;
   std::atomic<unsigned> max_event;
 };
-}
 }
 
 #endif /* COLLIE_BASE_POLLER_H_ */

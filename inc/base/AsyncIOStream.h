@@ -6,7 +6,6 @@
 #include "EventType.h"
 
 namespace collie {
-namespace base {
 
 class EventPool;
 
@@ -32,7 +31,6 @@ class AsyncIOStream : public util::NonCopyable {
   EventType event;
   std::shared_ptr<EventPool> event_pool;
 };
-}
 }
 
 #endif /* COLLIE_BASE_ASYNC_IO_STREAM_H_ */

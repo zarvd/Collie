@@ -1,7 +1,7 @@
 #include "../../inc/base/String.h"
 #include <gtest/gtest.h>
 
-using namespace collie::base;
+using namespace collie;
 
 TEST(String, DefaultConstructor) {
   String s1;

@@ -1,7 +1,6 @@
 #include "../../inc/base/String.h"
 
 namespace collie {
-namespace base {
 
 String::String(const String& that) noexcept {
   if (!that.data) {
@@ -252,6 +251,5 @@ char& String::operator[](const SizeType index) {
   if (index >= length)
     throw std::out_of_range("index of string is out of range");
   return data[index];
-}
 }
 }

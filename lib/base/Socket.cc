@@ -6,7 +6,6 @@
 #include "../../inc/base/Logger.h"
 
 namespace collie {
-namespace base {
 
 Socket::~Socket() noexcept {
   if (fd != -1) {
@@ -31,6 +30,5 @@ void Socket::Close() noexcept {
     }
     fd = -1;
   }
-}
 }
 }

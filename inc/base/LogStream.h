@@ -6,7 +6,6 @@
 #include "String.h"
 
 namespace collie {
-namespace base {
 
 // Does logging when destructing
 // Uses stream style input
@@ -34,7 +33,6 @@ class LogStream : public util::NonCopyable {
   const unsigned line;
   String content;
 };
-}
 }
 
 #endif /* COLLIE_BASE_LOG_STREAM_H_ */

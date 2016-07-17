@@ -8,7 +8,6 @@
 #include "../util/NonCopyable.h"
 
 namespace collie {
-namespace base {
 
 class AsyncIOStream;
 class EventPool;
@@ -43,7 +42,6 @@ class EventThreadPool : public util::NonCopyable {
 
   std::vector<IOStream> init_io_streams;
 };
-}
 }
 
 #endif /* COLLIE_BASE_EVENT_THREAD_POOL_H_ */

@@ -1,7 +1,6 @@
 #include "../../inc/base/Logger.h"
 
 namespace collie {
-namespace base {
 
 Logger Logger::logger;
 
@@ -29,6 +28,5 @@ void Logger::ClearLogHandler() noexcept {
     delete *it;
   }
   logger.handlers.clear();
-}
 }
 }

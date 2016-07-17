@@ -2,7 +2,6 @@
 #define COLLIE_BASE_EVENT_TYPE_H_
 
 namespace collie {
-namespace base {
 
 class EventType {
  public:
@@ -34,7 +33,6 @@ class EventType {
   bool is_urgent = false;
   bool is_oneshot = false;
 };
-}
 }
 
 #endif /* COLLIE_BASE_EVENT_TYPE_H_ */

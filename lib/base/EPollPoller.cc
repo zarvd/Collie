@@ -5,7 +5,6 @@
 #include "../../inc/base/Logger.h"
 
 namespace collie {
-namespace base {
 
 EPollPoller::EPollPoller() : Poller() {}
 EPollPoller::~EPollPoller() noexcept {}
@@ -125,6 +124,5 @@ EventType EPollPoller::ToEventType(unsigned events) noexcept {
     event.SetOneShot(true);
   }
   return event;
-}
 }
 }

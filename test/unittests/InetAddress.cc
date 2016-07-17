@@ -1,7 +1,7 @@
 #include "../../inc/base/InetAddress.h"
 #include <gtest/gtest.h>
 
-using namespace collie::base;
+using namespace collie;
 
 TEST(InetAddress, StaticConstructor) {
 }

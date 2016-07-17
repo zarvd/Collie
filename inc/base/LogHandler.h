@@ -6,7 +6,6 @@
 #include "String.h"
 
 namespace collie {
-namespace base {
 
 // Default log handler
 class LogHandler : public util::NonCopyable {
@@ -17,7 +16,6 @@ class LogHandler : public util::NonCopyable {
   virtual void Log(const LogLevel, const String& msg, const String& file,
                    const String& func, unsigned line) const noexcept;
 };
-}
 }
 
 #endif /* COLLIE_BASE_LOG_HANDLER_H_ */
