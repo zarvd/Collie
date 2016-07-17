@@ -176,6 +176,8 @@ String String::From(bool cond) noexcept {
   return String(cond ? "true" : "false");
 }
 
+String String::From(const char* str) noexcept { return str; }
+
 String& String::Append(const String& that) noexcept {
   *this += that;
   return *this;

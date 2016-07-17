@@ -65,6 +65,7 @@ class String final {
   static String From(long double) noexcept;
   static String From(float) noexcept;
   static String From(bool) noexcept;
+  static String From(const char*) noexcept;
 
  private:
   SizeType length;

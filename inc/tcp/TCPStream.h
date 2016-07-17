@@ -24,7 +24,12 @@ class TCPStream : public util::NonCopyable {
   virtual String ReadLine() const;
   virtual void Abort() noexcept;
 
-  const InetAddress& PeerAddress() const noexcept;
+  std::shared_ptr<InetAddress> LocalAddress() const noexcept {
+    return socket->LocalAddress();
+  }
+  std::shared_ptr<InetAddress> PeerAddress() const noexcept {
+    return socket->PeerAddress();
+  }
 
   void SetReadSize(SizeType size) noexcept { read_size = size; }
   SizeType ReadSize() const noexcept { return read_size; }

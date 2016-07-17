@@ -12,7 +12,8 @@ int main(void) {
 
   server.SetRequestHandler([](TCPStream& tcp_stream) {
     auto greeting = tcp_stream.Read();
-    LOG(INFO) << "Read: " << greeting;
+    LOG(INFO) << "Read: " << greeting << " From "
+              << tcp_stream.PeerAddress()->ToString();
     tcp_stream.Write(greeting);
     tcp_stream.Abort();
   });

@@ -3,6 +3,7 @@
 
 #include "../util/NonCopyable.h"
 #include "LogLib.h"
+#include "Serializable.h"
 #include "String.h"
 
 namespace collie {
@@ -17,6 +18,16 @@ class LogStream : public util::NonCopyable {
 
   LogStream& operator<<(const String& msg) noexcept {
     content += msg;
+    return *this;
+  }
+
+  LogStream& operator<<(const char* msg) noexcept {
+    content += msg;
+    return *this;
+  }
+
+  LogStream& operator<<(const Serializable& msg) noexcept {
+    content += msg.ToString();
     return *this;
   }
 

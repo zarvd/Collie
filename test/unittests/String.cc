@@ -83,8 +83,6 @@ TEST(String, Trim) {
 }
 
 TEST(String, FromPrimitives) {
-  ASSERT_TRUE(String::From(true) == "true");
-  ASSERT_TRUE(String::From(false) == "false");
   int n1 = 123;
   ASSERT_TRUE(String::From(n1) == "123");
   long n2 = 123456789;
