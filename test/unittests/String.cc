@@ -154,3 +154,14 @@ TEST(String, OperatorAppend) {
   ASSERT_EQ(14, s5.Length());
   ASSERT_GE(s5.Capacity(), s5.Length());
 }
+
+TEST(String, OperatorIndex) {
+  String s1("abcdefg");
+  ASSERT_THROW(s1[7], std::out_of_range);
+  ASSERT_NO_THROW(s1[0]);
+  ASSERT_NO_THROW(s1[6]);
+  s1[5] = 'g';
+  ASSERT_TRUE(s1 == "abcdegg");
+  s1[3] = 'u';
+  ASSERT_TRUE(s1 == "abcuegg");
+}

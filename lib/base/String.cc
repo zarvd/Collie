@@ -173,7 +173,14 @@ String String::From(unsigned long long num) noexcept {
   return s;
 }
 
-String String::From(bool b) noexcept { return String(b ? "true" : "false"); }
+String String::From(bool cond) noexcept {
+  return String(cond ? "true" : "false");
+}
+
+String& String::Append(const String& that) noexcept {
+  *this += that;
+  return *this;
+}
 
 String& String::operator+=(const String& that) noexcept {
   if (!that.data || that.length == 0) return *this;
@@ -234,6 +241,17 @@ bool String::operator==(const String& that) const noexcept {
 
 bool String::operator!=(const String& that) const noexcept {
   return !(*this == that);
+}
+
+const char& String::operator[](const SizeType index) const {
+  if (index >= length)
+    throw std::out_of_range("index of string is out of range");
+  return data[index];
+}
+char& String::operator[](const SizeType index) {
+  if (index >= length)
+    throw std::out_of_range("index of string is out of range");
+  return data[index];
 }
 }
 }

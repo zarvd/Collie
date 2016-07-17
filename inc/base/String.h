@@ -1,14 +1,14 @@
 #ifndef COLLIE_BASE_STRING_H_
 #define COLLIE_BASE_STRING_H_
 
-#include <string.h>
+#include <cstring>
 #include <ostream>
 #include "../collie.h"
 
 namespace collie {
 namespace base {
 
-class String {
+class String final {
  public:
   template <SizeType size>
   String(const char (&chars)[size]) noexcept : length(::strlen(chars)),
@@ -27,6 +27,7 @@ class String {
   String(const String& that) noexcept;
   String& operator=(const String& that) noexcept;
   // Move
+
   String(String&& that) noexcept;
   String& operator=(String&& that) noexcept;
 
@@ -37,6 +38,7 @@ class String {
   String& Trim() noexcept;
   String& Replace(const String& old_value, const String& new_value) noexcept;
   String& Remove(const String&) noexcept;
+  String& Append(const String&) noexcept;
   SizeType Length() const noexcept { return length; }
   SizeType Capacity() const noexcept { return capacity; }
   const char* RawData() const noexcept { return data; }
@@ -48,8 +50,8 @@ class String {
 
   String& operator+=(const String&) noexcept;
   String operator+(const String&) const noexcept;
-  const String& operator[](const SizeType) const;
-  String& operator[](const SizeType);
+  const char& operator[](const SizeType) const;
+  char& operator[](const SizeType);
   bool operator==(const String&) const noexcept;
   bool operator!=(const String&) const noexcept;
 
