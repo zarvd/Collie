@@ -1,5 +1,6 @@
 set(BASE_SRC
   base/String.cc
+  base/InetAddress.cc
   # timer.cc
   # log_stream.cc
   # log_handler.cc
