@@ -1,7 +1,7 @@
 #ifndef COLLIE_BASE_LOG_STREAM_H_
 #define COLLIE_BASE_LOG_STREAM_H_
 
-#include "../util/noncopyable.h"
+#include "../util/NonCopyable.h"
 #include "LogLib.h"
 #include "String.h"
 
