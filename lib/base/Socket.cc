@@ -1,13 +1,12 @@
-#include <sys/socket.h>
-#include <unistd.h>
+#include "../../inc/base/Socket.h"
 #include <string.h>
 #include <sys/fcntl.h>
-#include "../inc/socket.h"
-#include "../inc/logger.h"
+#include <sys/socket.h>
+#include <unistd.h>
+#include "../../inc/base/Logger.h"
 
 namespace collie {
-
-Socket::Socket() noexcept : fd(-1) {}
+namespace base {
 
 Socket::~Socket() noexcept {
   if (fd != -1) {
@@ -32,5 +31,6 @@ void Socket::Close() noexcept {
     }
     fd = -1;
   }
+}
 }
 }
