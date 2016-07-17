@@ -1,6 +1,7 @@
 #ifndef COLLIE_BASE_LOGGER_H_
 #define COLLIE_BASE_LOGGER_H_
 
+#include <atomic>
 #include <mutex>
 #include <vector>
 #include "../collie.h"
@@ -11,8 +12,7 @@ namespace collie {
 namespace base {
 
 // Global logger configuration
-class Logger {
- public:
+class Logger {public:
   ~Logger() noexcept;
 
   static void Init();
