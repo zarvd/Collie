@@ -9,12 +9,6 @@ namespace collie {
 
 class String final {
  public:
-  template <SizeType size>
-  String(const char (&chars)[size]) noexcept : length(::strlen(chars)),
-                                               capacity(length),
-                                               data(new char[capacity]) {
-    ::strcpy(data, chars);
-  }
   String(const char* chars) noexcept : length(::strlen(chars)),
                                        capacity(length),
                                        data(new char[capacity]) {
@@ -25,8 +19,8 @@ class String final {
   // Copy
   String(const String& that) noexcept;
   String& operator=(const String& that) noexcept;
-  // Move
 
+  // Move
   String(String&& that) noexcept;
   String& operator=(String&& that) noexcept;
 
@@ -38,8 +32,10 @@ class String final {
   String& Replace(const String& old_value, const String& new_value) noexcept;
   String& Remove(const String&) noexcept;
   String& Append(const String&) noexcept;
+  String Slice(const SizeType index, const SizeType length = 0) const noexcept;
   SizeType Length() const noexcept { return length; }
   SizeType Capacity() const noexcept { return capacity; }
+  bool IsNull() const noexcept { return length == 0; }
   const char* RawData() const noexcept { return data; }
 
   friend std::ostream& operator<<(std::ostream& os, const String& str) {

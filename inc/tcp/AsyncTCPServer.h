@@ -1,52 +1,52 @@
-#ifndef COLLIE_ASYNC_TCP_SERVER_H_
-#define COLLIE_ASYNC_TCP_SERVER_H_
+#ifndef COLLIE_TCP_ASYNC_TCP_SERVER_H_
+#define COLLIE_TCP_ASYNC_TCP_SERVER_H_
 
-#include <memory>
 #include <functional>
-#include "util/noncopyable.h"
-#include "exception.h"
+#include <memory>
+#include "../base/String.h"
+#include "../util/NonCopyable.h"
 
 namespace collie {
 
 class InetAddress;
-class AsyncTcpStream;
-class TcpSocket;
 class EventThreadPool;
 
-class AsyncTcpServer : public util::NonCopyable {
+namespace tcp {
+
+class AsyncTCPStream;
+class TCPSocket;
+
+class AsyncTCPServer : public util::NonCopyable {
  public:
-  using Address = std::shared_ptr<InetAddress>;
-  using Port = unsigned;
-  using Host = std::string;
-  using RequestHandler = std::function<void(std::shared_ptr<AsyncTcpStream>)>;
+  using RequestHandler = std::function<void(std::shared_ptr<AsyncTCPStream>)>;
 
-  AsyncTcpServer() noexcept;
-  ~AsyncTcpServer() noexcept;
+  AsyncTCPServer() noexcept;
+  ~AsyncTCPServer() noexcept;
 
-  AsyncTcpServer& Listen(const Port,
-                         const Host& = "0.0.0.0") throw(TcpException);
-  AsyncTcpServer& Listen(Address host_address) throw(TcpException);
+  AsyncTCPServer& Listen(const unsigned port, const String& = "0.0.0.0");
+  AsyncTCPServer& Listen(std::shared_ptr<InetAddress> host_address);
 
-  AsyncTcpServer& SetRequestHandler(const RequestHandler& handler) noexcept {
-    req_handler_ = handler;
+  AsyncTCPServer& SetRequestHandler(const RequestHandler& handler) noexcept {
+    req_handler = handler;
     return *this;
   };
-  AsyncTcpServer& SetRequestHandler(RequestHandler&& handler) noexcept {
-    req_handler_ = std::move(handler);
+  AsyncTCPServer& SetRequestHandler(RequestHandler&& handler) noexcept {
+    req_handler = std::move(handler);
     return *this;
   }
 
-  void SetLoop(std::shared_ptr<EventThreadPool> pool) noexcept;
+  void SetEventLoop(std::shared_ptr<EventThreadPool> pool) noexcept;
 
  private:
-  void Accept() throw(TcpException);
+  void Accept();
 
-  std::shared_ptr<TcpSocket> socket_fd_;
-  std::shared_ptr<AsyncTcpStream> socket_stream_;
-  RequestHandler req_handler_;
-  Address host_address_;
-  std::shared_ptr<EventThreadPool> event_thread_pool_;
+  std::shared_ptr<TCPSocket> socket;
+  std::shared_ptr<AsyncTCPStream> socket_stream;
+  RequestHandler req_handler;
+  std::shared_ptr<const InetAddress> host_address;
+  std::shared_ptr<EventThreadPool> event_thread_pool;
 };
 }
+}
 
-#endif /* COLLIE_ASYNC_TCP_SERVER_H_ */
+#endif /* COLLIE_TCP_ASYNC_TCP_SERVER_H_ */

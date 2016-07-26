@@ -163,3 +163,19 @@ TEST(String, OperatorIndex) {
   s1[3] = 'u';
   ASSERT_TRUE(s1 == "abcuegg");
 }
+
+TEST(String, Slice) {
+  String s1("abcdefg");
+  auto s2 = s1.Slice(0);
+  ASSERT_EQ(s1.Length(), s2.Length());
+  ASSERT_TRUE(s2 == "abcdefg") << s2;
+  auto s3 = s1.Slice(s1.Length());
+  ASSERT_EQ(0, s3.Length());
+  ASSERT_TRUE(s3.IsNull()) << s3;
+  auto s4 = s1.Slice(0, 1);
+  ASSERT_EQ(1, s4.Length()) << s4;
+  ASSERT_TRUE(s4 == "a") << s4;
+  auto s5 = s1.Slice(3, 3);
+  ASSERT_EQ(3, s5.Length());
+  ASSERT_TRUE(s5 == "def") << s5;
+}

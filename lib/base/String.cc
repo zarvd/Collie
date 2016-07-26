@@ -183,6 +183,25 @@ String& String::Append(const String& that) noexcept {
   return *this;
 }
 
+String String::Slice(const SizeType index, const SizeType length) const
+    noexcept {
+  if (index >= this->length || IsNull()) return String();
+  auto min = [](auto x, auto y) { return x < y ? x : y; };
+  SizeType slice_len;
+  if (length == 0) {
+    slice_len = this->length + 1 - index;
+  } else {
+    slice_len = min(this->length + 1 - index, length);
+  }
+  char new_str[slice_len + 1];
+  for (auto i = index; i < slice_len + index; ++i) {
+    new_str[i - index] = data[i];
+  }
+  new_str[slice_len] = '\0';
+  String s(new_str);
+  return s;
+}
+
 String& String::operator+=(const String& that) noexcept {
   if (!that.data || that.length == 0) return *this;
 

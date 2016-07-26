@@ -7,6 +7,10 @@ target_link_libraries(EchoServer collie)
 add_executable(EchoClient EchoClient)
 target_link_libraries(EchoClient collie)
 
+add_executable(AsyncEchoServer AsyncEchoServer)
+target_link_libraries(AsyncEchoServer collie)
+
+
 # add_executable(timer timer)
 # target_link_libraries(timer collie)
 

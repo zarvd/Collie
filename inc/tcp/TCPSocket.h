@@ -22,10 +22,10 @@ class TCPSocket final : public util::NonCopyable {
   std::unique_ptr<TCPSocket> Accept(bool is_block = true) const;
 
   void Connect(std::shared_ptr<InetAddress> peer_address);
-  std::shared_ptr<InetAddress> LocalAddress() const noexcept {
+  std::shared_ptr<const InetAddress> LocalAddress() const noexcept {
     return local_address;
   }
-  std::shared_ptr<InetAddress> PeerAddress() const noexcept {
+  std::shared_ptr<const InetAddress> PeerAddress() const noexcept {
     return peer_address;
   }
   void Close() noexcept {
@@ -36,8 +36,8 @@ class TCPSocket final : public util::NonCopyable {
   }
 
  protected:
-  std::shared_ptr<InetAddress> local_address;
-  std::shared_ptr<InetAddress> peer_address;
+  std::shared_ptr<const InetAddress> local_address;
+  std::shared_ptr<const InetAddress> peer_address;
 
   int fd;
 };

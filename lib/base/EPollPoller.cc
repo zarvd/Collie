@@ -10,22 +10,17 @@ EPollPoller::EPollPoller() : Poller() {}
 EPollPoller::~EPollPoller() noexcept {}
 
 void EPollPoller::Init() {
-  ASSERT(this->fd != -1)
+  ASSERT(fd == -1)
 
-  this->fd = ::epoll_create1(0);
-  if (this->fd == -1) {
-    throw std::system_error();
-  }
+  fd = ::epoll_create1(0);
+  if (fd == -1) throw std::system_error();
 }
 
 void EPollPoller::Destroy() {
-  ASSERT(this->fd != -1)
+  ASSERT(fd != -1)
 
-  if (::close(this->fd) == -1) {
-    throw std::system_error();
-  } else {
-    this->fd = -1;
-  }
+  if (::close(fd) == -1) throw std::system_error();
+  fd = -1;
 }
 
 void EPollPoller::Insert(unsigned fd, const EventType& events) {

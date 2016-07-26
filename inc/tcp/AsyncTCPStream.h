@@ -1,29 +1,30 @@
-#ifndef COLLIE_ASYNC_TCP_STREAM_H_
-#define COLLIE_ASYNC_TCP_STREAM_H_
+#ifndef COLLIE_TCP_ASYNC_TCP_STREAM_H_
+#define COLLIE_TCP_ASYNC_TCP_STREAM_H_
 
 #include <memory>
-#include "exception.h"
-#include "logger.h"
-#include "poll/async_io_stream.h"
+#include "../base/AsyncIOStream.h"
+#include "../base/Logger.h"
 
 namespace collie {
 
-class TcpSocket;
 class InetAddress;
 
+namespace tcp {
+
+class TCPSocket;
+
 // Should be shared pointer
-class AsyncTcpStream : public AsyncIOStream,
-                       public std::enable_shared_from_this<AsyncTcpStream> {
+class AsyncTCPStream final
+    : public AsyncIOStream,
+      public std::enable_shared_from_this<AsyncTCPStream> {
  public:
-  enum Status { OK, ABORT, READ, READ_UNTIL, READ_LINE, WRITE };
-  using AsyncIOHandler = std::function<void(std::shared_ptr<AsyncTcpStream>)>;
-  using AsyncCallback = std::function<void(std::shared_ptr<AsyncTcpStream>)>;
-  using Address = std::shared_ptr<InetAddress>;
+  enum StatusType { OK, ABORT, READ, READ_UNTIL, READ_LINE, WRITE };
+  using AsyncIOHandler = std::function<void(std::shared_ptr<AsyncTCPStream>)>;
+  using AsyncCallback = std::function<void(std::shared_ptr<AsyncTCPStream>)>;
 
-  AsyncTcpStream(std::shared_ptr<TcpSocket>) noexcept;
-  ~AsyncTcpStream() noexcept override;
+  AsyncTCPStream(std::shared_ptr<TCPSocket>) noexcept;
+  ~AsyncTCPStream() noexcept override;
 
-  int GetDescriptor() const noexcept override;
   void HandleRead() noexcept override {
     if (read_handler)
       read_handler(shared_from_this());
@@ -51,18 +52,20 @@ class AsyncTcpStream : public AsyncIOStream,
       LOG(ERROR) << "read handler is not callable";
   }
 
-  void Write(const std::string&, const AsyncCallback&) throw(TcpException);
-  void Read(const AsyncCallback&) throw(TcpException);
-  void ReadUntil(const char, const AsyncCallback&) throw(TcpException);
-  void ReadLine(const AsyncCallback&) throw(TcpException);
+  int Descriptor() const noexcept override;
+  void Write(const String&, const AsyncCallback&);
+  void Read(const AsyncCallback&);
+  void ReadUntil(const char, const AsyncCallback&);
+  void ReadLine(const AsyncCallback&);
   void Abort() noexcept;
 
-  const Address GetPeerAddress() const noexcept;
+  std::shared_ptr<const InetAddress> LocalAddress() const noexcept;
+  std::shared_ptr<const InetAddress> PeerAddress() const noexcept;
 
-  const char* GetReadBuffer() const noexcept { return read_buffer.c_str(); }
-  void SetReadSize(unsigned size) noexcept { read_size = size; }
-  unsigned GetReadSize() const noexcept { return read_size; }
-  Status GetStatus() const noexcept { return status; }
+  String ReadBuffer() const noexcept { return read_buffer; }
+  void ReadSize(unsigned size) noexcept { read_size = size; }
+  unsigned ReadSize() const noexcept { return read_size; }
+  StatusType Status() const noexcept { return status; }
 
   void SetWriteHander(const AsyncIOHandler& handler) noexcept {
     write_handler = handler;
@@ -77,17 +80,18 @@ class AsyncTcpStream : public AsyncIOStream,
     error_handler = handler;
   }
 
- protected:
+ private:
   AsyncIOHandler write_handler;
   AsyncIOHandler read_handler;
   AsyncIOHandler error_handler;
   AsyncIOHandler close_handler;
 
-  const std::shared_ptr<TcpSocket> peer_fd;
+  const std::shared_ptr<TCPSocket> socket;
   unsigned read_size;
-  Status status;
-  std::string read_buffer;
+  StatusType status;
+  String read_buffer;
 };
 }
+}
 
-#endif /* COLLIE_ASYNC_TCP_STREAM_H_ */
+#endif /* COLLIE_TCP_ASYNC_TCP_STREAM_H_ */
