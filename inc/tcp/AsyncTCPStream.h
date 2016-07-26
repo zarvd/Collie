@@ -22,7 +22,7 @@ class AsyncTCPStream final
   using AsyncIOHandler = std::function<void(std::shared_ptr<AsyncTCPStream>)>;
   using AsyncCallback = std::function<void(std::shared_ptr<AsyncTCPStream>)>;
 
-  AsyncTCPStream(std::shared_ptr<TCPSocket>) noexcept;
+  AsyncTCPStream(std::unique_ptr<TCPSocket>) noexcept;
   ~AsyncTCPStream() noexcept override;
 
   void HandleRead() noexcept override {
@@ -86,7 +86,7 @@ class AsyncTCPStream final
   AsyncIOHandler error_handler;
   AsyncIOHandler close_handler;
 
-  const std::shared_ptr<TCPSocket> socket;
+  const std::unique_ptr<TCPSocket> socket;
   unsigned read_size;
   StatusType status;
   String read_buffer;

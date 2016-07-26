@@ -7,8 +7,8 @@
 namespace collie {
 namespace tcp {
 
-AsyncTCPStream::AsyncTCPStream(std::shared_ptr<TCPSocket> socket) noexcept
-    : socket(socket),
+AsyncTCPStream::AsyncTCPStream(std::unique_ptr<TCPSocket> socket) noexcept
+    : socket(std::move(socket)),
       read_size(3000) {
   write_handler = [](auto) { LOG(WARN) << "No write handler"; };
   read_handler = [](auto) { LOG(WARN) << "No write handler"; };

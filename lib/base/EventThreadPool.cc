@@ -7,19 +7,18 @@
 
 namespace collie {
 
-sig_atomic_t SIGNAL_STOP_FLAG = true;
-
 thread_local std::shared_ptr<EventPool> EventThreadPool::current_event_pool;
 
 EventThreadPool::EventThreadPool(unsigned thread_num) noexcept
-    : thread_num(thread_num) {}
+    : is_running(false),
+      thread_num(thread_num) {}
 
 EventThreadPool::~EventThreadPool() noexcept {
   LOG(DEBUG) << "event thread pool is stopping";
   Stop();
 }
 
-void EventThreadPool::Start(bool is_forever) noexcept {
+void EventThreadPool::Start() noexcept {
   if (is_running) {
     LOG(WARN) << "Event thread pool is running";
     return;
@@ -29,12 +28,7 @@ void EventThreadPool::Start(bool is_forever) noexcept {
     workers.emplace_back(&EventThreadPool::EventLoop, this);
   }
   is_running = true;
-  if (is_forever) {
-    LOG(INFO) << "Enter Ctrl+C to quit...";
-    signal(SIGINT, [](int) -> void { SIGNAL_STOP_FLAG = false; });
-    while (SIGNAL_STOP_FLAG) {
-    }
-  }
+  LOG(INFO) << "Enter Ctrl+C to quit...";
 }
 
 void EventThreadPool::Stop() noexcept {
@@ -56,7 +50,7 @@ void EventThreadPool::PushInit(IOStream io) noexcept {
 
 void EventThreadPool::Push(IOStream io) noexcept {
   if (!is_running) {
-    LOG(DEBUG) << "event thread pool is not running";
+    LOG(WARN) << "event thread pool is not running";
     return;
   }
   current_event_pool->Update(io);
@@ -68,9 +62,11 @@ void EventThreadPool::EventLoop() {
   current_event_pool->Init();
   LOG(DEBUG) << "event pool started";
 
-  for (auto& io : init_io_streams) {
-    current_event_pool->Update(io);
-  }
+  // // FIXME
+  // for (auto& io : init_io_streams) {
+  //   AsyncIOStream * init_io = io.get();
+  //   current_event_pool->Update(init_io);
+  // }
 
   LOG(DEBUG) << "event pool looping";
   current_event_pool->Loop();

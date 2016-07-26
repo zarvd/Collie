@@ -24,7 +24,7 @@ int main(void) {
     });
   });
   server.Listen(8080);
-  pool->Start();
+  server.Start();
 
   return 0;
 }

@@ -36,6 +36,7 @@ void EventPool::LoopOne(int timeout) noexcept {
 }
 
 void EventPool::Update(std::shared_ptr<AsyncIOStream> stream) noexcept {
+  LOG(DEBUG) << "Event Pool update stream " << stream->Descriptor();
   if (io_streams.find(stream->Descriptor()) == io_streams.end()) {
     // new io
     io_streams.insert({stream->Descriptor(), stream});

@@ -19,7 +19,7 @@ class EventThreadPool : public util::NonCopyable {
   EventThreadPool(unsigned thread_num) noexcept;
   ~EventThreadPool() noexcept;
 
-  void Start(bool is_forever = false) noexcept;
+  void Start() noexcept;
   void Stop() noexcept;
   void Push(IOStream) noexcept;      // push io into CURRENT event pool
   void PushInit(IOStream) noexcept;  // for init iostream
