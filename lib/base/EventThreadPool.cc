@@ -7,8 +7,6 @@
 
 namespace collie {
 
-thread_local std::shared_ptr<EventPool> EventThreadPool::current_event_pool;
-
 EventThreadPool::EventThreadPool(unsigned thread_num) noexcept
     : is_running(false),
       thread_num(thread_num) {}
@@ -53,13 +51,20 @@ void EventThreadPool::Push(IOStream io) noexcept {
     LOG(WARN) << "event thread pool is not running";
     return;
   }
-  current_event_pool->Update(io);
+  static auto current_event_pool = event_pools.begin();
+  if (current_event_pool == event_pools.end()) {
+    current_event_pool = event_pools.begin();
+  }
+  current_event_pool->second->Update(io);
+  ++current_event_pool;
 }
 
 void EventThreadPool::EventLoop() {
-  current_event_pool = std::make_shared<EventPool>();
+  auto event_pool = std::make_shared<EventPool>();
 
-  current_event_pool->Init();
+  event_pools.insert({std::this_thread::get_id(), event_pool});
+
+  event_pool->Init();
   LOG(DEBUG) << "event pool started";
 
   // // FIXME
@@ -69,9 +74,9 @@ void EventThreadPool::EventLoop() {
   // }
 
   LOG(DEBUG) << "event pool looping";
-  current_event_pool->Loop();
+  event_pool->Loop();
 
   LOG(DEBUG) << "event pool stopped";
-  current_event_pool->Destroy();
+  event_pool->Destroy();
 }
 }

@@ -23,8 +23,7 @@ int main(void) {
       stream->Write(stream->ReadBuffer(), nullptr);
     });
   });
-  server.Listen(8080);
-  server.Start();
+  server.Listen(8080).Start();
 
   return 0;
 }

@@ -42,7 +42,6 @@ class AsyncTCPServer : public util::NonCopyable {
   void Accept();
 
   std::unique_ptr<TCPSocket> socket;
-  // std::shared_ptr<AsyncTCPStream> socket_stream;
   RequestHandler req_handler;
   std::shared_ptr<const InetAddress> host_address;
   std::shared_ptr<EventThreadPool> event_thread_pool;

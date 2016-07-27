@@ -25,16 +25,7 @@ AsyncTCPServer& AsyncTCPServer::Listen(
   }
   socket = std::make_unique<TCPSocket>();
   socket->Listen(host_address);
-  // socket->SetNonBlocking();
-  // Async io stream
-  // socket_stream = std::make_shared<AsyncTCPStream>(socket);
-  // socket_stream->SetReadHander([this](auto) { this->Accept(); });
-  // EventType event;
-  // event.SetRead(true);
-  // event.SetEdgeTriggeder(true);  // set edge triggered
-  // socket_stream->SetEvent(event);
 
-  // event_thread_pool->PushInit(socket_stream);  // push listening socket
   LOG(INFO) << "TCP Server listening " << host_address->ToString();
   return *this;
 }
