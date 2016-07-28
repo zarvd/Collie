@@ -8,7 +8,8 @@
 namespace collie {
 namespace tcp {
 
-AsyncTCPServer::AsyncTCPServer() noexcept {}
+AsyncTCPServer::AsyncTCPServer(std::shared_ptr<EventThreadPool> pool) noexcept
+    : event_thread_pool(pool) {}
 
 AsyncTCPServer::~AsyncTCPServer() noexcept {}
 
@@ -41,7 +42,6 @@ void AsyncTCPServer::Start() noexcept {
     exit(-1);
   }
 
-  event_thread_pool->Start();
   while (true) {
     Accept();
   }

@@ -15,15 +15,14 @@ class EventPool;
 
 class EventThreadPool : public util::NonCopyable {
  public:
-  using IOStream = std::shared_ptr<AsyncIOStream>;
-
   EventThreadPool(unsigned thread_num) noexcept;
   ~EventThreadPool() noexcept;
 
   void Start() noexcept;
   void Stop() noexcept;
-  void Push(IOStream) noexcept;      // push io into CURRENT event pool
-  void PushInit(IOStream) noexcept;  // for init iostream
+  void Push(std::shared_ptr<AsyncIOStream>) noexcept;  // push io into CURRENT
+                                                       // event pool
+  void PushInit(std::shared_ptr<AsyncIOStream>) noexcept;  // for init iostream
 
   SizeType ThreadNum() const noexcept { return thread_num; }
   void SetThreadNum(unsigned num) noexcept { thread_num = num; }
@@ -32,7 +31,6 @@ class EventThreadPool : public util::NonCopyable {
     auto it = event_pools.find(std::this_thread::get_id());
     if (it != event_pools.end()) return it->second;
     return nullptr;
-    // return current_event_pool;
   }
 
  private:
@@ -45,7 +43,7 @@ class EventThreadPool : public util::NonCopyable {
   unsigned thread_num;
   std::vector<std::thread> workers;
 
-  std::vector<IOStream> init_io_streams;
+  std::vector<std::shared_ptr<AsyncIOStream>> init_io_streams;
 };
 }
 

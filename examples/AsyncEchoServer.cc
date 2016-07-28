@@ -9,12 +9,11 @@ using namespace collie::tcp;
 int main(void) {
   Logger::SetLevel(DEBUG);
   Logger::Init();
-  AsyncTCPServer server;
 
   using IOStream = std::shared_ptr<AsyncTCPStream>;
 
   auto pool = std::make_shared<EventThreadPool>(1);
-  server.SetEventLoop(pool);
+  AsyncTCPServer server(pool);
 
   server.SetRequestHandler([](IOStream stream) {
     // stream->Write("Hello, world", nullptr);
@@ -23,6 +22,7 @@ int main(void) {
       stream->Write(stream->ReadBuffer(), nullptr);
     });
   });
+  pool->Start();
   server.Listen(8080).Start();
 
   return 0;

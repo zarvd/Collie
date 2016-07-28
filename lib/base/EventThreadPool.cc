@@ -42,11 +42,11 @@ void EventThreadPool::Stop() noexcept {
   workers.clear();
 }
 
-void EventThreadPool::PushInit(IOStream io) noexcept {
+void EventThreadPool::PushInit(std::shared_ptr<AsyncIOStream> io) noexcept {
   init_io_streams.push_back(io);
 }
 
-void EventThreadPool::Push(IOStream io) noexcept {
+void EventThreadPool::Push(std::shared_ptr<AsyncIOStream> io) noexcept {
   if (!is_running) {
     LOG(WARN) << "event thread pool is not running";
     return;
