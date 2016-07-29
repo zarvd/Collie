@@ -19,8 +19,8 @@ class TCPStream : public util::NonCopyable {
   virtual ~TCPStream() noexcept;
 
   virtual void Write(const String&) const;
-  virtual String Read() const;
-  virtual String ReadUntil(const char) const;
+  virtual String Read(const SizeType size = 0) const;
+  virtual String ReadUntil(const String&) const;
   virtual String ReadLine() const;
   virtual void Abort() noexcept;
 

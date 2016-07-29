@@ -12,11 +12,11 @@ enum class IPFamily { IPv4, IPv6, UNKNOWN };
 
 class InetAddress final : public Serializable {
  public:
-  constexpr InetAddress() noexcept : port(0),
-                                     address(nullptr),
-                                     family(IPFamily::UNKNOWN) {}
+  InetAddress() noexcept : port(0),
+                           address(nullptr),
+                           family(IPFamily::UNKNOWN) {}
 
-  InetAddress(sockaddr *) noexcept;
+  InetAddress(sockaddr*) noexcept;
 
   ~InetAddress() noexcept;
   InetAddress(const InetAddress&) noexcept;

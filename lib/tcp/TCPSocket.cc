@@ -1,4 +1,5 @@
 #include "../../inc/tcp/TCPSocket.h"
+#include <cstring>
 #include "../../inc/base/InetAddress.h"
 #include "../../inc/base/Logger.h"
 

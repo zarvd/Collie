@@ -1,20 +1,16 @@
 #ifndef COLLIE_BASE_STRING_H_
 #define COLLIE_BASE_STRING_H_
 
-#include <cstring>
 #include <ostream>
+#include <string>
 #include "../collie.h"
 
 namespace collie {
 
 class String final {
  public:
-  String(const char* chars) noexcept : length(::strlen(chars)),
-                                       capacity(length),
-                                       data(new char[capacity]) {
-    ::strcpy(data, chars);
-  }
-  constexpr String() noexcept : length(0), capacity(0), data(nullptr) {}
+  String(const char* str) noexcept : data(str) {}
+  String(const std::string& str = "") noexcept : data(str) {}
 
   // Copy
   String(const String& that) noexcept;
@@ -26,17 +22,18 @@ class String final {
 
   ~String() noexcept;
 
-  String& TrimLeft() noexcept;
-  String& TrimRight() noexcept;
-  String& Trim() noexcept;
+  String& TrimLeft(const String& = " ") noexcept;
+  String& TrimRight(const String& = " ") noexcept;
+  String& Trim(const String& = " ") noexcept;
   String& Replace(const String& old_value, const String& new_value) noexcept;
   String& Remove(const String&) noexcept;
   String& Append(const String&) noexcept;
   String Slice(const SizeType index, const SizeType length = 0) const noexcept;
-  SizeType Length() const noexcept { return length; }
-  SizeType Capacity() const noexcept { return capacity; }
-  bool IsNull() const noexcept { return length == 0; }
-  const char* RawData() const noexcept { return data; }
+  SizeType Length() const noexcept { return data.length(); }
+  SizeType Capacity() const noexcept { return data.capacity(); }
+  bool IsNull() const noexcept { return data.empty(); }
+  bool Contain(const String&) const noexcept;
+  const char* RawData() const noexcept { return data.c_str(); }
 
   friend std::ostream& operator<<(std::ostream& os, const String& str) {
     os << str.data;
@@ -64,9 +61,24 @@ class String final {
   static String From(const char*) noexcept;
 
  private:
-  SizeType length;
-  SizeType capacity;
-  char* data;
+  std::string data;
+};
+}
+
+namespace std {
+
+template <>
+struct hash<collie::String> : public unary_function<collie::String, size_t> {
+  size_t operator()(const collie::String& value) const {
+    unsigned long h = 5381;
+    const char* str = value.RawData();
+    int c = *str++;
+    while (c) {
+      h = ((h << 5) + h) + c; /* h * 33 + c */
+      c = *str++;
+    }
+    return h;
+  }
 };
 }
 

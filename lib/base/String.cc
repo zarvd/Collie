@@ -2,101 +2,54 @@
 
 namespace collie {
 
-String::String(const String& that) noexcept {
-  if (!that.data) {
-    data = nullptr;
-    length = 0;
-  } else {
-    data = new char[that.length];
-    ::strcpy(data, that.data);
-    length = that.length;
-    capacity = length;
-  }
-}
+String::String(const String& that) noexcept : data(that.data) {}
 
 String& String::operator=(const String& that) noexcept {
-  if (!that.data) {
-    delete[] data;
-    data = nullptr;
-    length = capacity = 0;
-    return *this;
-  }
-
-  if (capacity >= that.length) {
-    ::strncpy(data, that.data, that.length);
-    length = that.length;
-    if (capacity > length) data[length] = '\0';
-  } else {
-    if (data) {
-      delete[] data;
-    }
-    data = new char[that.length];
-    length = capacity = that.length;
-    ::strcpy(data, that.data);
-  }
-
-  return *this;
-}
-
-String::String(String&& that) noexcept : length(that.length),
-                                         capacity(that.capacity),
-                                         data(that.data) {
-  that.data = nullptr;
-  that.length = that.capacity = 0;
-}
-
-String& String::operator=(String&& that) noexcept {
-  if (data) delete[] data;
-  length = that.length;
-  capacity = that.capacity;
   data = that.data;
 
-  that.length = that.capacity = 0;
-  that.data = nullptr;
   return *this;
 }
 
-String::~String() noexcept {
-  if (data) delete[] data;
+String::String(String&& that) noexcept : data(std::move(that.data)) {}
+
+String& String::operator=(String&& that) noexcept {
+  data = std::move(that.data);
+  return *this;
 }
 
-String& String::TrimLeft() noexcept {
-  if (length == 0) return *this;
-  bool is_content_begin = false;
-  SizeType new_length = length;
-  for (SizeType x = 0, i = 0; i < length; ++i) {
-    if (!is_content_begin) {
-      if (data[i] == ' ') {
-        continue;
-      }
-      is_content_begin = true;
-      new_length = length - i;
-    }
-    data[x++] = data[i];
+String::~String() noexcept {}
+
+String& String::TrimLeft(const String& str) noexcept {
+  if (IsNull() || str.IsNull() || Length() < str.Length()) return *this;
+  unsigned i = 0, j = 0;
+  while (i < Length()) {
+    if (data[i] != str.data[j]) break;
+    ++i;
+    ++j;
+    if (j == str.Length()) j = 0;
   }
-  length = new_length;
+  data = data.substr(i);
   return *this;
 }
 
-String& String::TrimRight() noexcept {
-  if (length == 0) return *this;
-  SizeType new_length = length;
-  for (int i = length - 1; i >= 0; --i) {
-    if (data[i] == ' ') {
-      --new_length;
-    } else {
-      break;
-    }
+String& String::TrimRight(const String& str) noexcept {
+  if (IsNull() || str.IsNull() || Length() < str.Length()) return *this;
+  int i = Length() - 1, j = str.Length() - 1;
+  while (i >= 0) {
+    if (data[i] != str.data[j]) break;
+    --i;
+    --j;
+
+    if (j < 0) j = str.Length() - 1;
   }
-  data[new_length] = '\0';
-  length = new_length;
+  data = data.substr(0, i + 1);
   return *this;
 }
 
-String& String::Trim() noexcept {
-  if (length == 0) return *this;
-  TrimLeft();
-  TrimRight();
+String& String::Trim(const String& str) noexcept {
+  if (IsNull() || str.IsNull() || Length() < str.Length()) return *this;
+  TrimLeft(str);
+  TrimRight(str);
   return *this;
 }
 
@@ -185,78 +138,56 @@ String& String::Append(const String& that) noexcept {
 
 String String::Slice(const SizeType index, const SizeType length) const
     noexcept {
-  if (index >= this->length || IsNull()) return String();
-  auto min = [](auto x, auto y) { return x < y ? x : y; };
-  SizeType slice_len;
-  if (length == 0) {
-    slice_len = this->length + 1 - index;
-  } else {
-    slice_len = min(this->length + 1 - index, length);
-  }
-  char new_str[slice_len + 1];
-  for (auto i = index; i < slice_len + index; ++i) {
-    new_str[i - index] = data[i];
-  }
-  new_str[slice_len] = '\0';
-  String s(new_str);
-  return s;
+  if (length == 0) return data.substr(index);
+  return data.substr(index, length);
+}
+
+// KMP Algorithm
+bool String::Contain(const String& that) const noexcept {
+  return data.find(that.data) != std::string::npos;
+  // if (that.IsNull()) return true;
+  // if (that.Length() > Length()) return false;
+  // int next[that.Length()];
+  // next[0] = -1;
+  // for (SizeType i = 1; i < that.Length(); ++i) {
+  //   int k = next[i - 1];
+  //   while (k >= 0) {
+  //     if (that.data[k] == that.data[i - 1]) break;
+  //     k = next[k];
+  //   }
+  //   next[i] = k + 1;
+  // }
+
+  // SizeType i = 0;
+  // int k = 0;
+  // while (i < Length()) {
+  //   if (data[i] == that.data[k]) {
+  //     ++i;
+  //     ++k;
+  //     if (that.Length() == (SizeType)k) return true;
+  //   } else {
+  //     k = next[k];
+  //     if (k == -1) {
+  //       ++i;
+  //       k = 0;
+  //     }
+  //   }
+  // }
+  // return false;
 }
 
 String& String::operator+=(const String& that) noexcept {
-  if (!that.data || that.length == 0) return *this;
-
-  if (that.length <= capacity - length) {
-    for (SizeType i = length, j = 0; i < capacity; ++i, ++j) {
-      data[i] = that.data[j];
-    }
-  } else if (!data) {
-    capacity = that.length;
-    data = new char[capacity];
-    ::strncpy(data, that.data, that.length);
-    length = capacity;
-  } else {
-    const auto new_capacity = length + that.length;
-    auto new_data = new char[new_capacity];
-    ::strncpy(new_data, data, length);
-    for (SizeType i = length, j = 0; i < new_capacity; ++i, ++j) {
-      new_data[i] = that.data[j];
-    }
-    delete[] data;
-    data = new_data;
-    capacity = new_capacity;
-    length = capacity;
-  }
+  data += that.data;
 
   return *this;
 }
 
 String String::operator+(const String& that) const noexcept {
-  if (!data || length == 0) return that;
-  if (!that.data || that.length == 0) return *this;
-
-  String str;
-  str.capacity = length + that.length;
-  str.length = length + that.length;
-  str.data = new char[str.capacity];
-
-  ::strncpy(str.data, data, length);
-
-  for (SizeType i = length, j = 0; i < str.length; ++i, ++j) {
-    str.data[i] = that.data[j];
-  }
-
-  return str;
+  return data + that.data;
 }
 
 bool String::operator==(const String& that) const noexcept {
-  if (length != that.length) return false;
-  if (length == 0) return true;
-
-  for (SizeType i = 0; i < length; ++i) {
-    if (data[i] != that.data[i]) return false;
-  }
-
-  return true;
+  return data == that.data;
 }
 
 bool String::operator!=(const String& that) const noexcept {
@@ -264,12 +195,12 @@ bool String::operator!=(const String& that) const noexcept {
 }
 
 const char& String::operator[](const SizeType index) const {
-  if (index >= length)
+  if (index >= Length())
     throw std::out_of_range("index of string is out of range");
   return data[index];
 }
 char& String::operator[](const SizeType index) {
-  if (index >= length)
+  if (index >= Length())
     throw std::out_of_range("index of string is out of range");
   return data[index];
 }

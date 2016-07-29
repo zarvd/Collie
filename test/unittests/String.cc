@@ -7,7 +7,6 @@ TEST(String, DefaultConstructor) {
   String s1;
   ASSERT_EQ(0, s1.Length());
   ASSERT_GE(s1.Capacity(), s1.Length());
-  ASSERT_EQ(nullptr, s1.RawData());
 
   String s2("abcd");
   ASSERT_EQ(4, s2.Length());
@@ -47,7 +46,6 @@ TEST(String, CopyConstructor) {
 
   String s3;
   String s4(s3);
-  ASSERT_EQ(nullptr, s4.RawData());
   ASSERT_EQ(s3.Length(), s4.Length());
   ASSERT_GE(s4.Capacity(), s4.Length());
 
@@ -66,11 +64,9 @@ TEST(String, MoveConstructor) {
   ASSERT_EQ(6, s2.Length());
   ASSERT_GE(s2.Capacity(), s2.Length());
   ASSERT_EQ(0, s1.Length());
-  ASSERT_EQ(0, s1.Capacity());
 
   String s3;
   String s4(std::move(s3));
-  ASSERT_EQ(nullptr, s4.RawData());
   ASSERT_EQ(s3.Length(), s4.Length());
   ASSERT_GE(s4.Capacity(), s4.Length());
 }
@@ -178,4 +174,14 @@ TEST(String, Slice) {
   auto s5 = s1.Slice(3, 3);
   ASSERT_EQ(3, s5.Length());
   ASSERT_TRUE(s5 == "def") << s5;
+}
+
+TEST(String, Contain) {
+  String s1("abcdefg");
+  ASSERT_TRUE(s1.Contain("a"));
+  ASSERT_TRUE(s1.Contain("g"));
+  ASSERT_TRUE(s1.Contain("abc"));
+  ASSERT_TRUE(s1.Contain("cde"));
+  ASSERT_FALSE(s1.Contain("ce"));
+  ASSERT_FALSE(s1.Contain("y"));
 }

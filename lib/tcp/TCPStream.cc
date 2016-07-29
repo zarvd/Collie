@@ -1,6 +1,7 @@
 #include "../../inc/tcp/TCPStream.h"
 #include <sys/socket.h>
 #include <unistd.h>
+#include <cstring>
 #include "../../inc/base/Logger.h"
 #include "../../inc/tcp/TCPSocket.h"
 
@@ -26,11 +27,14 @@ void TCPStream::Write(const String& buf) const {
     LOG(WARN) << "TCP cannot send";
   }
 }
-String TCPStream::Read() const {
+
+String TCPStream::Read(const SizeType size) const {
   if (status == ABORT) {
     LOG(WARN) << "TCP stream is closed";
     return "";
   }
+  auto read_size = size == 0 ? this->read_size : size;
+
   char buffer[read_size];
   if (::recv(socket->Descriptor(), buffer, read_size, 0) == -1) {
     LOG(WARN) << "TCP recv";
@@ -38,7 +42,7 @@ String TCPStream::Read() const {
   return buffer;
 }
 
-String TCPStream::ReadUntil(const char c) const {
+String TCPStream::ReadUntil(const String& str) const {
   if (status == ABORT) {
     LOG(WARN) << "TCP stream is closed";
     return "";
@@ -50,17 +54,12 @@ String TCPStream::ReadUntil(const char c) const {
       LOG(WARN) << "TCP recv";
     }
     recv_content += buffer;
-    // find if c in recv buffer;
-    int i = 0;
-    int buf_size = ::strlen(buffer);
-    while (i < buf_size && buffer[i] != c) ++i;
-    if (i < buf_size) break;
   }
 
   return recv_content;
 }
 
-String TCPStream::ReadLine() const { return ReadUntil('\n'); }
+String TCPStream::ReadLine() const { return ReadUntil("\n"); }
 
 void TCPStream::Abort() noexcept {
   if (status == OK) {

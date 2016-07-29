@@ -1,5 +1,6 @@
 #include "../../inc/base/InetAddress.h"
 #include <netdb.h>
+#include <cstring>
 #include "../../inc/base/Logger.h"
 
 namespace collie {
