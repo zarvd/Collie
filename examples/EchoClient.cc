@@ -8,11 +8,11 @@ using namespace collie::tcp;
 int main(void) {
   Logger::Init();
 
-  TCPClient::Connect("127.0.0.1", 8080, [](TCPStream& tcp_stream) {
-    tcp_stream.Write("Hello, world!");
-    auto msg = tcp_stream.Read();
-    LOG(INFO) << "Read: " << msg << " From "
-              << tcp_stream.PeerAddress()->ToString();
+  TCPClient::Connect("127.0.0.1", 8080, [](TCPStream& stream) {
+    stream.Write("Hello,world");
+    auto msg = stream.Read();
+    LOG(INFO) << "Read: " << msg.Length() << msg << " From "
+              << stream.PeerAddress()->ToString();
   });
 
   return 0;

@@ -10,7 +10,6 @@
 #include "../util/NonCopyable.h"
 
 namespace collie {
-
 namespace tcp {
 
 class AsyncTCPServer : public util::NonCopyable {

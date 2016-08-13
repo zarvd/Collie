@@ -12,8 +12,6 @@ namespace tcp {
 
 class TCPStream : public util::NonCopyable {
  public:
-  enum StatusType { OK, ABORT };
-
   TCPStream(std::unique_ptr<TCPSocket>) noexcept;
   virtual ~TCPStream();
 
@@ -21,7 +19,6 @@ class TCPStream : public util::NonCopyable {
   virtual String Read(const SizeType size = 0) const;
   virtual String ReadUntil(const String&) const;
   virtual String ReadLine() const;
-  virtual void Abort() noexcept;
 
   std::shared_ptr<const InetAddress> LocalAddress() const noexcept {
     return socket->LocalAddress();
@@ -32,12 +29,10 @@ class TCPStream : public util::NonCopyable {
 
   void SetReadSize(SizeType size) noexcept { read_size = size; }
   SizeType ReadSize() const noexcept { return read_size; }
-  StatusType Status() const noexcept { return status; }
 
  private:
   const std::unique_ptr<TCPSocket> socket;
   SizeType read_size;
-  StatusType status;
 };
 }
 }

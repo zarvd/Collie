@@ -1,5 +1,6 @@
 #include "../../inc/tcp/AsyncTCPStream.h"
 #include <sys/socket.h>
+#include <cstring>
 #include "../../inc/base/EventPool.h"
 
 namespace collie {
@@ -28,25 +29,16 @@ std::shared_ptr<const InetAddress> AsyncTCPStream::PeerAddress() const
 }
 
 void AsyncTCPStream::Write(const String& buf, const AsyncCallback& callback) {
-  if (status == ABORT) {
-    LOG(WARN) << "TCP stream is closed";
-    return;
-  }
-  write_handler = [buf, callback](std::shared_ptr<AsyncTCPStream> stream) {
-    if (stream->Status() == ABORT) {
-      // FIXME
-      LOG(WARN) << "TCP stream is closed";
-      return;
-    }
-    // TODO sendfile
-    // Non blocking I/O
-    int sent_size =
+  if (!event_pool) throw std::runtime_error("Event pool is not available");
+
+  write_handler = [buf, callback](auto stream) {
+    int ret =
         ::send(stream->Descriptor(), buf.RawData(), buf.Length(), MSG_DONTWAIT);
-    if (sent_size == -1) {
-      throw std::runtime_error("tcp cannot send");
-    } else if ((SizeType)sent_size < buf.Length()) {
+    if (ret == -1) {
+      throw std::runtime_error(::strerror(errno));
+    } else if ((SizeType)ret < buf.Length()) {
       // Some bytes are not sent, resend the left
-      stream->Write(buf.Slice(sent_size), callback);
+      stream->Write(buf.Slice(ret), callback);
       return;
     }
     stream->event.SetWrite(false);
@@ -59,33 +51,26 @@ void AsyncTCPStream::Write(const String& buf, const AsyncCallback& callback) {
   };
 
   event.SetWrite(true);
-  if (!event_pool) {
-    LOG(ERROR) << "Event pool is not available";
-    return;
-  }
 
   event_pool->Update(shared_from_this());
 }
 
 void AsyncTCPStream::Read(const AsyncCallback& callback) {
-  if (status == ABORT) {
-    LOG(WARN) << "TCP stream is closed";
-    return;
-  }
+  if (!event_pool) throw std::runtime_error("Event pool is not available");
 
-  read_handler = [callback](std::shared_ptr<AsyncTCPStream> stream) {
+  read_handler = [callback](auto stream) {
     char buffer[stream->read_size];
-    const int recv_size =
+    const int ret =
         ::recv(stream->Descriptor(), buffer, stream->read_size, MSG_DONTWAIT);
 
-    if (recv_size == -1) {
-      throw std::runtime_error("tcp cannot recv");
-    } else if (recv_size == 0) {
+    if (ret == -1) {
+      throw std::runtime_error(::strerror(errno));
+    } else if (ret == 0) {
       // close
       stream->Abort();
       return;
     }
-    LOG(DEBUG) << "recv: " << buffer;
+    // Disables read event
     stream->event.SetRead(false);
     stream->event_pool->Update(stream);
     stream->read_buffer = buffer;
@@ -97,10 +82,6 @@ void AsyncTCPStream::Read(const AsyncCallback& callback) {
     }
   };
   event.SetRead(true);
-  if (!event_pool) {
-    LOG(ERROR) << "Event pool is not available";
-    return;
-  }
   event_pool->Update(shared_from_this());
 }
 
@@ -108,11 +89,9 @@ void AsyncTCPStream::ReadUntil(const char, const AsyncCallback&) {}
 
 void AsyncTCPStream::ReadLine(const AsyncCallback&) {}
 
-void AsyncTCPStream::Abort() noexcept {
-  if (!event_pool) {
-    LOG(ERROR) << "Event pool is not available";
-    return;
-  }
+void AsyncTCPStream::Abort() {
+  if (!event_pool) throw std::runtime_error("Event pool is not available");
+
   event_pool->Remove(shared_from_this());
   event_pool = nullptr;
 }

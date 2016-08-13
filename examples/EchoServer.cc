@@ -15,7 +15,6 @@ int main(void) {
     LOG(INFO) << "Read: " << greeting << " From "
               << tcp_stream.PeerAddress()->ToString();
     tcp_stream.Write(greeting);
-    tcp_stream.Abort();
   });
   server.Listen(8080).Start();
 

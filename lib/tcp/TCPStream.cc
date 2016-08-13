@@ -10,43 +10,25 @@ namespace tcp {
 
 TCPStream::TCPStream(std::unique_ptr<TCPSocket> socket) noexcept
     : socket(std::move(socket)),
-      read_size(3000),
-      status(OK) {}
+      read_size(3000) {}
 
 TCPStream::~TCPStream() {}
 
 void TCPStream::Write(const String& buf) const {
-  if (status == ABORT) {
-    LOG(WARN) << "TCP stream is closed";
-    return;
-  }
-  char buffer[buf.Length() + 1];
-  ::strcpy(buffer, buf.RawData());
-  const auto len = strlen(buffer);
-  if (::send(socket->Descriptor(), buffer, len, 0) == -1) {
-    LOG(WARN) << "TCP cannot send";
-  }
+  int ret = ::send(socket->Descriptor(), buf.RawData(), buf.Length(), 0);
+  if (ret == -1) throw std::runtime_error(::strerror(errno));
 }
 
 String TCPStream::Read(const SizeType size) const {
-  if (status == ABORT) {
-    LOG(WARN) << "TCP stream is closed";
-    return "";
-  }
   auto read_size = size == 0 ? this->read_size : size;
 
   char buffer[read_size];
-  if (::recv(socket->Descriptor(), buffer, read_size, 0) == -1) {
-    LOG(WARN) << "TCP recv";
-  }
+  int ret = ::recv(socket->Descriptor(), buffer, read_size, 0);
+  if (ret == -1) throw std::runtime_error(::strerror(errno));
   return buffer;
 }
 
 String TCPStream::ReadUntil(const String& str) const {
-  if (status == ABORT) {
-    LOG(WARN) << "TCP stream is closed";
-    return "";
-  }
   String recv_content;
   while (true) {
     char buffer[read_size];
@@ -60,11 +42,5 @@ String TCPStream::ReadUntil(const String& str) const {
 }
 
 String TCPStream::ReadLine() const { return ReadUntil("\n"); }
-
-void TCPStream::Abort() noexcept {
-  if (status == OK) {
-    status = ABORT;
-  }
-}
 }
 }

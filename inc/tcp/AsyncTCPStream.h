@@ -14,7 +14,6 @@ class AsyncTCPStream final
     : public AsyncIOStream,
       public std::enable_shared_from_this<AsyncTCPStream> {
  public:
-  enum StatusType { OK, ABORT, READ, READ_UNTIL, READ_LINE, WRITE };
   using AsyncIOHandler = std::function<void(std::shared_ptr<AsyncTCPStream>)>;
   using AsyncCallback = std::function<void(std::shared_ptr<AsyncTCPStream>)>;
 
@@ -53,7 +52,7 @@ class AsyncTCPStream final
   void Read(const AsyncCallback&);
   void ReadUntil(const char, const AsyncCallback&);
   void ReadLine(const AsyncCallback&);
-  void Abort() noexcept;
+  void Abort();
 
   std::shared_ptr<const InetAddress> LocalAddress() const noexcept;
   std::shared_ptr<const InetAddress> PeerAddress() const noexcept;
@@ -61,7 +60,6 @@ class AsyncTCPStream final
   String ReadBuffer() const noexcept { return read_buffer; }
   void ReadSize(unsigned size) noexcept { read_size = size; }
   unsigned ReadSize() const noexcept { return read_size; }
-  StatusType Status() const noexcept { return status; }
 
   void SetWriteHander(const AsyncIOHandler& handler) noexcept {
     write_handler = handler;
@@ -84,7 +82,6 @@ class AsyncTCPStream final
 
   const std::unique_ptr<TCPSocket> socket;
   unsigned read_size;
-  StatusType status;
   String read_buffer;
 };
 }
