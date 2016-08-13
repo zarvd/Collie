@@ -1,9 +1,5 @@
 #include "../../inc/tcp/AsyncTCPServer.h"
-#include "../../inc/base/EventThreadPool.h"
-#include "../../inc/base/InetAddress.h"
 #include "../../inc/base/Logger.h"
-#include "../../inc/tcp/AsyncTCPStream.h"
-#include "../../inc/tcp/TCPSocket.h"
 
 namespace collie {
 namespace tcp {
@@ -11,7 +7,7 @@ namespace tcp {
 AsyncTCPServer::AsyncTCPServer(std::shared_ptr<EventThreadPool> pool) noexcept
     : event_thread_pool(pool) {}
 
-AsyncTCPServer::~AsyncTCPServer() noexcept {}
+AsyncTCPServer::~AsyncTCPServer() {}
 
 AsyncTCPServer& AsyncTCPServer::Listen(const unsigned port,
                                        const String& host) {
@@ -24,27 +20,20 @@ AsyncTCPServer& AsyncTCPServer::Listen(
     LOG(ERROR) << "Event Thread Pool is NULL";
     exit(-1);
   }
-  socket = std::make_unique<TCPSocket>();
-  socket->Listen(host_address);
+
+  socket = TCPSocket::Listen(host_address);
 
   LOG(INFO) << "TCP Server listening " << host_address->ToString();
   return *this;
 }
 
-void AsyncTCPServer::SetEventLoop(
-    std::shared_ptr<EventThreadPool> pool) noexcept {
-  event_thread_pool = pool;
-}
-
-void AsyncTCPServer::Start() noexcept {
+void AsyncTCPServer::Start() {
   if (!event_thread_pool) {
     LOG(ERROR) << "Event Thread Pool is NULL";
     exit(-1);
   }
 
-  while (true) {
-    Accept();
-  }
+  while (true) Accept();
 }
 
 // Blocking

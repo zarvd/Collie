@@ -16,8 +16,7 @@ void TCPClient::Connect(const String &host, const unsigned &port,
 
 void TCPClient::Connect(std::shared_ptr<InetAddress> serv_addr,
                         const Request &req) {
-  auto serv_socket = std::make_unique<TCPSocket>();
-  serv_socket->Connect(serv_addr);
+  auto serv_socket = TCPSocket::Connect(serv_addr);
 
   TCPStream tcp_stream(std::move(serv_socket));
   req(tcp_stream);

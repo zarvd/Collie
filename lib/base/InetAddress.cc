@@ -62,7 +62,7 @@ std::shared_ptr<InetAddress> InetAddress::GetInetAddress(const String &host,
   // Gets address info
   addrinfo *addr_info;
   int ret = ::getaddrinfo(host.RawData(), nullptr, nullptr, &addr_info);
-  throw std::runtime_error(::gai_strerror(ret));
+  if (ret != 0) throw std::runtime_error(::gai_strerror(ret));
 
   auto inet_address = std::make_shared<InetAddress>();
   inet_address->address = std::make_unique<sockaddr>();
@@ -71,7 +71,7 @@ std::shared_ptr<InetAddress> InetAddress::GetInetAddress(const String &host,
   char host_address[INET6_ADDRSTRLEN];  // Sets the max length
   if (addr_info->ai_family == AF_INET) {
     // IPv4
-    sockaddr_in *addr = ((sockaddr_in *)addr_info->ai_addr);
+    sockaddr_in *addr = (sockaddr_in *)addr_info->ai_addr;
     addr->sin_port = ::htons(port);
     if (!inet_ntop(AF_INET, &addr->sin_addr, host_address, INET_ADDRSTRLEN))
       throw std::runtime_error(::strerror(errno));
@@ -79,7 +79,7 @@ std::shared_ptr<InetAddress> InetAddress::GetInetAddress(const String &host,
     inet_address->family = IPFamily::IPv4;
   } else if (addr_info->ai_family == AF_INET6) {
     // IPv6
-    sockaddr_in6 *addr = ((sockaddr_in6 *)addr_info->ai_addr);
+    sockaddr_in6 *addr = (sockaddr_in6 *)addr_info->ai_addr;
     addr->sin6_port = ::htons(port);
     if (!inet_ntop(AF_INET6, &addr->sin6_addr, host_address, INET6_ADDRSTRLEN))
       throw std::runtime_error(::strerror(errno));

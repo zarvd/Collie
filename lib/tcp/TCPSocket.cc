@@ -6,70 +6,51 @@
 namespace collie {
 namespace tcp {
 
-// TCPSocket::~TCPSocket() noexcept {}
+TCPSocket::~TCPSocket() {}
 
-void TCPSocket::Listen(std::shared_ptr<InetAddress> address) {
-  if (fd > 0) {
-    Close();
-  }
-  auto ip_family = AF_INET;
-  if (address->Family() == IPFamily::IPv6) {
-    ip_family = AF_INET6;
-  }
-
-  fd = ::socket(ip_family, SOCK_STREAM, IPPROTO_TCP);
-  if (fd == -1) {
-    throw std::system_error();
-  }
-
-  int err_code = 0;
+std::unique_ptr<TCPSocket> TCPSocket::Listen(
+    std::shared_ptr<InetAddress> address) {
+  int fd = -1;
+  int ret = 0;
   if (address->Family() == IPFamily::IPv4) {
-    auto ipv4_addr = address->AddressV4();
-    err_code = ::bind(fd, (sockaddr *)ipv4_addr, sizeof(*ipv4_addr));
-
+    fd = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   } else {
-    auto ipv6_addr = address->AddressV6();
-    err_code = ::bind(fd, (sockaddr *)ipv6_addr, sizeof(*ipv6_addr));
+    fd = ::socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
   }
-  if (err_code == -1) {
-    throw std::system_error();
+  if (fd == -1) throw std::runtime_error(::strerror(errno));
+
+  ret = ::bind(fd, address->Address(), sizeof(*address->Address()));
+  if (ret == -1) {
+    ::close(fd);
+    throw std::runtime_error(::strerror(errno));
   }
 
-  err_code = ::listen(fd, SOMAXCONN);
-  if (err_code == -1) {
-    throw std::system_error();
+  ret = ::listen(fd, SOMAXCONN);
+  if (ret == -1) {
+    ::close(fd);
+    throw std::runtime_error(::strerror(errno));
   }
 
-  local_address = address;
+  return std::make_unique<TCPSocket>(fd, address, nullptr);
 }
 
-void TCPSocket::Connect(std::shared_ptr<InetAddress> address) {
-  if (fd > 0) {
-    Close();
-  }
-  auto ip_family = AF_INET;
-  if (address->Family() == IPFamily::IPv6) {
-    ip_family = AF_INET6;
-  }
-
-  fd = ::socket(ip_family, SOCK_STREAM, IPPROTO_TCP);
-  if (fd == -1) {
-    throw std::system_error();
-  }
-
-  int err_code = 0;
+std::unique_ptr<TCPSocket> TCPSocket::Connect(
+    std::shared_ptr<InetAddress> address) {
+  int fd;
+  int ret = 0;
   if (address->Family() == IPFamily::IPv4) {
-    auto ipv4_addr = address->AddressV4();
-    err_code = ::connect(fd, (sockaddr *)ipv4_addr, sizeof(*ipv4_addr));
+    fd = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (fd == -1) throw std::runtime_error(::strerror(errno));
   } else {
-    auto ipv6_addr = address->AddressV6();
-    err_code = ::connect(fd, (sockaddr *)ipv6_addr, sizeof(*ipv6_addr));
+    fd = ::socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
+    if (fd == -1) throw std::runtime_error(::strerror(errno));
   }
-  if (err_code == -1) {
-    throw std::system_error();
+  ret = ::connect(fd, address->Address(), sizeof(*address->Address()));
+  if (ret == -1) {
+    ::close(fd);
+    throw std::runtime_error(::strerror(errno));
   }
-
-  peer_address = address;
+  return std::make_unique<TCPSocket>(fd, nullptr, address);
 }
 
 std::unique_ptr<TCPSocket> TCPSocket::Accept(bool) const {
@@ -84,10 +65,9 @@ std::unique_ptr<TCPSocket> TCPSocket::Accept(bool) const {
   }
 
   // Creates connection socket
-  auto socket = std::make_unique<TCPSocket>();
-  socket->fd = peer_fd;
-  socket->peer_address =
-      std::make_shared<InetAddress>(std::move(client_address));
+  auto peer_address = std::make_shared<InetAddress>(std::move(client_address));
+  auto socket = std::make_unique<TCPSocket>(peer_fd, nullptr, peer_address);
+
   return socket;
 }
 }

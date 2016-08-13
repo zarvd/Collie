@@ -3,22 +3,20 @@
 
 #include <functional>
 #include <memory>
+#include "../../inc/tcp/TCPStream.h"
 #include "../base/String.h"
 #include "../util/NonCopyable.h"
-#include "TCPSocket.h"
 
 namespace collie {
 
 namespace tcp {
-
-class TCPStream;
 
 class TCPServer : public util::NonCopyable {
  public:
   using RequestHandler = std::function<void(TCPStream &)>;
 
   TCPServer() noexcept : req_handler(nullptr) {}
-  ~TCPServer() noexcept;
+  ~TCPServer();
 
   TCPServer &Listen(const unsigned port, const String &host = "0.0.0.0");
   TCPServer &Listen(std::shared_ptr<InetAddress> host_address);

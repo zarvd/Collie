@@ -7,7 +7,6 @@
 #include "TCPSocket.h"
 
 namespace collie {
-class InetAddress;
 
 namespace tcp {
 
@@ -16,7 +15,7 @@ class TCPStream : public util::NonCopyable {
   enum StatusType { OK, ABORT };
 
   TCPStream(std::unique_ptr<TCPSocket>) noexcept;
-  virtual ~TCPStream() noexcept;
+  virtual ~TCPStream();
 
   virtual void Write(const String&) const;
   virtual String Read(const SizeType size = 0) const;

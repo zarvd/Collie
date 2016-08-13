@@ -13,7 +13,7 @@ TCPStream::TCPStream(std::unique_ptr<TCPSocket> socket) noexcept
       read_size(3000),
       status(OK) {}
 
-TCPStream::~TCPStream() noexcept {}
+TCPStream::~TCPStream() {}
 
 void TCPStream::Write(const String& buf) const {
   if (status == ABORT) {
@@ -63,8 +63,6 @@ String TCPStream::ReadLine() const { return ReadUntil("\n"); }
 
 void TCPStream::Abort() noexcept {
   if (status == OK) {
-    socket->Close();
-
     status = ABORT;
   }
 }

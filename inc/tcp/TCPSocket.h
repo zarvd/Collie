@@ -11,31 +11,29 @@ namespace tcp {
 
 class TCPSocket final : public util::NonCopyable {
  public:
-  TCPSocket() noexcept : local_address(nullptr),
-                         peer_address(nullptr),
-                         fd(-1) {}
-  ~TCPSocket() noexcept {}
+  TCPSocket(const int fd, std::shared_ptr<const InetAddress> local_addr,
+            std::shared_ptr<const InetAddress> peer_addr) noexcept
+      : local_address(local_addr),
+        peer_address(peer_addr),
+        fd(fd < 3 ? throw : fd) {}
+  ~TCPSocket();
 
   int Descriptor() const noexcept { return fd; }
 
-  void Listen(std::shared_ptr<InetAddress> local_address);
+  static std::unique_ptr<TCPSocket> Listen(
+      std::shared_ptr<InetAddress> local_address);
   std::unique_ptr<TCPSocket> Accept(bool is_block = true) const;
 
-  void Connect(std::shared_ptr<InetAddress> peer_address);
+  static std::unique_ptr<TCPSocket> Connect(
+      std::shared_ptr<InetAddress> peer_address);
   std::shared_ptr<const InetAddress> LocalAddress() const noexcept {
     return local_address;
   }
   std::shared_ptr<const InetAddress> PeerAddress() const noexcept {
     return peer_address;
   }
-  void Close() noexcept {
-    if (fd != -1) {
-      ::close(fd);
-      fd = -1;
-    }
-  }
 
- protected:
+ private:
   std::shared_ptr<const InetAddress> local_address;
   std::shared_ptr<const InetAddress> peer_address;
 

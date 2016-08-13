@@ -3,25 +3,22 @@
 
 #include <functional>
 #include <memory>
+#include "../../inc/base/EventThreadPool.h"
+#include "../../inc/tcp/AsyncTCPStream.h"
+#include "../../inc/tcp/TCPSocket.h"
 #include "../base/String.h"
 #include "../util/NonCopyable.h"
 
 namespace collie {
 
-class InetAddress;
-class EventThreadPool;
-
 namespace tcp {
-
-class AsyncTCPStream;
-class TCPSocket;
 
 class AsyncTCPServer : public util::NonCopyable {
  public:
   using RequestHandler = std::function<void(std::shared_ptr<AsyncTCPStream>)>;
 
   AsyncTCPServer(std::shared_ptr<EventThreadPool>) noexcept;
-  ~AsyncTCPServer() noexcept;
+  ~AsyncTCPServer();
 
   AsyncTCPServer& Listen(const unsigned port, const String& = "0.0.0.0");
   AsyncTCPServer& Listen(std::shared_ptr<InetAddress> host_address);
@@ -35,8 +32,10 @@ class AsyncTCPServer : public util::NonCopyable {
     return *this;
   }
 
-  void SetEventLoop(std::shared_ptr<EventThreadPool> pool) noexcept;
-  void Start() noexcept;
+  void SetEventLoop(std::shared_ptr<EventThreadPool> pool) noexcept {
+    event_thread_pool = pool;
+  }
+  void Start();
 
  private:
   void Accept();
