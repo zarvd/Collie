@@ -6,7 +6,7 @@ namespace collie {
 class EventType {
  public:
   constexpr EventType() noexcept {}
-  ~EventType() noexcept {}
+  ~EventType() {}
 
   bool IsRead() const noexcept { return is_read; }
   bool IsWrite() const noexcept { return is_write; }

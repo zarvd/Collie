@@ -13,7 +13,7 @@ namespace collie {
 
 class EventThreadPool : public util::NonCopyable {
  public:
-  EventThreadPool(unsigned thread_num) noexcept;
+  EventThreadPool(const unsigned thread_num) noexcept;
   ~EventThreadPool();
 
   void Start() noexcept;

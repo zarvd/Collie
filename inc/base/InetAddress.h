@@ -16,9 +16,9 @@ class InetAddress final : public Serializable {
                            address(nullptr),
                            family(IPFamily::UNKNOWN) {}
 
-  InetAddress(sockaddr*) noexcept;
+  explicit InetAddress(std::unique_ptr<sockaddr>);
 
-  ~InetAddress() noexcept;
+  ~InetAddress();
   InetAddress(const InetAddress&) noexcept;
   InetAddress& operator=(const InetAddress&) noexcept;
   InetAddress(InetAddress&&) noexcept;
@@ -27,11 +27,12 @@ class InetAddress final : public Serializable {
   IPFamily Family() const { return family; }
   String Host() const noexcept { return host; }
   unsigned Port() const noexcept { return port; }
-  const sockaddr* Address() const noexcept { return address; }
+  const sockaddr* Address() const noexcept { return address.get(); }
   const sockaddr_in* AddressV4() const noexcept;
   const sockaddr_in6* AddressV6() const noexcept;
   String ToString() const noexcept override;
 
+  // Host could be ip address or domain URL
   static std::shared_ptr<InetAddress> GetInetAddress(const String& host,
                                                      const unsigned port);
   bool IsLoopback() const noexcept;
@@ -39,7 +40,7 @@ class InetAddress final : public Serializable {
  private:
   String host;
   unsigned port;
-  sockaddr* address;
+  std::unique_ptr<sockaddr> address;
   IPFamily family;
 };
 }

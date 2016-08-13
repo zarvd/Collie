@@ -3,14 +3,11 @@
 
 namespace collie {
 
-EventThreadPool::EventThreadPool(unsigned thread_num) noexcept
+EventThreadPool::EventThreadPool(const unsigned thread_num) noexcept
     : is_running(false),
       thread_num(thread_num) {}
 
-EventThreadPool::~EventThreadPool() {
-  LOG(DEBUG) << "event thread pool is stopping";
-  Stop();
-}
+EventThreadPool::~EventThreadPool() { Stop(); }
 
 void EventThreadPool::Start() noexcept {
   if (is_running) {
@@ -27,7 +24,7 @@ void EventThreadPool::Start() noexcept {
 
 void EventThreadPool::Stop() noexcept {
   if (!is_running) {
-    LOG(DEBUG) << "Event thread pool is not running";
+    LOG(WARN) << "Event thread pool is not running";
     return;
   }
 

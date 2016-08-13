@@ -73,16 +73,21 @@ void TCPSocket::Connect(std::shared_ptr<InetAddress> address) {
 }
 
 std::unique_ptr<TCPSocket> TCPSocket::Accept(bool) const {
-  sockaddr *client_address = new sockaddr;
+  auto client_address = std::make_unique<sockaddr>();
   socklen_t client_address_len = sizeof(*client_address);
-  int peer_fd = ::accept4(fd, client_address, &client_address_len, 0);
+
+  // Accepts new client
+  int peer_fd = ::accept4(fd, client_address.get(), &client_address_len, 0);
   if (peer_fd == -1) {
     LOG(DEBUG) << "TCP Socket Accept: " << ::strerror(errno);
     return nullptr;
   }
+
+  // Creates connection socket
   auto socket = std::make_unique<TCPSocket>();
   socket->fd = peer_fd;
-  socket->peer_address = std::make_shared<InetAddress>(client_address);
+  socket->peer_address =
+      std::make_shared<InetAddress>(std::move(client_address));
   return socket;
 }
 }
