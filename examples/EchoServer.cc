@@ -11,7 +11,7 @@ int main(void) {
   TCPServer server;
 
   server.SetRequestHandler([](TCPStream& stream) {
-    auto greeting = stream.Read();
+    auto greeting = stream.ReadUntil("\n\n");
     LOG(INFO) << "Read: " << greeting << " From "
               << stream.PeerAddress()->ToString();
     stream.Write(greeting);

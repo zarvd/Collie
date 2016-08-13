@@ -60,7 +60,6 @@ class String final {
   static String From(bool) noexcept;
   static String From(const char*) noexcept;
 
- private:
   std::string data;
 };
 }

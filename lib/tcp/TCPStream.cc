@@ -29,16 +29,22 @@ String TCPStream::Read(const SizeType size) const {
 }
 
 String TCPStream::ReadUntil(const String& str) const {
-  String recv_content;
+  static String peek_buffer;
   while (true) {
-    char buffer[read_size];
-    if (::recv(socket->Descriptor(), buffer, read_size, 0) == -1) {
-      LOG(WARN) << "TCP recv";
+    char buf[read_size];
+    if (::recv(socket->Descriptor(), buf, read_size, 0) == -1) {
+      LOG(WARN) << ::strerror(errno);
     }
-    recv_content += buffer;
-  }
+    peek_buffer += buf;
 
-  return recv_content;
+    auto it = peek_buffer.data.find(str.data);
+
+    if (it != std::string::npos) {
+      const String buffer = peek_buffer.Slice(0, it + str.Length());
+      peek_buffer = peek_buffer.Slice(it + str.Length());
+      return buffer;
+    }
+  }
 }
 
 String TCPStream::ReadLine() const { return ReadUntil("\n"); }
