@@ -6,7 +6,11 @@
 namespace collie {
 namespace tcp {
 
-TCPSocket::~TCPSocket() {}
+TCPSocket::~TCPSocket() {
+  if (::close(fd) == -1) {
+    LOG(WARN) << "TCPSocket cannot close for descriptor " << fd;
+  }
+}
 
 std::unique_ptr<TCPSocket> TCPSocket::Listen(
     std::shared_ptr<InetAddress> address) {
