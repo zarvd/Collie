@@ -85,9 +85,48 @@ void AsyncTCPStream::Read(const AsyncCallback& callback) {
   event_pool->Update(shared_from_this());
 }
 
-void AsyncTCPStream::ReadUntil(const char, const AsyncCallback&) {}
+void AsyncTCPStream::ReadUntil(const String& str,
+                               const AsyncCallback& callback) {
+  if (!event_pool) throw std::runtime_error("Event pool is not available");
 
-void AsyncTCPStream::ReadLine(const AsyncCallback&) {}
+  read_handler = [callback, str](std::shared_ptr<AsyncTCPStream> stream) {
+    char buffer[stream->read_size];
+    const int ret =
+        ::recv(stream->Descriptor(), buffer, stream->read_size, MSG_DONTWAIT);
+
+    if (ret == -1) {
+      throw std::runtime_error(::strerror(errno));
+    } else if (ret == 0) {
+      // close
+      stream->Abort();
+      return;
+    }
+
+    stream->peek_buffer += buffer;
+
+    auto it = stream->peek_buffer.data.find(str.data);
+    if (it != std::string::npos) {
+      // Finds the target string, refreshes peek buffer and read buffer
+      stream->read_buffer = stream->peek_buffer.Slice(0, it + str.Length());
+      stream->peek_buffer = stream->peek_buffer.Slice(it + str.Length());
+      // Disables read event
+      stream->event.SetRead(false);
+      stream->event_pool->Update(stream);
+      if (!callback) {
+        stream->Abort();
+      } else {
+        callback(stream);
+      }
+    }
+
+    // else keeps looking for the target string
+  };
+
+  event.SetRead(true);
+  event_pool->Update(shared_from_this());
+}
+
+void AsyncTCPStream::ReadLine(const AsyncCallback& cb) { ReadUntil("\n", cb); }
 
 void AsyncTCPStream::Abort() {
   if (!event_pool) throw std::runtime_error("Event pool is not available");

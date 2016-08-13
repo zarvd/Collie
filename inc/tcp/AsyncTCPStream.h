@@ -50,7 +50,7 @@ class AsyncTCPStream final
   int Descriptor() const noexcept override;
   void Write(const String&, const AsyncCallback&);
   void Read(const AsyncCallback&);
-  void ReadUntil(const char, const AsyncCallback&);
+  void ReadUntil(const String&, const AsyncCallback&);
   void ReadLine(const AsyncCallback&);
   void Abort();
 
@@ -83,6 +83,7 @@ class AsyncTCPStream final
   const std::unique_ptr<TCPSocket> socket;
   unsigned read_size;
   String read_buffer;
+  String peek_buffer;
 };
 }
 }

@@ -17,14 +17,14 @@ int main(void) {
 
   server.SetRequestHandler([](IOStream stream) {
     // stream->Write("Hello, world", nullptr);
-    stream->Read([](IOStream stream) {
+    stream->ReadUntil("\n\n", [](IOStream stream) {
       LOG(DEBUG) << "Read: " << stream->ReadBuffer() << " From "
                  << stream->PeerAddress()->ToString();
       stream->Write(stream->ReadBuffer(), nullptr);
     });
   });
   pool->Start();
-  server.Listen(8081).Start();
+  server.Listen(8080).Start();
 
   return 0;
 }

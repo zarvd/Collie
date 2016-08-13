@@ -36,6 +36,7 @@ void EPollPoller::Remove(const unsigned fd) const {
 
 void EPollPoller::Poll(const PollCallback& cb, const int timeout,
                        int max_event) const {
+  LOG(DEBUG) << "POLLING";
   if (max_event == -1) max_event = 1000;
   ::epoll_event revents[max_event];
   const int ret = ::epoll_wait(efd, revents, max_event, timeout);
@@ -76,27 +77,13 @@ unsigned EPollPoller::ToEvents(const EventType& event) const noexcept {
 
 EventType EPollPoller::ToEventType(const unsigned events) const noexcept {
   EventType event;
-  if ((events & EPOLLIN) == EPOLLIN) {
-    event.SetRead(true);
-  }
-  if ((events & EPOLLOUT) == EPOLLOUT) {
-    event.SetWrite(true);
-  }
-  if ((events & EPOLLRDHUP) == EPOLLRDHUP) {
-    event.SetClose(true);
-  }
-  if ((events & EPOLLERR) == EPOLLERR) {
-    event.SetError(true);
-  }
-  if ((events & EPOLLET) == EPOLLET) {
-    event.SetEdgeTriggeder(true);
-  }
-  if ((events & EPOLLPRI) == EPOLLPRI) {
-    event.SetUrgetnRead(true);
-  }
-  if ((events & EPOLLONESHOT) == EPOLLONESHOT) {
-    event.SetOneShot(true);
-  }
+  event.SetRead((events & EPOLLIN) == EPOLLIN);
+  event.SetWrite((events & EPOLLOUT) == EPOLLOUT);
+  event.SetClose((events & EPOLLRDHUP) == EPOLLRDHUP);
+  event.SetError((events & EPOLLERR) == EPOLLERR);
+  event.SetEdgeTriggeder((events & EPOLLET) == EPOLLET);
+  event.SetUrgetnRead((events & EPOLLPRI) == EPOLLPRI);
+  event.SetOneShot((events & EPOLLONESHOT) == EPOLLONESHOT);
   return event;
 }
 }
