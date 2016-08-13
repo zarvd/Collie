@@ -25,7 +25,7 @@ std::shared_ptr<const InetAddress> AsyncTCPStream::LocalAddress() const
 }
 std::shared_ptr<const InetAddress> AsyncTCPStream::PeerAddress() const
     noexcept {
-  return socket->LocalAddress();
+  return socket->PeerAddress();
 }
 
 void AsyncTCPStream::Write(const String& buf, const AsyncCallback& callback) {

@@ -11,7 +11,7 @@ AsyncTCPServer::~AsyncTCPServer() {}
 
 AsyncTCPServer& AsyncTCPServer::Listen(const unsigned port,
                                        const String& host) {
-  return Listen(InetAddress::GetInetAddress(host, port));
+  return Listen(std::make_shared<InetAddress>(host, port));
 }
 
 AsyncTCPServer& AsyncTCPServer::Listen(

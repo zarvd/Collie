@@ -10,11 +10,11 @@ int main(void) {
 
   TCPServer server;
 
-  server.SetRequestHandler([](TCPStream& tcp_stream) {
-    auto greeting = tcp_stream.Read();
+  server.SetRequestHandler([](TCPStream& stream) {
+    auto greeting = stream.Read();
     LOG(INFO) << "Read: " << greeting << " From "
-              << tcp_stream.PeerAddress()->ToString();
-    tcp_stream.Write(greeting);
+              << stream.PeerAddress()->ToString();
+    stream.Write(greeting);
   });
   server.Listen(8080).Start();
 

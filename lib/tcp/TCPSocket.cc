@@ -35,22 +35,39 @@ std::unique_ptr<TCPSocket> TCPSocket::Listen(
 }
 
 std::unique_ptr<TCPSocket> TCPSocket::Connect(
-    std::shared_ptr<InetAddress> address) {
+    std::shared_ptr<InetAddress> peer_address,
+    std::shared_ptr<InetAddress> local_address) {
+  if (local_address && local_address->Family() != peer_address->Family()) {
+    throw std::runtime_error(
+        "Peer address family doesn't match local address family");
+  }
   int fd;
   int ret = 0;
-  if (address->Family() == IPFamily::IPv4) {
+  if (peer_address->Family() == IPFamily::IPv4) {
     fd = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (fd == -1) throw std::runtime_error(::strerror(errno));
   } else {
     fd = ::socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
     if (fd == -1) throw std::runtime_error(::strerror(errno));
   }
-  ret = ::connect(fd, address->Address(), sizeof(*address->Address()));
+
+  if (local_address) {
+    ret =
+        ::bind(fd, local_address->Address(), sizeof(*local_address->Address()));
+    if (ret == -1) {
+      ::close(fd);
+      throw std::runtime_error(::strerror(errno));
+    }
+  }
+
+  ret =
+      ::connect(fd, peer_address->Address(), sizeof(*peer_address->Address()));
+
   if (ret == -1) {
     ::close(fd);
     throw std::runtime_error(::strerror(errno));
   }
-  return std::make_unique<TCPSocket>(fd, nullptr, address);
+  return std::make_unique<TCPSocket>(fd, local_address, peer_address);
 }
 
 std::unique_ptr<TCPSocket> TCPSocket::Accept(bool) const {

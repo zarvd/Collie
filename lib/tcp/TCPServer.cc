@@ -11,7 +11,7 @@ namespace tcp {
 TCPServer::~TCPServer() {}
 
 TCPServer& TCPServer::Listen(const unsigned port, const String& host) {
-  return Listen(InetAddress::GetInetAddress(host, port));
+  return Listen(std::make_shared<InetAddress>(host, port));
 }
 
 TCPServer& TCPServer::Listen(std::shared_ptr<InetAddress> host_address) {

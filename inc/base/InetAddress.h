@@ -12,11 +12,11 @@ enum class IPFamily { IPv4, IPv6, UNKNOWN };
 
 class InetAddress final : public Serializable {
  public:
-  InetAddress() noexcept : port(0),
-                           address(nullptr),
-                           family(IPFamily::UNKNOWN) {}
+  InetAddress(const String& ip, const unsigned port,
+              const IPFamily family = IPFamily::IPv4);
 
-  explicit InetAddress(std::unique_ptr<sockaddr>);
+  explicit InetAddress(std::unique_ptr<sockaddr>,
+                       const IPFamily family = IPFamily::IPv4);
 
   ~InetAddress();
   InetAddress(const InetAddress&) noexcept;
@@ -32,9 +32,6 @@ class InetAddress final : public Serializable {
   const sockaddr_in6* AddressV6() const noexcept;
   String ToString() const noexcept override;
 
-  // Host could be ip address or domain URL
-  static std::shared_ptr<InetAddress> GetInetAddress(const String& host,
-                                                     const unsigned port);
   bool IsLoopback() const noexcept;
 
  private:
