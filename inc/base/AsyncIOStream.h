@@ -12,7 +12,7 @@ class EventPool;
 class AsyncIOStream : public util::NonCopyable {
  public:
   constexpr AsyncIOStream() noexcept {}
-  virtual ~AsyncIOStream() noexcept {};
+  virtual ~AsyncIOStream(){};
 
   virtual int Descriptor() const noexcept = 0;
   virtual void HandleRead() noexcept = 0;

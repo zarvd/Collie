@@ -5,56 +5,39 @@
 
 namespace collie {
 
-EventPool::EventPool() noexcept {}
+EventPool::EventPool() : poller(std::make_unique<POLLER>()) {}
 
-EventPool::~EventPool() noexcept {}
+EventPool::~EventPool() {}
 
-void EventPool::Init() noexcept {
-  poller = std::make_unique<POLLER>();
-  try {
-    poller->Init();
-  } catch (std::system_error) {
-  }
+void EventPool::Loop(int timeout) {
+  while (true) LoopOne(timeout);
 }
 
-void EventPool::Destroy() noexcept {
-  try {
-    poller->Destroy();
-  } catch (std::system_error) {
-  }
-}
-
-void EventPool::Loop(int timeout) noexcept {
-  while (true) {
-    LoopOne(timeout);
-  }
-}
-
-void EventPool::LoopOne(int timeout) noexcept {
+void EventPool::LoopOne(int timeout) {
   using namespace std::placeholders;
   poller->Poll(std::bind(&EventPool::PollHandler, this, _1, _2), timeout);
 }
 
-void EventPool::Update(std::shared_ptr<AsyncIOStream> stream) noexcept {
+void EventPool::Update(std::shared_ptr<AsyncIOStream> stream) {
   LOG(DEBUG) << "Event Pool update stream " << stream->Descriptor();
   if (io_streams.find(stream->Descriptor()) == io_streams.end()) {
     // new io
-    io_streams.insert({stream->Descriptor(), stream});
     poller->Insert(stream->Descriptor(), stream->Event());  // throwable
+    io_streams.insert({stream->Descriptor(), stream});
     stream->event_pool = shared_from_this();
   } else {
-    poller->Update(stream->Descriptor(), stream->Event());
+    poller->Update(stream->Descriptor(), stream->Event());  // throwable
   }
 }
 
-void EventPool::Delete(std::shared_ptr<AsyncIOStream> stream) noexcept {
+void EventPool::Remove(std::shared_ptr<AsyncIOStream> stream) {
   auto it = io_streams.find(stream->Descriptor());
 
   if (it == io_streams.end()) {
     LOG(WARN) << "IO stream is not in event pool";
     return;
   }
-  poller->Delete(stream->Descriptor());
+  poller->Remove(stream->Descriptor());  // throwable
 
   stream->event_pool = nullptr;
   io_streams.erase(it);

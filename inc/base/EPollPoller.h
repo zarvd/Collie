@@ -1,26 +1,32 @@
 #ifndef COLLIE_BASE_EPOLL_POLLER_H_
 #define COLLIE_BASE_EPOLL_POLLER_H_
 
+#include <atomic>
 #include "Poller.h"
 
 namespace collie {
 
-class EPollPoller : public Poller {
+class EPollPoller final : public Poller {
  public:
   EPollPoller();
-  ~EPollPoller() noexcept override;
+  ~EPollPoller() override;
 
-  void Init() override;
-  void Destroy() override;
-  void Poll(const PollHandler&, const int timeout) override;
-  void Insert(unsigned fd, const EventType&) override;
-  void Update(unsigned fd, const EventType&) override;
-  void Delete(unsigned fd) override;
+  // void Init() override;
+  // void Destroy() override;
+  void Poll(const PollCallback&, const int timeout = -1,
+            int max_event = -1) const override;
+  void Insert(const unsigned fd, const EventType&) const override;
+  void Update(const unsigned fd, const EventType&) const override;
+  void Remove(const unsigned fd) const override;
 
-  static unsigned ToEvents(const EventType&) noexcept;
-  static EventType ToEventType(unsigned events) noexcept;
+  unsigned ToEvents(const EventType&) const noexcept override;
+  EventType ToEventType(const unsigned events) const noexcept override;
+  unsigned MaxEvent() const noexcept override { return max_event; }
+  void SetMaxEvent(unsigned num) noexcept override { max_event = num; }
 
  private:
+  int efd;
+  std::atomic<int> max_event;
 };
 }
 

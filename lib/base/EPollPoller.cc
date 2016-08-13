@@ -1,75 +1,54 @@
 #include "../../inc/base/EPollPoller.h"
 #include <sys/epoll.h>
 #include <unistd.h>
-#include "../../inc/base/EventType.h"
+#include <cstring>
 #include "../../inc/base/Logger.h"
 
 namespace collie {
 
-EPollPoller::EPollPoller() : Poller() {}
-EPollPoller::~EPollPoller() noexcept {}
-
-void EPollPoller::Init() {
-  ASSERT(fd == -1)
-
-  fd = ::epoll_create1(0);
-  if (fd == -1) throw std::system_error();
+EPollPoller::EPollPoller() : efd(::epoll_create1(0)) {
+  if (efd == -1) throw std::runtime_error(::strerror(errno));
 }
+EPollPoller::~EPollPoller() { ::close(efd); }
 
-void EPollPoller::Destroy() {
-  ASSERT(fd != -1)
-
-  if (::close(fd) == -1) throw std::system_error();
-  fd = -1;
-}
-
-void EPollPoller::Insert(unsigned fd, const EventType& events) {
-  ASSERT(this->fd != -1)
-
+void EPollPoller::Insert(const unsigned fd, const EventType& events) const {
   ::epoll_event e;
   e.data.fd = fd;
   e.events = ToEvents(events);
-  if (::epoll_ctl(this->fd, EPOLL_CTL_ADD, e.data.fd, &e) == -1) {
-    throw std::system_error();
-  }
+  const int ret = ::epoll_ctl(efd, EPOLL_CTL_ADD, e.data.fd, &e);
+  if (ret == -1) throw std::runtime_error(::strerror(errno));
 }
 
-void EPollPoller::Update(unsigned fd, const EventType& events) {
-  ASSERT(this->fd != -1)
-
+void EPollPoller::Update(const unsigned fd, const EventType& events) const {
   ::epoll_event e;
   e.data.fd = fd;
   e.events = ToEvents(events);
-  if (::epoll_ctl(this->fd, EPOLL_CTL_MOD, e.data.fd, &e) == -1) {
-    throw std::system_error();
+  const int ret = ::epoll_ctl(efd, EPOLL_CTL_MOD, e.data.fd, &e);
+  if (ret == -1) throw std::runtime_error(::strerror(errno));
+}
+
+void EPollPoller::Remove(const unsigned fd) const {
+  ASSERT(efd != -1)
+
+  const int ret = ::epoll_ctl(efd, EPOLL_CTL_DEL, fd, nullptr);
+  if (ret == -1) throw std::runtime_error(::strerror(errno));
+}
+
+void EPollPoller::Poll(const PollCallback& cb, const int timeout,
+                       int max_event) const {
+  if (max_event == -1) max_event = 1000;
+  ::epoll_event revents[max_event];
+  const int ret = ::epoll_wait(efd, revents, max_event, timeout);
+
+  if (ret == -1) throw std::runtime_error(::strerror(errno));
+
+  for (int i = 0; i < ret; ++i) {
+    const auto& e = revents[i];
+    cb(e.data.fd, ToEventType(e.events));
   }
 }
 
-void EPollPoller::Delete(unsigned fd) {
-  ASSERT(this->fd != -1)
-
-  if (::epoll_ctl(this->fd, EPOLL_CTL_DEL, fd, nullptr) == -1) {
-    throw std::system_error();
-  }
-}
-
-void EPollPoller::Poll(const PollHandler& handler, int timeout) {
-  ASSERT(this->fd != -1)
-
-  int size = max_event;
-  ::epoll_event revents[size];
-  int num = ::epoll_wait(this->fd, revents, max_event, timeout);
-  if (num == -1) {
-    throw std::system_error();
-  }
-
-  for (int i = 0; i < num; ++i) {
-    ::epoll_event& e = revents[i];
-    handler(e.data.fd, ToEventType(e.events));
-  }
-}
-
-unsigned EPollPoller::ToEvents(const EventType& event) noexcept {
+unsigned EPollPoller::ToEvents(const EventType& event) const noexcept {
   unsigned events = 0;
   if (event.IsRead()) {
     events |= EPOLLIN;
@@ -95,7 +74,7 @@ unsigned EPollPoller::ToEvents(const EventType& event) noexcept {
   return events;
 }
 
-EventType EPollPoller::ToEventType(unsigned events) noexcept {
+EventType EPollPoller::ToEventType(const unsigned events) const noexcept {
   EventType event;
   if ((events & EPOLLIN) == EPOLLIN) {
     event.SetRead(true);

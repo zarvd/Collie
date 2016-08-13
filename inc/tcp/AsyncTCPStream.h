@@ -23,7 +23,7 @@ class AsyncTCPStream final
   using AsyncCallback = std::function<void(std::shared_ptr<AsyncTCPStream>)>;
 
   AsyncTCPStream(std::unique_ptr<TCPSocket>) noexcept;
-  ~AsyncTCPStream() noexcept override;
+  ~AsyncTCPStream() override;
 
   void HandleRead() noexcept override {
     if (read_handler)

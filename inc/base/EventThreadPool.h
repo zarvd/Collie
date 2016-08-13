@@ -16,7 +16,7 @@ class EventPool;
 class EventThreadPool : public util::NonCopyable {
  public:
   EventThreadPool(unsigned thread_num) noexcept;
-  ~EventThreadPool() noexcept;
+  ~EventThreadPool();
 
   void Start() noexcept;
   void Stop() noexcept;

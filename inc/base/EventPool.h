@@ -20,16 +20,14 @@ class AsyncIOStream;
 class EventPool : public util::NonCopyable,
                   public std::enable_shared_from_this<EventPool> {
  public:
-  EventPool() noexcept;
-  ~EventPool() noexcept;
+  EventPool();
+  ~EventPool();
 
-  void Loop(int timeout = -1) noexcept;
-  void LoopOne(int timeout = -1) noexcept;
-  void Init() noexcept;
-  void Destroy() noexcept;
+  void Loop(int timeout = -1);
+  void LoopOne(int timeout = -1);
 
-  void Update(std::shared_ptr<AsyncIOStream>) noexcept;
-  void Delete(std::shared_ptr<AsyncIOStream>) noexcept;
+  void Update(std::shared_ptr<AsyncIOStream>);
+  void Remove(std::shared_ptr<AsyncIOStream>);
 
   SizeType Size() const noexcept { return io_streams.size(); }
   bool IsEmpty() const noexcept { return io_streams.empty(); }

@@ -11,7 +11,7 @@ EventThreadPool::EventThreadPool(unsigned thread_num) noexcept
     : is_running(false),
       thread_num(thread_num) {}
 
-EventThreadPool::~EventThreadPool() noexcept {
+EventThreadPool::~EventThreadPool() {
   LOG(DEBUG) << "event thread pool is stopping";
   Stop();
 }
@@ -64,7 +64,6 @@ void EventThreadPool::EventLoop() {
 
   event_pools.insert({std::this_thread::get_id(), event_pool});
 
-  event_pool->Init();
   LOG(DEBUG) << "event pool started";
 
   // // FIXME
@@ -77,6 +76,5 @@ void EventThreadPool::EventLoop() {
   event_pool->Loop();
 
   LOG(DEBUG) << "event pool stopped";
-  event_pool->Destroy();
 }
 }

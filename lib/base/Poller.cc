@@ -2,5 +2,5 @@
 
 namespace collie {
 
-Poller::~Poller() noexcept {}
+Poller::~Poller() {}
 }

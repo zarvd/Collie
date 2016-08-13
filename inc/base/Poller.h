@@ -1,41 +1,37 @@
 #ifndef COLLIE_BASE_POLLER_H_
 #define COLLIE_BASE_POLLER_H_
 
-#include <atomic>
 #include <functional>
 #include "../util/NonCopyable.h"
+#include "EventType.h"
 
 namespace collie {
 
-class EventType;
-
 class Poller : public util::NonCopyable {
  public:
-  using PollHandler =
-      std::function<void(unsigned fd, const EventType& revents)>;
+  using PollCallback = std::function<void(const unsigned, const EventType&)>;
 
-  Poller() : fd(-1), max_event(200000) {}
-  virtual ~Poller() noexcept = 0;
+  constexpr Poller() {}
+  virtual ~Poller() = 0;
 
-  virtual void Init() = 0;
-  virtual void Destroy() = 0;
   // The timeout argument specifies the number of milliseconds that
   // Poller will block.
   // Specifying a timeout of -1 causes Poller to block indefinitely,
   // while specifying a timeout equal to zero cause Poller to return
   // immediately,
   // even if no events are available.
-  virtual void Poll(const PollHandler&, const int timeout) = 0;
-  virtual void Insert(unsigned fd, const EventType&) = 0;
-  virtual void Update(unsigned fd, const EventType&) = 0;
-  virtual void Delete(unsigned fd) = 0;
+  virtual void Poll(const PollCallback&, const int timeout = -1,
+                    int max_event = -1) const = 0;
 
-  unsigned MaxEvent() const noexcept { return max_event; }
-  void SetMaxEvent(unsigned num) noexcept { max_event = num; }
+  virtual void Insert(const unsigned fd, const EventType&) const = 0;
+  virtual void Update(const unsigned fd, const EventType&) const = 0;
+  virtual void Remove(const unsigned fd) const = 0;
 
- protected:
-  int fd;
-  std::atomic<unsigned> max_event;
+  virtual unsigned MaxEvent() const noexcept = 0;
+  virtual void SetMaxEvent(unsigned num) noexcept = 0;
+
+  virtual unsigned ToEvents(const EventType&) const noexcept = 0;
+  virtual EventType ToEventType(const unsigned events) const noexcept = 0;
 };
 }
 

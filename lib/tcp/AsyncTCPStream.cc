@@ -16,7 +16,7 @@ AsyncTCPStream::AsyncTCPStream(std::unique_ptr<TCPSocket> socket) noexcept
   close_handler = [](auto) { LOG(WARN) << "No close handler"; };
 }
 
-AsyncTCPStream::~AsyncTCPStream() noexcept {}
+AsyncTCPStream::~AsyncTCPStream() {}
 
 int AsyncTCPStream::Descriptor() const noexcept { return socket->Descriptor(); }
 
@@ -115,7 +115,7 @@ void AsyncTCPStream::Abort() noexcept {
     LOG(ERROR) << "Event pool is not available";
     return;
   }
-  event_pool->Delete(shared_from_this());
+  event_pool->Remove(shared_from_this());
   event_pool = nullptr;
 }
 }
