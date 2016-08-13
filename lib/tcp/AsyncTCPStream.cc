@@ -1,8 +1,6 @@
 #include "../../inc/tcp/AsyncTCPStream.h"
 #include <sys/socket.h>
 #include "../../inc/base/EventPool.h"
-#include "../../inc/base/Logger.h"
-#include "../../inc/tcp/TCPSocket.h"
 
 namespace collie {
 namespace tcp {

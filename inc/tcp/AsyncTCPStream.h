@@ -2,16 +2,12 @@
 #define COLLIE_TCP_ASYNC_TCP_STREAM_H_
 
 #include <memory>
+#include "../../inc/tcp/TCPSocket.h"
 #include "../base/AsyncIOStream.h"
 #include "../base/Logger.h"
 
 namespace collie {
-
-class InetAddress;
-
 namespace tcp {
-
-class TCPSocket;
 
 // Should be shared pointer
 class AsyncTCPStream final

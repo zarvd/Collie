@@ -7,11 +7,9 @@
 #include <vector>
 #include "../collie.h"
 #include "../util/NonCopyable.h"
+#include "EventPool.h"
 
 namespace collie {
-
-class AsyncIOStream;
-class EventPool;
 
 class EventThreadPool : public util::NonCopyable {
  public:
@@ -20,9 +18,9 @@ class EventThreadPool : public util::NonCopyable {
 
   void Start() noexcept;
   void Stop() noexcept;
-  void Push(std::shared_ptr<AsyncIOStream>) noexcept;  // push io into CURRENT
-                                                       // event pool
-  void PushInit(std::shared_ptr<AsyncIOStream>) noexcept;  // for init iostream
+  void Push(std::shared_ptr<AsyncIOStream>,
+            bool to_all = false) noexcept;  // push io into CURRENT
+                                            // event pool
 
   SizeType ThreadNum() const noexcept { return thread_num; }
   void SetThreadNum(unsigned num) noexcept { thread_num = num; }
@@ -42,8 +40,6 @@ class EventThreadPool : public util::NonCopyable {
   std::atomic<bool> is_running;
   unsigned thread_num;
   std::vector<std::thread> workers;
-
-  std::vector<std::shared_ptr<AsyncIOStream>> init_io_streams;
 };
 }
 

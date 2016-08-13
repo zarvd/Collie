@@ -1,8 +1,4 @@
 #include "../../inc/base/EventThreadPool.h"
-#include <signal.h>
-#include <cstdio>
-#include "../../inc/base/AsyncIOStream.h"
-#include "../../inc/base/EventPool.h"
 #include "../../inc/base/Logger.h"
 
 namespace collie {
@@ -42,21 +38,25 @@ void EventThreadPool::Stop() noexcept {
   workers.clear();
 }
 
-void EventThreadPool::PushInit(std::shared_ptr<AsyncIOStream> io) noexcept {
-  init_io_streams.push_back(io);
-}
-
-void EventThreadPool::Push(std::shared_ptr<AsyncIOStream> io) noexcept {
+void EventThreadPool::Push(std::shared_ptr<AsyncIOStream> io,
+                           bool to_all) noexcept {
   if (!is_running) {
     LOG(WARN) << "event thread pool is not running";
     return;
   }
-  static auto current_event_pool = event_pools.begin();
-  if (current_event_pool == event_pools.end()) {
-    current_event_pool = event_pools.begin();
+
+  if (to_all) {
+    // Inserts to all pools
+    for (auto& e : event_pools) e.second->Update(io);
+  } else {
+    // All pools take turns at inserting io for balance
+    static auto current_event_pool = event_pools.begin();
+    if (current_event_pool == event_pools.end()) {
+      current_event_pool = event_pools.begin();
+    }
+    current_event_pool->second->Update(io);
+    ++current_event_pool;
   }
-  current_event_pool->second->Update(io);
-  ++current_event_pool;
 }
 
 void EventThreadPool::EventLoop() {
@@ -64,17 +64,6 @@ void EventThreadPool::EventLoop() {
 
   event_pools.insert({std::this_thread::get_id(), event_pool});
 
-  LOG(DEBUG) << "event pool started";
-
-  // // FIXME
-  // for (auto& io : init_io_streams) {
-  //   AsyncIOStream * init_io = io.get();
-  //   current_event_pool->Update(init_io);
-  // }
-
-  LOG(DEBUG) << "event pool looping";
   event_pool->Loop();
-
-  LOG(DEBUG) << "event pool stopped";
 }
 }
