@@ -18,7 +18,7 @@ class TCPServer : public util::NonCopyable {
   TCPServer() noexcept : req_handler(nullptr) {}
   ~TCPServer();
 
-  TCPServer &Listen(const unsigned port, const String &host = "0.0.0.0");
+  TCPServer &Listen(const unsigned port, const std::string &host = "0.0.0.0");
   TCPServer &Listen(std::shared_ptr<InetAddress> host_address);
 
   void Start(const bool is_loop = true);

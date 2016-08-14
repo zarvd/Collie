@@ -1,14 +1,12 @@
 #include "../../inc/tcp/TCPClient.h"
 #include <sys/socket.h>
-#include "../../inc/base/InetAddress.h"
-#include "../../inc/base/String.h"
 #include "../../inc/tcp/TCPSocket.h"
 #include "../../inc/tcp/TCPStream.h"
 
 namespace collie {
 namespace tcp {
 
-void TCPClient::Connect(const String &host, const unsigned port,
+void TCPClient::Connect(const std::string &host, const unsigned port,
                         const Request &req, const int local_port) {
   auto serv_addr = std::make_shared<InetAddress>(host, port);
   Connect(serv_addr, req, local_port);

@@ -13,8 +13,9 @@ class LogHandler : public util::NonCopyable {
   LogHandler() noexcept {}
   virtual ~LogHandler() noexcept {}
 
-  virtual void Log(const LogLevel, const String& msg, const String& file,
-                   const String& func, unsigned line) const noexcept;
+  virtual void Log(const LogLevel, const std::string& msg,
+                   const std::string& file, const std::string& func,
+                   unsigned line) const noexcept;
 };
 }
 

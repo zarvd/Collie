@@ -13,7 +13,7 @@ namespace collie {
 // Global logger configuration
 class Logger {
  public:
-  ~Logger() noexcept;
+  ~Logger();
 
   static void Init();
   static void SetLevel(LogLevel level) noexcept;
@@ -27,8 +27,9 @@ class Logger {
   }
   static void ClearLogHandler() noexcept;
   static SizeType NumOfHandler() noexcept;
-  static void Log(const LogLevel level, const String& msg, const String& file,
-                  const String& func, unsigned line) noexcept;
+  static void Log(const LogLevel level, const std::string& msg,
+                  const std::string& file, const std::string& func,
+                  unsigned line) noexcept;
 
  private:
   Logger() noexcept {}

@@ -10,7 +10,7 @@ namespace tcp {
 
 TCPServer::~TCPServer() {}
 
-TCPServer& TCPServer::Listen(const unsigned port, const String& host) {
+TCPServer& TCPServer::Listen(const unsigned port, const std::string& host) {
   return Listen(std::make_shared<InetAddress>(host, port));
 }
 

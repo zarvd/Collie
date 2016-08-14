@@ -42,9 +42,9 @@ inline std::string ToString(LogLevel level, bool with_color = true) {
     return level_str;
 }
 
-void LogHandler::Log(const LogLevel level, const String& msg,
-                     const String& file, const String&, unsigned int line) const
-    noexcept {
+void LogHandler::Log(const LogLevel level, const std::string& msg,
+                     const std::string& file, const std::string&,
+                     unsigned int line) const noexcept {
   ::time_t now;
   ::time(&now);
   char buffer[80];

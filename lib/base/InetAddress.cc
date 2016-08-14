@@ -5,7 +5,7 @@
 
 namespace collie {
 
-InetAddress::InetAddress(const String &ip, const unsigned port,
+InetAddress::InetAddress(const std::string &ip, const unsigned port,
                          const IPFamily family)
     : host(ip), port(port), family(family) {
   if (family == IPFamily::UNKNOWN)
@@ -17,7 +17,7 @@ InetAddress::InetAddress(const String &ip, const unsigned port,
 
     addr->sin_port = ::htons(port);
     addr->sin_family = AF_INET;
-    if (inet_pton(AF_INET, ip.RawData(), &addr->sin_addr) <= 0) {
+    if (inet_pton(AF_INET, ip.c_str(), &addr->sin_addr) <= 0) {
       throw std::runtime_error(::strerror(errno));
     }
   } else {
@@ -26,7 +26,7 @@ InetAddress::InetAddress(const String &ip, const unsigned port,
 
     addr->sin6_port = ::htons(port);
     addr->sin6_family = AF_INET6;
-    if (inet_pton(AF_INET6, ip.RawData(), &addr->sin6_addr) <= 0) {
+    if (inet_pton(AF_INET6, ip.c_str(), &addr->sin6_addr) <= 0) {
       throw std::runtime_error(::strerror(errno));
     }
   }
@@ -102,7 +102,7 @@ const sockaddr_in6 *InetAddress::AddressV6() const noexcept {
   return (const sockaddr_in6 *)(address.get());
 }
 
-String InetAddress::ToString() const noexcept {
-  return host + ":" + String::From(port);
+std::string InetAddress::ToString() const noexcept {
+  return host + ":" + std::to_string(port);
 }
 }

@@ -28,17 +28,18 @@ std::shared_ptr<const InetAddress> AsyncTCPStream::PeerAddress() const
   return socket->PeerAddress();
 }
 
-void AsyncTCPStream::Write(const String& buf, const AsyncCallback& callback) {
+void AsyncTCPStream::Write(const std::string& buf,
+                           const AsyncCallback& callback) {
   if (!event_pool) throw std::runtime_error("Event pool is not available");
 
   write_handler = [buf, callback](auto stream) {
     int ret =
-        ::send(stream->Descriptor(), buf.RawData(), buf.Length(), MSG_DONTWAIT);
+        ::send(stream->Descriptor(), buf.c_str(), buf.length(), MSG_DONTWAIT);
     if (ret == -1) {
       throw std::runtime_error(::strerror(errno));
-    } else if ((SizeType)ret < buf.Length()) {
+    } else if ((SizeType)ret < buf.length()) {
       // Some bytes are not sent, resend the left
-      stream->Write(buf.Slice(ret), callback);
+      stream->Write(buf.substr(ret), callback);
       return;
     }
     stream->event.SetWrite(false);
@@ -85,7 +86,7 @@ void AsyncTCPStream::Read(const AsyncCallback& callback) {
   event_pool->Update(shared_from_this());
 }
 
-void AsyncTCPStream::ReadUntil(const String& str,
+void AsyncTCPStream::ReadUntil(const std::string& str,
                                const AsyncCallback& callback) {
   if (!event_pool) throw std::runtime_error("Event pool is not available");
 
@@ -104,11 +105,11 @@ void AsyncTCPStream::ReadUntil(const String& str,
 
     stream->peek_buffer += buffer;
 
-    auto it = stream->peek_buffer.data.find(str.data);
+    auto it = stream->peek_buffer.find(str);
     if (it != std::string::npos) {
       // Finds the target string, refreshes peek buffer and read buffer
-      stream->read_buffer = stream->peek_buffer.Slice(0, it + str.Length());
-      stream->peek_buffer = stream->peek_buffer.Slice(it + str.Length());
+      stream->read_buffer = stream->peek_buffer.substr(0, it + str.length());
+      stream->peek_buffer = stream->peek_buffer.substr(it + str.length());
       // Disables read event
       stream->event.SetRead(false);
       stream->event_pool->Update(stream);

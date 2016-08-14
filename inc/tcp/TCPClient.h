@@ -3,11 +3,10 @@
 
 #include <functional>
 #include <memory>
+#include "../base/InetAddress.h"
+#include "../base/String.h"
 
 namespace collie {
-class InetAddress;
-class String;
-
 namespace tcp {
 
 class TCPStream;
@@ -18,7 +17,7 @@ class TCPClient {
 
   TCPClient() = delete;
 
-  static void Connect(const String& host, const unsigned port,
+  static void Connect(const std::string& host, const unsigned port,
                       const Request& req, const int local_port = -1);
   static void Connect(std::shared_ptr<InetAddress> serv_addr,
                       const Request& req, const int local_port = -1);

@@ -48,16 +48,16 @@ class AsyncTCPStream final
   }
 
   int Descriptor() const noexcept override;
-  void Write(const String&, const AsyncCallback&);
+  void Write(const std::string&, const AsyncCallback&);
   void Read(const AsyncCallback&);
-  void ReadUntil(const String&, const AsyncCallback&);
+  void ReadUntil(const std::string&, const AsyncCallback&);
   void ReadLine(const AsyncCallback&);
   void Abort();
 
   std::shared_ptr<const InetAddress> LocalAddress() const noexcept;
   std::shared_ptr<const InetAddress> PeerAddress() const noexcept;
 
-  String ReadBuffer() const noexcept { return read_buffer; }
+  std::string ReadBuffer() const noexcept { return read_buffer; }
   void ReadSize(unsigned size) noexcept { read_size = size; }
   unsigned ReadSize() const noexcept { return read_size; }
 
@@ -82,8 +82,8 @@ class AsyncTCPStream final
 
   const std::unique_ptr<TCPSocket> socket;
   unsigned read_size;
-  String read_buffer;
-  String peek_buffer;
+  std::string read_buffer;
+  std::string peek_buffer;
 };
 }
 }

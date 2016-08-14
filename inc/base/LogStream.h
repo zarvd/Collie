@@ -12,16 +12,21 @@ namespace collie {
 // Uses stream style input
 class LogStream : public util::NonCopyable {
  public:
-  LogStream(LogLevel level, const String& file, const String& func,
+  LogStream(LogLevel level, const std::string& file, const std::string& func,
             unsigned line) noexcept;
   ~LogStream() noexcept;
 
-  LogStream& operator<<(const String& msg) noexcept {
+  LogStream& operator<<(const std::string& msg) noexcept {
     content += msg;
     return *this;
   }
 
   LogStream& operator<<(const char* msg) noexcept {
+    content += msg;
+    return *this;
+  }
+
+  LogStream& operator<<(char msg[]) noexcept {
     content += msg;
     return *this;
   }
@@ -33,16 +38,16 @@ class LogStream : public util::NonCopyable {
 
   template <typename T>
   LogStream& operator<<(const T& msg) noexcept {
-    content += String::From(msg);
+    content += std::to_string(msg);
     return *this;
   }
 
  private:
   const LogLevel level;
-  const String file;
-  const String func;
+  const std::string file;
+  const std::string func;
   const unsigned line;
-  String content;
+  std::string content;
 };
 }
 

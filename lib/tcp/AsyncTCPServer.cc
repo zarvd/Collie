@@ -10,7 +10,7 @@ AsyncTCPServer::AsyncTCPServer(std::shared_ptr<EventThreadPool> pool) noexcept
 AsyncTCPServer::~AsyncTCPServer() {}
 
 AsyncTCPServer& AsyncTCPServer::Listen(const unsigned port,
-                                       const String& host) {
+                                       const std::string& host) {
   return Listen(std::make_shared<InetAddress>(host, port));
 }
 

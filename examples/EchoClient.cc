@@ -14,7 +14,7 @@ int main(void) {
     stream.Write("Hello,world");
     stream.Write("Hello,world\n\nHello,world");
     auto msg = stream.Read();
-    LOG(INFO) << "Read: " << msg.Length() << msg << " From "
+    LOG(INFO) << "Read: " << msg.length() << msg << " From "
               << stream.PeerAddress()->ToString();
   });
 

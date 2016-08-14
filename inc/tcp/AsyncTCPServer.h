@@ -19,7 +19,7 @@ class AsyncTCPServer : public util::NonCopyable {
   AsyncTCPServer(std::shared_ptr<EventThreadPool>) noexcept;
   ~AsyncTCPServer();
 
-  AsyncTCPServer& Listen(const unsigned port, const String& = "0.0.0.0");
+  AsyncTCPServer& Listen(const unsigned port, const std::string& = "0.0.0.0");
   AsyncTCPServer& Listen(std::shared_ptr<InetAddress> host_address);
 
   AsyncTCPServer& SetRequestHandler(const RequestHandler& handler) noexcept {

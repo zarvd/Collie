@@ -4,7 +4,7 @@ namespace collie {
 
 Logger Logger::logger;
 
-Logger::~Logger() noexcept { ClearLogHandler(); }
+Logger::~Logger() { ClearLogHandler(); }
 
 void Logger::Init() { logger.AddLogHandler<LogHandler>(); }
 
@@ -14,8 +14,9 @@ LogLevel Logger::Level() noexcept { return logger.log_level; }
 
 SizeType Logger::NumOfHandler() noexcept { return logger.handlers.size(); }
 
-void Logger::Log(const LogLevel level, const String& msg, const String& file,
-                 const String& func, unsigned line) noexcept {
+void Logger::Log(const LogLevel level, const std::string& msg,
+                 const std::string& file, const std::string& func,
+                 unsigned line) noexcept {
   std::lock_guard<std::mutex> lock(logger.handlers_mutex);
   for (auto& handler : logger.handlers) {
     handler->Log(level, msg, file, func, line);

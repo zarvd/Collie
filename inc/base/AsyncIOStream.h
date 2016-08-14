@@ -3,11 +3,10 @@
 
 #include <memory>
 #include "../util/NonCopyable.h"
+#include "EventPool.h"
 #include "EventType.h"
 
 namespace collie {
-
-class EventPool;
 
 class AsyncIOStream : public util::NonCopyable {
  public:

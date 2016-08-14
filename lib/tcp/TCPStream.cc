@@ -14,12 +14,12 @@ TCPStream::TCPStream(std::unique_ptr<TCPSocket> socket) noexcept
 
 TCPStream::~TCPStream() {}
 
-void TCPStream::Write(const String& buf) const {
-  int ret = ::send(socket->Descriptor(), buf.RawData(), buf.Length(), 0);
+void TCPStream::Write(const std::string& buf) const {
+  int ret = ::send(socket->Descriptor(), buf.c_str(), buf.length(), 0);
   if (ret == -1) throw std::runtime_error(::strerror(errno));
 }
 
-String TCPStream::Read(const SizeType size) const {
+std::string TCPStream::Read(const SizeType size) const {
   auto read_size = size == 0 ? this->read_size : size;
 
   char buffer[read_size];
@@ -28,8 +28,8 @@ String TCPStream::Read(const SizeType size) const {
   return buffer;
 }
 
-String TCPStream::ReadUntil(const String& str) const {
-  static String peek_buffer;
+std::string TCPStream::ReadUntil(const std::string& str) const {
+  static std::string peek_buffer;
   while (true) {
     char buf[read_size];
     if (::recv(socket->Descriptor(), buf, read_size, 0) == -1) {
@@ -37,16 +37,16 @@ String TCPStream::ReadUntil(const String& str) const {
     }
     peek_buffer += buf;
 
-    auto it = peek_buffer.data.find(str.data);
+    auto it = peek_buffer.find(str);
 
     if (it != std::string::npos) {
-      const String buffer = peek_buffer.Slice(0, it + str.Length());
-      peek_buffer = peek_buffer.Slice(it + str.Length());
+      const std::string buffer = peek_buffer.substr(0, it + str.length());
+      peek_buffer = peek_buffer.substr(it + str.length());
       return buffer;
     }
   }
 }
 
-String TCPStream::ReadLine() const { return ReadUntil("\n"); }
+std::string TCPStream::ReadLine() const { return ReadUntil("\n"); }
 }
 }
