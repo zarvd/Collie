@@ -48,6 +48,9 @@ void AsyncTCPStream::Write(const std::string& buf,
       stream->Abort();
     } else {
       callback(stream);
+      if (!stream->event.IsRead() && !stream->event.IsWrite()) {
+        stream->Abort();
+      }
     }
   };
 
@@ -80,6 +83,9 @@ void AsyncTCPStream::Read(const AsyncCallback& callback) {
       stream->Abort();
     } else {
       callback(stream);
+      if (!stream->event.IsRead() && !stream->event.IsWrite()) {
+        stream->Abort();
+      }
     }
   };
   event.SetRead(true);
@@ -117,6 +123,9 @@ void AsyncTCPStream::ReadUntil(const std::string& str,
         stream->Abort();
       } else {
         callback(stream);
+        if (!stream->event.IsRead() && !stream->event.IsWrite()) {
+          stream->Abort();
+        }
       }
     }
 

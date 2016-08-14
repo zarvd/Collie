@@ -48,7 +48,7 @@ inline void trim(std::string& str,
 }
 
 inline std::vector<std::string> split(const std::string& str,
-                                      const std::string& delimeter) noexcept {}
+                                      const std::string& delimeter) noexcept;
 
 void replace(std::string& str, const std::string& old_value,
              const std::string& new_value) noexcept;

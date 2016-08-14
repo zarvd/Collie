@@ -7,7 +7,7 @@ namespace collie {
 namespace tcp {
 
 TCPSocket::~TCPSocket() {
-  if (::shutdown(fd, SHUT_RDWR) == -1 && ::close(fd) == -1) {
+  if (::close(fd) == -1) {
     LOG(WARN) << "TCPSocket cannot close for descriptor " << fd;
   }
 }
