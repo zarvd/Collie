@@ -36,11 +36,10 @@ inline std::string to_string(Method method) noexcept {
 }
 
 inline Method to_http_method(const std::string& str) noexcept {
-  std::string method;
-  std::transform(str.begin(), str.end(), method.begin(),
+  std::string method(str);
+  std::transform(method.begin(), method.end(), method.begin(),
                  [](auto& c) { return std::toupper(c); });
   // Gets upper string
-
   for (auto& m : Methods)
     if (m.second == method) return m.first;
 

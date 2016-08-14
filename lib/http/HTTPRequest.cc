@@ -1,49 +1,47 @@
 #include "../../inc/http/HTTPRequest.h"
+#include <cassert>
+#include <iostream>
 #include <sstream>
 
 namespace collie {
 namespace http {
 
 HTTPRequest::HTTPRequest(const std::string& message) {
-  std::istringstream iss(message);
+  const auto line = string::split(message, "\r\n");
 
-  std::string start_line;
-  std::getline(iss, start_line);
+  const auto start_line = string::split(line[0], " ");
 
-  std::string method_str;
-  std::string query_str;
-  std::string protocol_str;
+  assert(start_line.size() == 3);
 
-  using std::getline;
-
-  // Seperates method, url and protocol
-  if (!getline(getline(getline(iss, method_str, ' '), query_str, ' '),
-               protocol_str))
-    throw std::runtime_error("Unknown http request");
-  // Parses method
-  method = to_http_method(method_str);
+  method = to_http_method(start_line[0]);
 
   // Parses url
   {
-    std::istringstream iqs(query_str);
-    getline(iqs, url, '?');
+    const auto it = start_line[1].find('?');
+    if (it != std::string::npos) {
+      url = start_line[1].substr(0, it);
+    }
+    const auto params = string::split(start_line[1].substr(it + 1), "&");
 
-    // Parses query param
-    std::string param;
-    while (getline(iqs, param, '&')) {
-      std::istringstream ips(param);
-      std::string key, value;
-      if (getline(getline(ips, key, '='), value))
+    for (auto& param : params) {
+      const auto it = param.find('=');
+
+      if (it != std::string::npos && it + 1 < param.length()) {
+        // If value is null then ignore it
+        const std::string key(param.substr(0, it));
+        const std::string value(param.substr(it + 1));
         query_params.insert({key, value});
+      }
     }
   }
 
-  protocol = protocol_str;
+  protocol = start_line[2];
 
-  // Parses headers
-  {}
+  // // Parses headers
 
   // Parses body
 }
+
+HTTPRequest::~HTTPRequest() {}
 }
 }

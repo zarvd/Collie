@@ -18,8 +18,28 @@ class HTTPRequest : public util::NonCopyable {
 
   Method Method() const noexcept { return method; }
   std::string Url() const noexcept { return url; }
-  bool HasQuery(const std::string& field) const noexcept;
-  std::string Query(const std::string& field) const noexcept;
+  bool HasQuery(const std::string& field) const noexcept {
+    return query_params.find(field) != query_params.end();
+  }
+  std::string Query(const std::string& field) const noexcept {
+    const auto it = query_params.find(field);
+    if (it != query_params.end()) {
+      return it->second;
+    } else {
+      return "";
+    }
+  }
+  std::vector<std::string> QueryArray(const std::string& field) const noexcept {
+    // FIXME could be duplicated
+    const auto pair = query_params.equal_range(field);
+    std::vector<std::string> queries;
+    for (auto it = pair.first; it != pair.second; ++it) {
+      queries.emplace_back(it->second);
+    }
+
+    return queries;
+  }
+
   bool HasForm(const std::string& field) const noexcept;
   std::string Form(const std::string& field) const noexcept;
 

@@ -20,6 +20,10 @@ set(TCP_SRC
   tcp/AsyncTCPServer.cc
   )
 
+set(HTTP_SRC
+  http/HTTPRequest.cc
+  )
+
 set(UTIL_SRC
   util/NonCopyable.cc
   )
@@ -27,6 +31,7 @@ set(UTIL_SRC
 set(LIB_SRC
   ${BASE_SRC}
   ${TCP_SRC}
+  ${HTTP_SRC}
   ${UTIL_SRC})
 add_library(collie STATIC ${LIB_SRC})
 #install(TARGETS collie DESTINATION /usr/local/lib)
