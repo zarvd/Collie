@@ -48,7 +48,18 @@ inline void trim(std::string& str,
 }
 
 inline std::vector<std::string> split(const std::string& str,
-                                      const std::string& delimeter) noexcept;
+                                      const std::string& delimeter) noexcept {
+  std::string::size_type pos = 0;
+  std::vector<std::string> res;
+
+  std::string::size_type it;
+  while ((it = str.find(delimeter, pos)) != std::string::npos) {
+    if (it - pos > 0) res.emplace_back(str.substr(pos, it - pos));
+    pos = it + delimeter.length();
+  }
+  if (pos < str.length() - 1) res.emplace_back(str.substr(pos));
+  return res;
+}
 
 void replace(std::string& str, const std::string& old_value,
              const std::string& new_value) noexcept;

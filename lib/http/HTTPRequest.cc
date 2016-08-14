@@ -41,8 +41,7 @@ HTTPRequest::HTTPRequest(const std::string& message) {
   protocol = protocol_str;
 
   // Parses headers
-  {
-  }
+  {}
 
   // Parses body
 }
