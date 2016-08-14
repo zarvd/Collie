@@ -15,8 +15,10 @@ class HTTPHeader final : public Serializable {
   explicit HTTPHeader(
       const std::unordered_map<std::string, std::string>& headers)
       : headers(headers) {}
+  explicit HTTPHeader(std::unordered_map<std::string, std::string>&& headers)
+      : headers(std::move(headers)) {}
   explicit HTTPHeader(const std::string& header_buffer);
-  ~HTTPHeader() override;
+  ~HTTPHeader() override {}
 
   // HTTPHeader(const HTTPHeader&) noexcept;
   // HTTPHeader& operator=(const HTTPHeader&) noexcept;
@@ -39,7 +41,7 @@ class HTTPHeader final : public Serializable {
     }
   }
 
-  std::string ToString() const noexcept override;
+  std::string ToString() const noexcept override { return ""; }
 
  private:
   std::unordered_map<std::string, std::string> headers;

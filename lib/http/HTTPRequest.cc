@@ -37,7 +37,19 @@ HTTPRequest::HTTPRequest(const std::string& message) {
 
   protocol = start_line[2];
 
-  // // Parses headers
+  std::unordered_map<std::string, std::string> headers;
+  auto it = line.begin();
+  // Parses headers
+  while (++it != line.end()) {
+    const auto sep = it->find(':');
+    if (sep == std::string::npos) continue;
+    std::string key = it->substr(0, sep);
+    std::string value = it->substr(sep + 1);
+    string::trim(key);
+    string::trim(value);
+    headers.insert({key, value});
+  }
+  header = std::make_shared<HTTPHeader>(headers);
 
   // Parses body
 }

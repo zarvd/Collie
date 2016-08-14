@@ -20,4 +20,12 @@ TEST(HTTPRequest, parse) {
   const auto queries = req.QueryArray("name");
   EXPECT_EQ(1, queries.size());
   EXPECT_EQ(std::string("currant"), queries[0]);
+
+  auto header = req.Header();
+  EXPECT_EQ(std::string("example.com"), header->Get("Host"));
+  EXPECT_EQ(std::string("en-us,en;q=0.5"), header->Get("Accept-Language"));
+  EXPECT_EQ(std::string("gzip,deflate"), header->Get("Accept-Encoding"));
+  EXPECT_EQ(std::string("ISO-8859-1,utf-8;q=0.7,*;q=0.7"), header->Get("Accept-Charset"));
+  EXPECT_EQ(std::string("application/x-www-form-urlencoded"), header->Get("Content-Type"));
+  EXPECT_EQ(std::string("25"), header->Get("Content-Length"));
 }
