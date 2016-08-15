@@ -9,10 +9,15 @@
 namespace collie {
 namespace http {
 
-class HTTPRequest : public util::NonCopyable {
+class HTTPRequest final : public util::NonCopyable {
  public:
-  explicit HTTPRequest(const std::string&);
-  ~HTTPRequest();
+  HTTPRequest(
+      const Method& method, const std::string& url,
+      const std::shared_ptr<HTTPHeader> header,
+      const std::initializer_list<std::pair<std::string, std::string>>& query,
+      const std::string& protocol = "HTTP/1.1");
+  explicit HTTPRequest(const std::string& http_message);
+  ~HTTPRequest() override;
 
   std::shared_ptr<const HTTPHeader> Header() const noexcept { return header; }
 
@@ -44,11 +49,11 @@ class HTTPRequest : public util::NonCopyable {
   std::string Form(const std::string& field) const noexcept;
 
  private:
-  std::shared_ptr<HTTPHeader> header;
   http::Method method;
   std::string url;
-  std::string protocol;
+  std::shared_ptr<HTTPHeader> header;
   std::unordered_multimap<std::string, std::string> query_params;
+  std::string protocol;
 };
 }
 }

@@ -50,9 +50,18 @@ HTTPRequest::HTTPRequest(const std::string& message) {
     headers.insert({key, value});
   }
   header = std::make_shared<HTTPHeader>(headers);
-
-  // Parses body
 }
+
+HTTPRequest::HTTPRequest(
+    const http::Method& method, const std::string& url,
+    const std::shared_ptr<HTTPHeader> header,
+    const std::initializer_list<std::pair<std::string, std::string>>& query,
+    const std::string& protocol)
+    : method(method),
+      url(url),
+      header(header),
+      query_params(query.begin(), query.end()),
+      protocol(protocol) {}
 
 HTTPRequest::~HTTPRequest() {}
 }

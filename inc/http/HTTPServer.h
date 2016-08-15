@@ -17,19 +17,17 @@ class HTTPServer : public util::NonCopyable {
   using RequestHandler =
       std::function<HTTPResponse*(std::shared_ptr<const HTTPRequest>)>;
 
-  HTTPServer(const unsigned port, const String& host);
+  HTTPServer(const unsigned port, const std::string& host);
   ~HTTPServer();
 
   void Start();
   void Handle(const RequestHandler& handler) noexcept { req_handler = handler; }
 
-  void Parse(const String&);
-
  private:
   RequestHandler req_handler;
   const std::unique_ptr<tcp::TCPServer> tcp_server;
   const unsigned port;
-  const String host;
+  const std::string host;
 };
 }
 }
